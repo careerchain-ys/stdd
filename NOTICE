@@ -1,0 +1,25 @@
+stdd
+Copyright 2026 株式会社CareerChain
+
+This product includes software developed at 株式会社CareerChain
+(https://github.com/careerchain-ys/stdd).
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+----------------------------------------------------------------------
+
+THIRD-PARTY COMPONENTS
+
+The following third-party components are included in this distribution
+and are licensed under their respective licenses.
+
+1. skill-creator
+   Location: .claude/skills/skill-creator/
+   License:  Apache License 2.0
+   Source:   Anthropic (公式 Claude Code skill)
+   Notes:    本リポジトリ発足時のスナップショットに含まれる。MVP リリース時の
+             同梱可否は Phase 2 で再判断する（v2.0 以降にプラグイン化検討）。

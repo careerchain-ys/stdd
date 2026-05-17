@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "MAX_THINKING_TOKENS": "10000",
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "50"
+  },
+  "permissions": {
+    "allow": [
+      "Skill",
+      "Task",
+      "Bash(npm:*)",
+      "Bash(git:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(bash:*)",
+      "Bash(devcontainer:*)",
+      "Bash(docker:*)",
+      "Bash(gh:*)",
+      "Bash(./scripts/create-worktree.sh:*)",
+      "Bash(./scripts/remove-worktree.sh:*)",
+      "Bash(./scripts/:*)",
+      "Bash(git -C:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(wc:*)",
+      "Bash(sort:*)",
+      "Bash(jq:*)",
+      "Bash(echo:*)",
+      "Bash(test:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(sed:*)",
+      "Bash(curl:*)",
+      "Bash(nc:*)",
+      "Bash(lsof:*)",
+      "Bash(pgrep:*)",
+      "Bash(pkill:*)",
+      "Bash(realpath:*)",
+      "Bash(shasum:*)",
+      "Bash(xargs:*)",
+      "Bash(awk:*)",
+      "Bash(PGPASSWORD=postgres psql:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/pre-bash-check.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/pre-push-check.sh",
+            "timeout": 600
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-format.sh",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-typecheck.sh",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/session-end.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
