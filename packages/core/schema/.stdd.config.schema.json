@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/careerchain-ys/stdd/main/packages/core/schema/.stdd.config.schema.json",
+  "title": "STDD project configuration",
+  "description": "Schema for .stdd.config.yml. Declares project structure, commands, docs layout, workflow options, and plugins consumed by stdd skills and agents.",
+  "type": "object",
+  "required": ["project", "apps", "commands", "docs"],
+  "additionalProperties": false,
+  "properties": {
+    "project": {
+      "type": "object",
+      "description": "Top-level metadata about the project.",
+      "required": ["name", "primary_branch"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Short identifier for the project. Kebab-case recommended (e.g. 'my-app')."
+        },
+        "primary_branch": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Integration / PR target branch. Examples: 'main', 'develop', 'trunk'."
+        },
+        "language": {
+          "type": "string",
+          "enum": ["ja", "en"],
+          "default": "ja",
+          "description": "Preferred natural-language for skill / agent output. Currently only 'ja' and 'en' are supported by core skills; additional locales require new translations to be contributed."
+        }
+      }
+    },
+    "apps": {
+      "type": "array",
+      "description": "List of applications inside the repository. At least one app is required.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "path"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]*$",
+            "description": "Short identifier used in docs paths and command substitution. Lowercase, may contain digits, underscore, or hyphen. Examples: 'web', 'admin', 'user_app'."
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Filesystem path (relative to repo root) where this app's source lives. Examples: 'apps/web', 'user_app'."
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535,
+            "description": "Optional dev-server port for this app. Used by E2E config and worktree port allocation."
+          },
+          "framework": {
+            "type": "string",
+            "description": "Optional informational tag (e.g. 'nextjs', 'remix', 'sveltekit'). Plugins may key off this value."
+          }
+        }
+      }
+    },
+    "commands": {
+      "type": "object",
+      "description": "Commands stdd will execute on behalf of the project. Define them so skills do not need to hardcode tooling.",
+      "required": ["typecheck", "test"],
+      "additionalProperties": false,
+      "properties": {
+        "typecheck": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Command that performs static type checking and exits 0 on success. Example: 'npx tsc --noEmit'."
+        },
+        "test": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Default test runner command. Example: 'npm test', 'pnpm test', 'vitest run'."
+        },
+        "lint": {
+          "type": "string",
+          "description": "Lint command. Optional."
+        },
+        "format": {
+          "type": "string",
+          "description": "Code formatter command. Optional."
+        },
+        "db_reset": {
+          "type": "string",
+          "description": "Command to reset the local database to a known seeded state. Optional."
+        },
+        "db_types": {
+          "type": "string",
+          "description": "Command to regenerate database-derived TypeScript / language types. Optional."
+        }
+      }
+    },
+    "docs": {
+      "type": "object",
+      "description": "Documentation layout used by spec / plan skills.",
+      "required": ["layout"],
+      "additionalProperties": false,
+      "properties": {
+        "layout": {
+          "type": "object",
+          "description": "Path templates that map an app + feature to its documentation files. Handlebars variables available: {{app.id}}, {{app.path}}, {{feature_path}}, {{date}}. {{app.*}} resolves against each entry of the top-level `apps[]`. Note: test file layout (e2e / integration / unit paths) is intentionally out of scope for this schema in Phase 1-A; templates currently assume conventional layouts and Phase 1-B may introduce a separate `tests.layout` object.",
+          "required": ["requirements", "tech_design", "plan"],
+          "additionalProperties": false,
+          "properties": {
+            "requirements": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Path template for REQUIREMENTS.md. Example: 'docs/{{app.id}}/{{feature_path}}/REQUIREMENTS.md'."
+            },
+            "tech_design": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Path template for TECH_DESIGN.md. Same variables as 'requirements'."
+            },
+            "plan": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Path template for PLAN documents. Additional variable: {{date}} (yyyy-mm-dd of the session)."
+            }
+          }
+        }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "description": "Optional workflow toggles. Skills consult these to enable / disable worktree- and devcontainer-aware code paths.",
+      "additionalProperties": false,
+      "properties": {
+        "worktree": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false,
+              "description": "Whether the project uses git worktrees for parallel development."
+            },
+            "script": {
+              "type": "string",
+              "description": "Path to the project's worktree creation script. Required when 'enabled' is true."
+            },
+            "port_base": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 65535,
+              "description": "Base port number used to derive per-worktree port offsets."
+            }
+          }
+        },
+        "devcontainer": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false,
+              "description": "Whether the project uses devcontainers."
+            },
+            "override_config": {
+              "type": "string",
+              "description": "Path to a devcontainer override config used by the worktree flow."
+            }
+          }
+        }
+      }
+    },
+    "plugins": {
+      "type": "array",
+      "description": "Plugins loaded in addition to core skills/agents. Each entry may be a short string id or an object with options.",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string",
+            "minLength": 1,
+            "description": "Short plugin id. Resolves to npm package '@stdd/plugin-<id>' by convention."
+          },
+          {
+            "type": "object",
+            "required": ["id"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Plugin id (same resolution rules as the string form)."
+              },
+              "options": {
+                "type": "object",
+                "description": "Plugin-specific options. Validated by the plugin's own schema, not by this schema."
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
