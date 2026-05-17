@@ -1,0 +1,131 @@
+# プラグイン分離方針
+
+本ドキュメントは Phase 0 にて確定した、stdd OSS におけるプラグイン分離の対象と境界を定める。
+
+## 1. 基本方針
+
+stdd OSS の core（`packages/core/` および `packages/claude-code/skills/` 等）に置く skill は、
+**特定の技術スタックや実行環境に依存しない汎用ロジック**に限定する。
+500 行規模の固有ノウハウを `.stdd.config.yml` に設定として持たせると config が破綻するため、
+技術スタック固有・実行環境固有のノウハウは**プラグイン化**して分離する。
+
+プラグインは独立した npm パッケージ（`@stdd/plugin-*`）として配布し、
+利用プロジェクトの `.stdd.config.yml` に明示的に列挙された場合のみロードされる。
+
+```yaml
+# .stdd.config.yml 例
+plugins:
+  - "nextjs-supabase"
+  - "playwright"
+  - "worktree"
+```
+
+## 2. プラグイン化対象 skill（Phase 0 確定）
+
+| skill                | 分離理由                                                                                             | 配置先（予定）                                      |
+| -------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `implementing-ui`    | shadcn/ui・Tailwind の特定カラーコード・admin_app 固有レイアウト等、技術スタックと UI 仕様に強く依存 | `@stdd/plugin-nextjs-supabase`                      |
+| `migrating-supabase` | Supabase 固有のマイグレーション規約・RLS パターンに依存                                              | `@stdd/plugin-nextjs-supabase`                      |
+| `e2e-testing`        | Playwright API・Locator パターン・worker 設計に依存                                                  | `@stdd/plugin-playwright`                           |
+| `run-e2e`            | devcontainer + worktree + Playwright を組み合わせた実行手順に依存                                    | `@stdd/plugin-playwright` + `@stdd/plugin-worktree` |
+| `remove-worktree`    | git worktree + devcontainer を前提とした環境クリーンアップ手順に依存                                 | `@stdd/plugin-worktree`                             |
+
+## 3. プラグインパッケージ構成（予定）
+
+### 3.1 `@stdd/plugin-nextjs-supabase`
+
+Next.js + Supabase スタック向けのプラグイン。
+
+含めるもの:
+
+- `implementing-ui` 相当の UI 実装ガイド（shadcn/ui パターン、Tailwind ブレークポイント等）
+- `migrating-supabase` 相当の DB マイグレーションガイド
+- Next.js Server Actions / Server Components パターン
+- Supabase RLS・GRANT パターン
+
+含めないもの:
+
+- CareerChain 固有の admin 権限モデル（`agent_staff_role` 等）
+- CareerChain 固有のカラーコード（`bg-[#1e3a5f]` 等）→ プラグインのデフォルト値も持たず、利用側プロジェクトのトークン参照に委ねる
+
+### 3.2 `@stdd/plugin-playwright`
+
+Playwright を用いた E2E テスト向けのプラグイン。
+
+含めるもの:
+
+- `e2e-testing` 相当の Playwright ベストプラクティス
+- `run-e2e` 相当のテスト実行手順（環境変数・ポート設定は `.stdd.config.yml` から取得）
+
+含めないもの:
+
+- 特定の worker 数・並列度などの環境固有設定
+- worktree 固有の実行手順 → `@stdd/plugin-worktree` 側に分離
+
+### 3.3 `@stdd/plugin-worktree`
+
+git worktree + devcontainer を用いたマルチ環境並列開発向けのプラグイン。
+
+含めるもの:
+
+- `remove-worktree` 相当のクリーンアップ手順
+- worktree 命名規約・INSTANCE_ID 判定ロジック
+- devcontainer override 設定の生成ロジック
+
+含めないもの:
+
+- 特定プロジェクトのポート割り当て（`.stdd.config.yml` の `workflow.worktree.port_base` 等から取得）
+
+## 4. Core 側に残す skill（MVP 10 個）
+
+以下は技術スタックに依存しない汎用 skill として core に残す:
+
+1. `documenting-specifications`
+2. `documenting-plans`
+3. `auto-implement`
+4. `verify-consistency`
+5. `reverse-engineering-stdd`
+6. `create-pr`
+7. `review-pr-with-agents`
+8. `kaizen`
+9. `search-first`
+10. `software-architecture`
+
+これらの skill 内に含まれる CareerChain 固有値（`user_app` / `admin_app` / `develop` 等）は、
+Phase 1 で Handlebars 変数（`{{apps[].path}}` / `{{project.primary_branch}}` 等）に置換する。
+
+## 5. v2.0 以降に延期する skill
+
+以下は MVP に含めず、v2.0 以降のリリースで段階的に追加する:
+
+- `skill-creator`（Anthropic 公式の skill であり、別途同梱方針を要検討）
+- `security-scan`（プロジェクト依存パッケージ・Supabase RLS 等のスキャンを含むため、プラグイン化が必要）
+- `penetration-tester`（ペネトレーションテストエージェント、汎用化検討）
+
+これらは v0.1.0 リリース時点では同梱しない（`.claude/skills/` 配下から物理的に除外する）か、
+プラグイン化の準備が整うまで非公開ブランチに退避する方針とする。
+
+## 6. プラグインインタフェース（暫定）
+
+プラグインの具体的なインタフェース仕様は Phase 1 で確定する。
+ここでは Phase 0 時点での想定のみを記載する:
+
+```yaml
+# .stdd.config.yml
+plugins:
+  - "nextjs-supabase" # 文字列指定: 規約に従って `@stdd/plugin-*` を解決
+  - id: "playwright"
+    options: # プラグイン固有の設定を渡せる
+      base_url: "http://localhost:{{apps[0].port}}"
+```
+
+各プラグインは以下を提供する:
+
+- `skills/` — プラグインが追加する skill 群（Handlebars テンプレート）
+- `agents/` — プラグインが追加する agent 群（任意）
+- `templates/` — REQUIREMENTS / TECH_DESIGN テンプレートの追加セクション（任意）
+- `schema.json` — プラグイン固有の `options` の JSON Schema
+
+## 7. 改訂履歴
+
+- 2026-05-17 初版（Phase 0: スナップショット & 監査 にて作成）
