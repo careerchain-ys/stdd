@@ -13,7 +13,6 @@ STDD (Spec and Test Driven Development) の **方法論ドキュメント**, **S
 packages/core/
 ├── docs/
 │   ├── stdd-methodology.md       # STDD とは / なぜ TDD でなく STDD か / 開発フロー
-│   ├── stdd-vs-tdd-vs-bdd.md     # 隣接手法との比較と使い分け
 │   └── workflow-diagram.md       # 各フローを Mermaid で図示
 ├── templates/
 │   ├── REQUIREMENTS.md           # ビジネス要件テンプレ (コピーして使用)
@@ -29,10 +28,9 @@ packages/core/
 ## はじめての方は
 
 1. `docs/stdd-methodology.md` を読んで STDD の全体像を掴む
-2. `docs/stdd-vs-tdd-vs-bdd.md` で「自プロジェクトに STDD が合うか」を判定する
-3. `docs/workflow-diagram.md` でフローを視覚的に把握する
-4. 自プロジェクトに `.stdd.config.yml` を作成し、`schema/.stdd.config.schema.json` で IDE 補完 / 検証を有効化する
-5. `templates/` を実機能のディレクトリにコピーして書き始める
+2. `docs/workflow-diagram.md` でフローを視覚的に把握する
+3. 自プロジェクトに `.stdd.config.yml` を作成し、`schema/.stdd.config.schema.json` で IDE 補完 / 検証を有効化する
+4. `templates/` を実機能のディレクトリにコピーして書き始める
 
 ---
 

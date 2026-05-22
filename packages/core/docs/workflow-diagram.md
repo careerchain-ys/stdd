@@ -19,7 +19,7 @@ flowchart TD
     RedCheck{Red 確認<br/>テストが失敗するか}
     Green[実装 — テストを通す最小限のコード]
     GreenCheck{Green 確認<br/>テスト全件パス}
-    Refactor[リファクタ<br/>(必要に応じて)]
+    Refactor["リファクタ<br/>必要に応じて"]
     PR[PR 作成]
     CodeReview{コードレビュー}
     Merge([マージ])
@@ -118,10 +118,10 @@ gantt
     TECH_DESIGN.md           :done, tech1, after req1, 2d
 
     section PLAN セッション
-    PLAN #1 (P0 メインフロー) :active, p1, 2026-05-05, 3d
-    PLAN #2 (P0 エラーフロー) :p2, after p1, 2d
-    PLAN #3 (P1 エッジケース) :p3, after p2, 2d
-    PLAN #4 (P2 拡張)         :p4, after p3, 2d
+    PLAN 1 - P0 メインフロー  :active, p1, 2026-05-05, 3d
+    PLAN 2 - P0 エラーフロー  :p2, after p1, 2d
+    PLAN 3 - P1 エッジケース  :p3, after p2, 2d
+    PLAN 4 - P2 拡張          :p4, after p3, 2d
 ```
 
 ポイント:
@@ -159,5 +159,4 @@ flowchart LR
 ## 6. 関連ドキュメント
 
 - `stdd-methodology.md` — STDD の詳細ガイド
-- `stdd-vs-tdd-vs-bdd.md` — TDD / BDD との比較
 - `../templates/` — 各ドキュメントテンプレ

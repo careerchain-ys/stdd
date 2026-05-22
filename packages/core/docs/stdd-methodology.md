@@ -34,8 +34,6 @@ STDD は TDD の前に **Spec フェーズ** を追加することで、これ�
 | 3        | テストを通す実装を書く (Green)    | 同じ (Green)                                 |
 | 4        | リファクタ                        | 同じ                                         |
 
-`stdd-vs-tdd-vs-bdd.md` も併せて参照。
-
 ---
 
 ## 3. Spec ドキュメントの構成
@@ -201,7 +199,6 @@ Red を確認する目的:
 
 ## 9. 関連ドキュメント
 
-- `stdd-vs-tdd-vs-bdd.md` — TDD / BDD との比較と使い分け
 - `workflow-diagram.md` — 各フローを Mermaid で図示
 - `../templates/REQUIREMENTS.md` — ビジネス要件テンプレ
 - `../templates/TECH_DESIGN.md` — 技術設計テンプレ
