@@ -79,29 +79,47 @@ flowchart TD
 
 ---
 
-## 3. Spec / Test / Implementation の三角関係
+## 3. Spec → Test → Implementation の一方向フロー
+
+STDD は **常に Spec を起点とした一方向のウォーターフォール** で進む。
+矢印は決して逆流しない。
 
 ```mermaid
 flowchart LR
-    subgraph SSoT[Single Source of Truth]
+    subgraph SSoT["Single Source of Truth (Spec)"]
         Req[REQUIREMENTS.md<br/>What & Why]
         Tech[TECH_DESIGN.md<br/>How + Test Strategy]
+        Req --> Tech
     end
 
-    Req -- Journey を抽出 --> Test
-    Tech -- Test Strategy で割当 --> Test
-    Test[テスト<br/>E2E / Integration / Unit]
-    Test -- 通すために --> Impl[実装]
-    Impl -- 仕様を満たす証明 --> Test
-    Test -- 仕様乖離を検出 --> Req
-    Test -- 仕様乖離を検出 --> Tech
+    Tech --> Test[テスト<br/>E2E / Integration / Unit]
+    Test --> Impl[実装]
+```
+
+### 変更が発生したときも起点は常に Spec
+
+変更の **トリガー** (バグ報告、要件追加、設計見直しなど) は任意の場所で発生してよいが、
+**変更の適用** は必ず Spec から開始し、下流に伝播させる。
+
+```mermaid
+flowchart TD
+    Trigger[変更トリガー<br/>バグ / 要件追加 / 設計見直し / レビュー指摘]
+    Req[1. REQUIREMENTS.md を更新]
+    Tech[2. TECH_DESIGN.md を更新]
+    Test[3. テストを更新]
+    Impl[4. 実装を更新]
+
+    Trigger -. 起点はどこでも .-> Req
+    Req --> Tech
+    Tech --> Test
+    Test --> Impl
 ```
 
 ポイント:
 
-- Spec が SSoT。実装やテストとの乖離が出たら Spec を直す方向で同期する (Spec を後追いしない)
-- Test は Spec と Implementation の双方向の "鏡" として機能する
-- Implementation は Test を通すための手段にすぎない
+- Spec が SSoT。実装やテストで発覚した不具合・乖離も、まず Spec を更新し、その後 Test → Impl の順に直す (Spec を後追いさせない)
+- 実装側で先に「直したくなる」気持ちが出ても、Spec を飛ばして実装だけ修正すると Spec と実装が乖離し、SSoT 性が壊れる
+- これにより Spec が常に最新仕様を保持し、AI エージェントやステークホルダーが Spec だけ読めば最新仕様を把握できる状態を維持する
 
 ---
 
