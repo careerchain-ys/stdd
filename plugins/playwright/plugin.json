@@ -1,0 +1,8 @@
+{
+  "id": "playwright",
+  "name": "Playwright E2E テスト向けプラグイン",
+  "version": "0.1.0",
+  "skills": ["e2e-testing", "run-e2e"],
+  "requires": ["worktree"],
+  "description": "Playwright を用いた E2E テストの作成・実行ガイドを提供する。worktree と組み合わせた並列実行のフロー定義を含む。`run-e2e` の利用には `worktree` プラグインも有効化する必要がある。"
+}

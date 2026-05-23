@@ -78,6 +78,8 @@ docs:
 (B) は本パッケージを直接 vendoring せず GitHub 上から都度フェッチする方式。
 本番運用ではバージョン固定のため、`main` をリリースタグ (例: `v0.1.0`) に置き換えることを推奨する。
 
+> **注記**: 上記 URL に含まれる組織名 (`careerchain-ys`) は **公開リポジトリのホスト組織名** にすぎず、stdd の利用に当該組織固有の概念・依存はない。`$id` の URL は JSON Schema の identifier として下流プロジェクトの `yaml-language-server` 参照から解決されるため、互換性維持のためにそのまま維持している。将来 GitHub org / repo のリネームが行われた場合は別 Phase で URL を更新する。
+
 ---
 
 ## JSON Schema のローカル検証

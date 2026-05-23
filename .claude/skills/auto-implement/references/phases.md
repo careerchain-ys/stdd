@@ -150,7 +150,7 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
 
 チェック項目:
 
-- CLAUDE.mdのコーディング規約準拠（snake_case禁止、!演算子禁止、asキャスト禁止等）
+- `CLAUDE.md` のコーディング規約準拠（存在する場合のみ。snake_case禁止、!演算子禁止、asキャスト禁止等）
 - セキュリティ（OWASP Top 10）
 - パフォーマンス
 - レスポンシブ対応
@@ -158,7 +158,7 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
 
 ### 判定と差し戻しループ
 
-Code Reviewer の **Hard Threshold**（Critical 0件 / High 0件 / Medium ≤2件 / OWASP Critical/High 0件 / CLAUDE.md 絶対ルール違反 0件 / coding-conventions.md 全項目準拠）を1項目でも下回った場合は必ず NEEDS CHANGES 以下となる。
+Code Reviewer の **Hard Threshold**（Critical 0件 / High 0件 / Medium ≤2件 / OWASP Critical/High 0件 / `CLAUDE.md` 絶対ルール違反 0件（存在する場合のみ評価） / `.claude/docs/coding-conventions.md` 全項目準拠（存在する場合のみ評価））を1項目でも下回った場合は必ず NEEDS CHANGES 以下となる。
 
 - **✅ PASS**: 次の Phase に進む。
 - **⚠️ NEEDS CHANGES**: Code Reviewer 出力末尾の「Generator への差し戻し指示」をそのまま implementer に渡して修正させ、再度 Code Reviewer に依頼。**最大3回**ループ。

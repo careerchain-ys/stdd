@@ -5,6 +5,8 @@ description: |-
 allowed-tools: Bash, Read
 ---
 
+> **前提**: 本スキルは git worktree + devcontainer を用いた並列実行フローを前提とする。`.stdd.config.yml` で `worktree` プラグインを併せて有効化すること。
+
 # Worktree上でE2Eテストを実行するスキル
 
 worktree環境のdevcontainer内でE2Eテストをセットアップ・実行する。
@@ -14,7 +16,7 @@ worktree環境のdevcontainer内でE2Eテストをセットアップ・実行す
 
 ```bash
 for i in 1 2 3 4; do
-  wt_dir="/Users/yoichirohirano/Documents/Code/CareerChain/careerchain-worktree-${i}"
+  wt_dir="{{worktree.base_path}}/worktree-${i}"
   container=$(docker ps --filter "label=devcontainer.local_folder=${wt_dir}" --format "{{.Names}}" 2>/dev/null)
   if [ -n "$container" ]; then
     echo "FOUND:${i}:${container}"
@@ -35,7 +37,7 @@ done
 
 ```bash
 for i in 1 2 3 4; do
-  wt_dir="/Users/yoichirohirano/Documents/Code/CareerChain/careerchain-worktree-${i}"
+  wt_dir="{{worktree.base_path}}/worktree-${i}"
   if [ ! -d "$wt_dir" ]; then
     echo "AVAILABLE:${i}"
     break
@@ -54,7 +56,7 @@ done
 ### devcontainer起動
 
 ```bash
-devcontainer up --workspace-folder /Users/yoichirohirano/Documents/Code/CareerChain/careerchain-worktree-<INSTANCE_ID> --override-config /Users/yoichirohirano/Documents/Code/CareerChain/careerchain-worktree-<INSTANCE_ID>/.devcontainer/devcontainer.override.json
+devcontainer up --workspace-folder {{worktree.base_path}}/worktree-<INSTANCE_ID> --override-config {{worktree.base_path}}/worktree-<INSTANCE_ID>/.devcontainer/devcontainer.override.json
 ```
 
 起動完了を待ってからステップ2へ進む。
@@ -64,7 +66,7 @@ devcontainer up --workspace-folder /Users/yoichirohirano/Documents/Code/CareerCh
 特定したINSTANCE_IDから以下を算出する:
 
 ```
-WORKTREE_DIR = /Users/yoichirohirano/Documents/Code/CareerChain/careerchain-worktree-<INSTANCE_ID>
+WORKTREE_DIR = {{worktree.base_path}}/worktree-<INSTANCE_ID>
 OVERRIDE_CONFIG = ${WORKTREE_DIR}/.devcontainer/devcontainer.override.json
 
 # ポート計算（INSTANCE_IDに応じてオフセット）

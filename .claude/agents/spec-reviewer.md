@@ -149,14 +149,14 @@ model: opus
 | -------------------------- | -------------------------------------------- | ------------------------------------------------------ |
 | documenting-specifications | `.claude/skills/documenting-specifications/` | **常に参照**（Specの品質基準・テンプレート準拠の確認） |
 | software-architecture      | `.claude/skills/software-architecture/`      | TECH_DESIGN.mdのアーキテクチャ設計レビュー時           |
-| e2e-testing                | `.claude/skills/e2e-testing/`                | テスト戦略の妥当性評価時                               |
+| e2e-testing                | `plugins/playwright/skills/e2e-testing/`     | テスト戦略の妥当性評価時                               |
 
 ## 事前確認
 
 レビュー前に必ず以下を読むこと:
 
-- `CLAUDE.md` のプロジェクト規約
-- `.claude/docs/coding-conventions.md` のコーディング規約
+- `CLAUDE.md` のプロジェクト規約（存在する場合のみ）
+- `.claude/docs/coding-conventions.md` のコーディング規約（存在する場合のみ）
 - 対象issueの内容
 - 関連する既存のSpecドキュメント
 

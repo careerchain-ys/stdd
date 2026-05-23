@@ -7,11 +7,11 @@ allowed-tools: Read, Edit, Grep, Glob
 
 # ソフトウェアアーキテクチャスキル
 
-Clean ArchitectureとDDD（ドメイン駆動設計）の原則に基づく、CareerChainプロジェクトの設計ガイドライン。
+Clean ArchitectureとDDD（ドメイン駆動設計）の原則に基づく、対象プロジェクトの設計ガイドライン。
 
 ## Domain層の実装パターン
 
-CareerChainのデータフローは以下の4層構造に従う:
+対象プロジェクトのデータフローは以下の4層構造に従う:
 
 ```
 DB型（database.types.ts） → Entity型（models/） → Service（service/） → Server Actions（app/*/actions.ts）
@@ -227,7 +227,7 @@ export async function approveCertification(id: string) {
 | `as`型キャスト               | 型注釈、`satisfies`、明示的マッピング関数    |
 | `!`非nullアサーション        | `assert()`で明示チェック                     |
 
-> コーディング規約の詳細は `.claude/docs/coding-conventions.md` を参照
+> コーディング規約の詳細は `.claude/docs/coding-conventions.md`（存在する場合）を参照
 
 ## 設計判断のガイドライン
 

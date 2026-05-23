@@ -7,7 +7,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 
 # Supabase Migration Skill
 
-CareerChainプロジェクトにおけるSupabaseマイグレーションの作成・実行・修正ガイド。
+対象プロジェクトにおけるSupabaseマイグレーションの作成・実行・修正ガイド。
 
 ## Quick Start
 

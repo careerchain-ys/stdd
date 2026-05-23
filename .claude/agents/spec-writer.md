@@ -11,7 +11,7 @@ model: opus
 
 ## プロジェクトコンテキスト
 
-CareerChain（キャリアチェーン）プラットフォーム:
+対象プロジェクト:
 
 - Next.js 14 with App Router
 - TypeScript + Tailwind CSS + shadcn/ui
@@ -33,9 +33,9 @@ CareerChain（キャリアチェーン）プラットフォーム:
 
 - 既存の `docs/` 配下のSpecドキュメント（類似機能の参考）
 - 関連する既存コード（domain層、コンポーネント）
-- `supabase/generated/database.types.ts`（DBスキーマ）
-- `CLAUDE.md` のプロジェクト規約
-- `.claude/docs/coding-conventions.md` のコーディング規約
+- `supabase/generated/database.types.ts`（DBスキーマ。Supabase 利用プロジェクトの場合）
+- `CLAUDE.md` のプロジェクト規約（存在する場合のみ）
+- `.claude/docs/coding-conventions.md` のコーディング規約（存在する場合のみ）
 
 ### 1.5. 既存Specの確認（新規作成 or 追記の判断）
 
@@ -139,10 +139,10 @@ docs/<app>/<path>/SCREEN_ITEMS_DEFINITION.md（オプション）
 | スキル                     | 参照パス                                     | 参照タイミング                                                         |
 | -------------------------- | -------------------------------------------- | ---------------------------------------------------------------------- |
 | documenting-specifications | `.claude/skills/documenting-specifications/` | **常に参照**（テンプレート・ガイドライン・チェックリスト・STDD違反例） |
-| implementing-ui            | `.claude/skills/implementing-ui/`            | UI機能のSpec作成時（レスポンシブ要件、コンポーネントパターン）         |
-| migrating-supabase         | `.claude/skills/migrating-supabase/`         | DB変更を伴うSpec作成時（データモデル設計）                             |
+| implementing-ui            | `plugins/nextjs-supabase/skills/implementing-ui/`            | UI機能のSpec作成時（レスポンシブ要件、コンポーネントパターン）         |
+| migrating-supabase         | `plugins/nextjs-supabase/skills/migrating-supabase/`         | DB変更を伴うSpec作成時（データモデル設計）                             |
 | software-architecture      | `.claude/skills/software-architecture/`      | アーキテクチャ設計時（Domain層・責務分離）                             |
-| e2e-testing                | `.claude/skills/e2e-testing/`                | テスト戦略策定時（E2Eテストケース設計）                                |
+| e2e-testing                | `plugins/playwright/skills/e2e-testing/`                | テスト戦略策定時（E2Eテストケース設計）                                |
 
 ## 絶対遵守: SSOT原則（最優先）
 

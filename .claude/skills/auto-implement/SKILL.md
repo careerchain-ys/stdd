@@ -70,7 +70,7 @@ Worktree作成スクリプトを実行:
 devcontainerを起動:
 
 ```bash
-devcontainer up --workspace-folder ../careerchain-worktree-<instance-id> --override-config ../careerchain-worktree-<instance-id>/.devcontainer/devcontainer.override.json
+devcontainer up --workspace-folder ../worktree-<instance-id> --override-config ../worktree-<instance-id>/.devcontainer/devcontainer.override.json
 ```
 
 以降の作業はすべてworktree内のdevcontainerで実行する。

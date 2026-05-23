@@ -199,13 +199,13 @@ expect(result.error.issues[0].message).toBe('必須項目です')
 | スキル                     | 参照パス                                     | 参照タイミング                                              |
 | -------------------------- | -------------------------------------------- | ----------------------------------------------------------- |
 | documenting-specifications | `.claude/skills/documenting-specifications/` | TECH_DESIGN.mdテスト戦略の読み取り・Spec準拠判定時          |
-| e2e-testing                | `.claude/skills/e2e-testing/`                | E2Eテストの品質評価・Locator選択・Web First Assertion判定時 |
+| e2e-testing                | `plugins/playwright/skills/e2e-testing/`     | E2Eテストの品質評価・Locator選択・Web First Assertion判定時 |
 
 ## 必須の事前読み込み
 
-作業開始前に以下のファイルを**必ずRead**すること:
+作業開始前に、対象機能の Spec ドキュメントは必ず Read すること。加えて、プロジェクトルートに `CLAUDE.md` が**存在する場合は必ず Read** すること（存在しない場合はスキップして次に進む）:
 
-1. `CLAUDE.md` - プロジェクト全体規約
+1. `CLAUDE.md`（プロジェクト固有ルール。存在する場合のみ）
 2. 対象機能の `REQUIREMENTS.md` - 受入基準・ジャーニー優先度の把握
 3. 対象機能の `TECH_DESIGN.md` - テスト戦略の把握（最重要）
 4. 対象機能の `SCREEN_ITEMS_DEFINITION.md`（存在する場合）- バリデーション仕様

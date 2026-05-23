@@ -7,7 +7,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 
 # E2Eテスト作成・実行スキル
 
-CareerChainプロジェクトにおけるPlaywright E2Eテストの作成・実行ガイド。
+対象プロジェクトにおけるPlaywright E2Eテストの作成・実行ガイド。
 
 ## Quick Start
 
@@ -135,7 +135,7 @@ test('ユーザー情報を更新できる', async ({ page, testUser }) => {
 
 ## 並列実行時のテスト間干渉対策（必須）
 
-⚠️ **CareerChainのE2Eは `playwright.config.ts` で `fullyParallel: true` + 複数workerで動作する**。具体的には:
+⚠️ **対象プロジェクトのE2Eは `playwright.config.ts` で `fullyParallel: true` + 複数workerで動作する**。具体的には:
 
 - 同じspecファイル内のテストはデフォルトで並列実行される
 - specファイル間も並列実行される
@@ -336,7 +336,7 @@ devcontainer内のworktree環境でE2Eテストを実行する手順。
 ```bash
 # 変数定義（IDはworktreeのインスタンスID）
 WT_ID=2
-WF=/path/to/careerchain-worktree-$WT_ID
+WF=/path/to/worktree-$WT_ID
 OC=$WF/.devcontainer/devcontainer.override.json
 
 # 1. DBリセット（テストデータ投入）
