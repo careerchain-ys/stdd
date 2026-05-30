@@ -94,15 +94,23 @@ git worktree + devcontainer を用いたマルチ環境並列開発向けのプ�
 これらの skill 内に含まれる下流プロジェクト固有値（`user_app` / `admin_app` / `develop` 等のサンプル値）は、
 Phase 1 で Handlebars 変数（`{{apps[].path}}` / `{{project.primary_branch}}` 等）に置換する。
 
-## 5. v2.0 以降に延期する skill
+## 5. v0.1.0 から物理除外する skill（Phase 2-B 確定）
 
-以下は MVP に含めず、v2.0 以降のリリースで段階的に追加する:
+以下の skill / agent は **v0.1.0 リポジトリから物理除外**する。Phase 2-B (2026-05-30) の確定判断:
 
-- `skill-creator`（Anthropic 公式の skill であり、別途同梱方針を要検討）
-- `security-scan`（プロジェクト依存パッケージ・Supabase RLS 等のスキャンを含むため、プラグイン化が必要）
-- `penetration-tester`（ペネトレーションテストエージェント、汎用化検討）
+| skill / agent        | 扱い                 | 理由                                                                                                                                      |
+| -------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `skill-creator`      | 物理除外（削除）     | Anthropic 公式の skill であり stdd 独自実装ではない。stdd の STDD コア（Spec→Test→Impl）と直接関係しないため OSS リポジトリには同梱しない |
+| `security-scan`      | 物理除外（削除）     | 実装が下流プロジェクト固有のスタック（Supabase RLS / npm audit 等）に強く依存しており、汎用化には大幅な再設計が必要。コア機能には含めない |
+| `penetration-tester` | 物理除外（記述削除） | agent 実体はもともと無く、本ポリシーへの記載のみが残っていた。記載を削除                                                                  |
 
-これらの skill の最終的な扱い（プラグイン化 / 削除 / 非公開ブランチ退避）は Phase 2-B 以降で決定する。Phase 2-A 時点では `.claude/skills/` 配下に存置するが、v0.1.0 公開直前 (Phase 2-C) に再度扱いを確定する。本ポリシードキュメントも Phase 2-C で改めて見直す予定である。
+判断方針: ミニマム公開（親 issue #1289, @yuki-sakaue 2026-05-25）を優先し、コア STDD ワークフローの中核から外れる skill は同梱しない。将来必要が出た場合は **プラグイン化** または **専用リポジトリ化** で対応する（v0.2.0 以降の検討事項）。
+
+実施内容（Phase 2-B PR）:
+
+- `.claude/skills/skill-creator/` ディレクトリを `git rm -r` で削除
+- `.claude/skills/security-scan/` ディレクトリを `git rm -r` で削除
+- `.claude/agents/code-reviewer.md` 内の `/security-scan` コマンド参照を「下記のセキュリティチェックを必ず実施」に一般化（チェック項目本体は別途 Phase 3 で汎用化）
 
 ## 6. プラグインインタフェース（暫定）
 

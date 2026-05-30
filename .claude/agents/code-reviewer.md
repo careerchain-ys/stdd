@@ -138,7 +138,7 @@ model: opus
 
 ## セキュリティスキャンの実施
 
-レビューの一環として、`/security-scan`コマンドと同等のセキュリティチェックを必ず実施すること。
+レビューの一環として、下記のセキュリティチェックを必ず実施すること。
 
 ### 必須セキュリティチェック項目
 
@@ -154,13 +154,13 @@ model: opus
 
 レビュー対象に応じて、以下のスキルのガイドラインを基準として参照すること:
 
-| スキル                | 参照パス                                | 参照タイミング                                             |
-| --------------------- | --------------------------------------- | ---------------------------------------------------------- |
-| software-architecture | `.claude/skills/software-architecture/` | アーキテクチャ・責務分離・命名規則のレビュー時             |
-| implementing-ui       | `plugins/nextjs-supabase/skills/implementing-ui/`       | UIコンポーネントのレビュー時（パターン準拠、レスポンシブ） |
-| kaizen                | `.claude/skills/kaizen/`                | 過剰設計・YAGNI違反の検出時                                |
-| migrating-supabase    | `plugins/nextjs-supabase/skills/migrating-supabase/`    | マイグレーション・RLSポリシーのレビュー時                  |
-| search-first          | `.claude/skills/search-first/`          | 車輪の再発明・不要な自前実装の検出時                       |
+| スキル                | 参照パス                                             | 参照タイミング                                             |
+| --------------------- | ---------------------------------------------------- | ---------------------------------------------------------- |
+| software-architecture | `.claude/skills/software-architecture/`              | アーキテクチャ・責務分離・命名規則のレビュー時             |
+| implementing-ui       | `plugins/nextjs-supabase/skills/implementing-ui/`    | UIコンポーネントのレビュー時（パターン準拠、レスポンシブ） |
+| kaizen                | `.claude/skills/kaizen/`                             | 過剰設計・YAGNI違反の検出時                                |
+| migrating-supabase    | `plugins/nextjs-supabase/skills/migrating-supabase/` | マイグレーション・RLSポリシーのレビュー時                  |
+| search-first          | `.claude/skills/search-first/`                       | 車輪の再発明・不要な自前実装の検出時                       |
 
 ## 必須の事前読み込み
 
