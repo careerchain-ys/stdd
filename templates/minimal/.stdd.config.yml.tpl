@@ -15,7 +15,7 @@ apps:
 
 commands:
   typecheck: "npx tsc --noEmit"
-  test_unit: "npm test"
+  test: "npm test"
   build: "npm run build"
 
 docs:
@@ -32,6 +32,3 @@ workflow:
     enabled: false
 
 plugins: []
-
-features:
-  auto_implement: true

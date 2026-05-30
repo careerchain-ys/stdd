@@ -22,7 +22,7 @@ model: opus
 
 1. **テスト作成（Red）**: TECH_DESIGN.mdのテスト戦略に基づきテストを作成
 2. **実装（Green）**: テストがパスするよう実装
-3. **型チェック**: `npx tsc --noEmit` でエラーがないことを確認
+3. **型チェック**: `.stdd.config.yml` の `commands.typecheck` を実行してエラーがないことを確認
 
 ## 実装フロー
 
@@ -30,7 +30,7 @@ model: opus
 
 実装を始める前に、必ず以下の順序で既存ソリューションを調査すること:
 
-1. **プロジェクト内検索**: `user_app/lib/`、`admin_app/lib/`、`packages/shared/`、`domain/service/` に同等の実装がないか
+1. **プロジェクト内検索**: `.stdd.config.yml` の各 `apps[].path` 配下（例: `<apps[].path>/lib/`）、および `packages/shared/`、`domain/service/` 等の共有ディレクトリに同等の実装がないか
 2. **依存パッケージの確認**: `package.json`に含まれるパッケージ（date-fns, zod, react-hook-form等）で解決できないか
 3. **Supabase組み込み機能**: RLS、Storage、Auth、Edge Functions等で対応できないか
 4. 上記で見つからない場合のみ自前実装を行う
@@ -59,8 +59,11 @@ model: opus
 
 ### Step 4: 型チェック
 
+`.stdd.config.yml` の `apps[]` を読み、各アプリについて `apps[].path` ディレクトリで `commands.typecheck` を実行する（apps[] の数だけ繰り返す）。
+
 ```bash
-npx tsc --noEmit
+# 例（実際の値は .stdd.config.yml に従う）
+cd <apps[].path> && <commands.typecheck>
 ```
 
 ## 参照すべきスキル
@@ -78,12 +81,11 @@ npx tsc --noEmit
 
 ## テストコマンド
 
-```bash
-# user_app
-cd user_app && npm test --no-cache
+`.stdd.config.yml` の `apps[]` を読み、各アプリについて `apps[].path` ディレクトリで `commands.test` を実行する（apps[] の数だけ繰り返す）。
 
-# admin_app
-cd admin_app && npm test --no-cache
+```bash
+# 例（実際の値は .stdd.config.yml に従う）
+cd <apps[].path> && <commands.test>
 ```
 
 ## 必須の事前読み込み

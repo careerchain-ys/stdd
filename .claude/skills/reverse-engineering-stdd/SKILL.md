@@ -224,7 +224,7 @@ REQUIREMENTS.md作成後、Playwright MCPを使って実装済みUIのスクリ�
 
 ### REQUIREMENTS.mdへの記載フォーマット
 
-オンボーディングSpec（`docs/user_app/onboarding/REQUIREMENTS.md`）の「Figmaデザイン」セクションを参考にする:
+既存のSpec（例: `docs/<app.id>/<feature_path>/REQUIREMENTS.md`、`.stdd.config.yml` の `docs.layout.requirements` テンプレートに従う）の「Figmaデザイン」セクションを参考にする:
 
 ```markdown
 ### Figmaデザイン
@@ -259,7 +259,7 @@ interface UserProfile {
 }
 
 // ✅ 実装から正確にコピーした型
-// user_app/domain/models/user.ts から転記
+// <app.path>/domain/models/user.ts から転記（app.path は .stdd.config.yml の apps[].path）
 interface UserEntity {
   first_name: string | null;
   last_name: string | null;
@@ -430,7 +430,7 @@ TECH_DESIGN.mdのテスト戦略で定めたテストレベルに従って作成
 ```
 □ /verify-consistency を実行した
 □ 検出された不整合をすべて修正した（Specを実装に合わせる方向で）
-□ TypeScript型チェック（npx tsc --noEmit）がクリーン
+□ TypeScript型チェック（`.stdd.config.yml` の `commands.typecheck`）がクリーン
 ```
 
 ---

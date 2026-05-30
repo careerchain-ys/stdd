@@ -40,7 +40,7 @@ done
 
 ```bash
 git -C "../worktree-<INSTANCE_ID>" status
-git -C "../worktree-<INSTANCE_ID>" log develop..HEAD --oneline 2>/dev/null
+git -C "../worktree-<INSTANCE_ID>" log <primary_branch>..HEAD --oneline 2>/dev/null  # <primary_branch> = .stdd.config.yml の project.primary_branch
 ```
 
 ## 4. 破棄を実行

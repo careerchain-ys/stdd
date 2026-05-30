@@ -20,10 +20,12 @@ model: opus
 
 ### Phase 1: テスト実行
 
+`.stdd.config.yml` の `apps[]` を読み、各アプリについて `apps[].path` ディレクトリで `commands.test` を実行する（apps[] の数だけ繰り返す）。E2Eテストは関連テストがある場合に実行する。
+
 ```bash
-# ユニットテスト・インテグレーションテスト
-cd user_app && npm test --no-cache
-cd admin_app && npm test --no-cache
+# 例（実際の値は .stdd.config.yml に従う）
+# 各 apps[] について繰り返す
+cd <apps[].path> && <commands.test>
 
 # E2Eテスト（関連テストがある場合）
 cd e2e && npm run test
@@ -59,20 +61,15 @@ cd e2e && npm run test
 
 ### Phase 5: 型チェック・ビルドチェック
 
-```bash
-cd user_app && npx tsc --noEmit
-cd admin_app && npx tsc --noEmit
-
-# ビルドチェック
-cd user_app && npm run build
-cd admin_app && npm run build
-```
-
-### Phase 5: ビルドチェック
+`.stdd.config.yml` の `apps[]` を読み、各アプリについて `apps[].path` ディレクトリで `commands.typecheck` を実行する。続いて、`commands.build` が定義されている場合は同じく各アプリで実行する（いずれも apps[] の数だけ繰り返す）。
 
 ```bash
-cd {{apps[0].path}} && npm run build
-cd {{apps[1].path}} && npm run build
+# 例（実際の値は .stdd.config.yml に従う）
+# 型チェック（各 apps[] について繰り返す）
+cd <apps[].path> && <commands.typecheck>
+
+# ビルドチェック（commands.build が定義されている場合、各 apps[] について繰り返す）
+cd <apps[].path> && <commands.build>
 ```
 
 ## レポートフォーマット
@@ -82,8 +79,8 @@ cd {{apps[1].path}} && npm run build
 
 ### テスト結果
 
-- **user_app**: ✅ XX passed / ❌ XX failed
-- **admin_app**: ✅ XX passed / ❌ XX failed
+<!-- .stdd.config.yml の各 apps[] について apps[].id を見出しに結果を列挙する（apps[] の数だけ繰り返す） -->
+- **<apps[].id>**: ✅ XX passed / ❌ XX failed
 - **E2E**: ✅ XX passed / ❌ XX failed
 
 ### 整合性チェック
@@ -97,13 +94,13 @@ cd {{apps[1].path}} && npm run build
 
 ### 型チェック
 
-- **user_app**: ✅ / ❌ エラーあり
-- **admin_app**: ✅ / ❌ エラーあり
+<!-- .stdd.config.yml の各 apps[] について apps[].id を見出しに結果を列挙する（apps[] の数だけ繰り返す） -->
+- **<apps[].id>**: ✅ / ❌ エラーあり
 
 ### ビルドチェック
 
-- **user_app**: ✅ / ❌ エラーあり
-- **admin_app**: ✅ / ❌ エラーあり
+<!-- .stdd.config.yml の各 apps[] について apps[].id を見出しに結果を列挙する（apps[] の数だけ繰り返す） -->
+- **<apps[].id>**: ✅ / ❌ エラーあり
 
 ### 発見した問題
 

@@ -1,7 +1,7 @@
 ---
 name: implementing-ui
 description: |-
-  UI実装の包括的ガイドライン。admin_app管理画面パターン、React Hook Formフォーム実装、レスポンシブデザインを提供。「UI」「コンポーネント」「admin_app」「管理画面」「一覧画面」「テーブル表示」「フォーム」「React Hook Form」「バリデーション」「useForm」「レスポンシブ」「モバイル対応」「ブレークポイント」「Tailwind」に関する作業で使用。
+  UI実装の包括的ガイドライン。管理画面パターン、React Hook Formフォーム実装、レスポンシブデザインを提供。「UI」「コンポーネント」「管理画面」「一覧画面」「テーブル表示」「フォーム」「React Hook Form」「バリデーション」「useForm」「レスポンシブ」「モバイル対応」「ブレークポイント」「Tailwind」に関する作業で使用。
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
@@ -27,15 +27,15 @@ SCREEN_ITEMS_DEFINITION.md が存在する場合:
 
 | セクション | トリガーキーワード |
 |-----------|------------------|
-| [admin_app管理画面パターン](#admin_app-管理画面パターン) | admin_app、管理画面、一覧画面、テーブル表示 |
+| [管理画面パターン](#管理画面パターン) | 管理画面、一覧画面、テーブル表示 |
 | [React Hook Formガイドライン](#react-hook-form-ガイドライン) | フォーム、React Hook Form、バリデーション、useForm |
 | [レスポンシブデザイン](#レスポンシブデザインガイドライン) | レスポンシブ、モバイル対応、ブレークポイント、Tailwind |
 
 ---
 
-## admin_app 管理画面パターン
+## 管理画面パターン
 
-admin_appの一覧管理画面（エージェント管理、ユーザー管理など）は、以下の統一されたUIパターンを採用すること。
+管理画面アプリ（`.stdd.config.yml` の該当する `apps[]`）の一覧管理画面は、以下の統一されたUIパターンを採用すること。
 
 ### 画面構成
 
@@ -116,8 +116,7 @@ admin_appの一覧管理画面（エージェント管理、ユーザー管理�
 
 ### 参考実装
 
-- エージェント管理: `admin_app/app/dashboard/agents/AgentsClient.tsx`
-- ユーザー管理: `admin_app/app/dashboard/agent-staff/AgentStaffClient.tsx`
+管理画面アプリ（`.stdd.config.yml` の該当する `apps[].path`）内の既存の一覧管理画面コンポーネントを参考にすること。例: `<apps[].path>/app/dashboard/<feature>/<Feature>Client.tsx`
 
 ---
 
@@ -241,7 +240,7 @@ useEffect(() => {
 
 **確認方法**:
 - IDEの未使用コード警告を確認
-- `npx tsc --noEmit`で型エラーとともに未使用の警告を確認
+- `commands.typecheck`（`.stdd.config.yml`）を実行し、型エラーとともに未使用の警告を確認
 
 ---
 

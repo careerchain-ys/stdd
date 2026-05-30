@@ -1,7 +1,16 @@
 #!/bin/bash
 # PreToolUse Hook: git push 実行前にテスト・ビルドを実行
-# いずれかが失敗した場合、push を中止する
-# 変更がないアプリはスキップする
+# いずれかが失敗した場合、push を中止する。
+#
+# このフックは下流プロジェクト固有の値をハードコードせず、リポジトリルートの
+# .stdd.config.yml を実行時に読み取って動作する（設定駆動）。
+#   - apps[].path            : 検査対象アプリのディレクトリ
+#   - commands.test          : 各アプリで実行するテストコマンド（必須）
+#   - commands.build         : 各アプリで実行するビルドコマンド（任意）
+#   - project.primary_branch : upstream 未設定時の比較先ブランチ
+#
+# 設定が無い / 必須キーが欠ける場合は push をブロックせずスキップする。
+# 詳細な記述規約は docs/config-driven-authoring.md を参照。
 
 hook_input=$(cat)
 command=$(echo "$hook_input" | jq -r '.tool_input.command // empty')
@@ -17,102 +26,130 @@ if echo "$command" | grep -qE "\-\-no-verify"; then
 fi
 
 # プロジェクトルートディレクトリを取得
-ROOT_DIR=$(git rev-parse --show-toplevel)
+ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+CONFIG="$ROOT_DIR/.stdd.config.yml"
+
+if [ ! -f "$CONFIG" ]; then
+    echo "Pre-push check: .stdd.config.yml が見つからないためスキップします"
+    exit 0
+fi
+
+# --- .stdd.config.yml パーサ（外部依存なし） ---
+
+# 指定セクション直下のスカラー値を取得: $1=section, $2=key
+yaml_scalar() {
+    awk -v sec="$1:" -v k="$2:" '
+        /^[^[:space:]]/ { insec = ($1 == sec) }
+        insec && $1 == k {
+            sub(/^[[:space:]]*[^:]*:[[:space:]]*/, "", $0)
+            print $0
+            exit
+        }
+    ' "$CONFIG"
+}
+
+# apps[] の path を 1 行ずつ取得
+yaml_apps_paths() {
+    awk '
+        /^[^[:space:]]/ { inapps = ($1 == "apps:") }
+        inapps && $1 == "path:" {
+            sub(/^[[:space:]]*path:[[:space:]]*/, "", $0)
+            print $0
+        }
+    ' "$CONFIG"
+}
+
+# 前後のクォートを除去
+strip_quotes() {
+    local v="$1"
+    v="${v%\"}"; v="${v#\"}"
+    v="${v%\'}"; v="${v#\'}"
+    printf '%s' "$v"
+}
+
+PRIMARY_BRANCH=$(strip_quotes "$(yaml_scalar project primary_branch)")
+PRIMARY_BRANCH=${PRIMARY_BRANCH:-main}
+TEST_CMD=$(strip_quotes "$(yaml_scalar commands test)")
+BUILD_CMD=$(strip_quotes "$(yaml_scalar commands build)")
+
+if [ -z "$TEST_CMD" ]; then
+    echo "Pre-push check: commands.test が未定義のためスキップします"
+    exit 0
+fi
 
 # リモートブランチとの差分を取得（push対象のコミット）
-# upstream が設定されていない場合は origin/develop と比較
-UPSTREAM=$(git rev-parse --abbrev-ref @{upstream} 2>/dev/null || echo "origin/develop")
-CHANGED_FILES=$(git diff --name-only "$UPSTREAM"...HEAD 2>/dev/null || git diff --name-only origin/develop...HEAD 2>/dev/null || echo "")
+# upstream 未設定時は origin/<primary_branch> と比較
+UPSTREAM=$(git rev-parse --abbrev-ref @{upstream} 2>/dev/null || echo "origin/$PRIMARY_BRANCH")
+CHANGED_FILES=$(git diff --name-only "$UPSTREAM"...HEAD 2>/dev/null \
+    || git diff --name-only "origin/$PRIMARY_BRANCH"...HEAD 2>/dev/null \
+    || echo "")
 
-# 各アプリに変更があるかチェック
-USER_APP_CHANGED=0
-ADMIN_APP_CHANGED=0
-
-if echo "$CHANGED_FILES" | grep -qE "^user_app/"; then
-    USER_APP_CHANGED=1
+# 検査対象アプリ（apps[].path）を取得。未定義ならリポジトリルートを単一アプリ扱い
+APPS_PATHS=$(yaml_apps_paths)
+if [ -z "$APPS_PATHS" ]; then
+    APPS_PATHS="."
 fi
 
-if echo "$CHANGED_FILES" | grep -qE "^admin_app/"; then
-    ADMIN_APP_CHANGED=1
-fi
+echo "=========================================="
+echo "Pre-push check: 変更のあったアプリを検査します"
+echo "=========================================="
 
-# 両方とも変更がない場合はスキップ
-if [ $USER_APP_CHANGED -eq 0 ] && [ $ADMIN_APP_CHANGED -eq 0 ]; then
-    echo "=========================================="
-    echo "Pre-push check: user_app/admin_app に変更がないためスキップします"
+FAILED=0
+ANY=0
+
+while IFS= read -r raw_path; do
+    [ -z "$raw_path" ] && continue
+    appdir=$(strip_quotes "$raw_path")
+    [ -z "$appdir" ] && continue
+
+    # 変更があったか判定
+    if [ "$appdir" = "." ]; then
+        # ルートを単一アプリとする構成: 何らかの変更があれば対象
+        if [ -n "$CHANGED_FILES" ]; then changed=1; else changed=0; fi
+    else
+        if echo "$CHANGED_FILES" | grep -qE "^${appdir%/}/"; then changed=1; else changed=0; fi
+    fi
+
+    if [ "$changed" -eq 0 ]; then
+        echo "⏭ $appdir: 変更がないためスキップ"
+        continue
+    fi
+
+    ANY=1
+    echo ""
+    echo "▶ $appdir: テスト実行中... ($TEST_CMD)"
+    if ( cd "$ROOT_DIR/$appdir" && eval "$TEST_CMD" 2>&1 ); then
+        echo "✓ $appdir: テスト成功"
+    else
+        echo "✗ $appdir: テスト失敗"
+        FAILED=1
+        break
+    fi
+
+    if [ -n "$BUILD_CMD" ]; then
+        echo ""
+        echo "▶ $appdir: ビルド実行中... ($BUILD_CMD)"
+        if ( cd "$ROOT_DIR/$appdir" && eval "$BUILD_CMD" 2>&1 ); then
+            echo "✓ $appdir: ビルド成功"
+        else
+            echo "✗ $appdir: ビルド失敗"
+            FAILED=1
+            break
+        fi
+    fi
+done <<EOF
+$APPS_PATHS
+EOF
+
+echo ""
+echo "=========================================="
+if [ "$ANY" -eq 0 ]; then
+    echo "Pre-push check: 対象アプリに変更がないためスキップします"
     echo "=========================================="
     exit 0
 fi
 
-echo "=========================================="
-echo "Pre-push check: テストとビルドを実行中..."
-echo "=========================================="
-
-# 失敗フラグ
-FAILED=0
-STEP=1
-TOTAL_STEPS=$((USER_APP_CHANGED * 2 + ADMIN_APP_CHANGED * 2))
-
-# user_app のテスト
-if [ $USER_APP_CHANGED -eq 1 ]; then
-    echo ""
-    echo "[$STEP/$TOTAL_STEPS] user_app: テスト実行中..."
-    if (cd "$ROOT_DIR/user_app" && npm test --no-cache -- --watchAll=false 2>&1); then
-        echo "✓ user_app: テスト成功"
-    else
-        echo "✗ user_app: テスト失敗"
-        FAILED=1
-    fi
-    STEP=$((STEP + 1))
-
-    # user_app のビルド
-    if [ $FAILED -eq 0 ]; then
-        echo ""
-        echo "[$STEP/$TOTAL_STEPS] user_app: ビルド実行中..."
-        if (cd "$ROOT_DIR/user_app" && npm run build 2>&1); then
-            echo "✓ user_app: ビルド成功"
-        else
-            echo "✗ user_app: ビルド失敗"
-            FAILED=1
-        fi
-        STEP=$((STEP + 1))
-    fi
-else
-    echo ""
-    echo "⏭ user_app: 変更がないためスキップ"
-fi
-
-# admin_app のテスト
-if [ $ADMIN_APP_CHANGED -eq 1 ] && [ $FAILED -eq 0 ]; then
-    echo ""
-    echo "[$STEP/$TOTAL_STEPS] admin_app: テスト実行中..."
-    if (cd "$ROOT_DIR/admin_app" && npm test --no-cache -- --watchAll=false 2>&1); then
-        echo "✓ admin_app: テスト成功"
-    else
-        echo "✗ admin_app: テスト失敗"
-        FAILED=1
-    fi
-    STEP=$((STEP + 1))
-
-    # admin_app のビルド
-    if [ $FAILED -eq 0 ]; then
-        echo ""
-        echo "[$STEP/$TOTAL_STEPS] admin_app: ビルド実行中..."
-        if (cd "$ROOT_DIR/admin_app" && npm run build 2>&1); then
-            echo "✓ admin_app: ビルド成功"
-        else
-            echo "✗ admin_app: ビルド失敗"
-            FAILED=1
-        fi
-    fi
-elif [ $ADMIN_APP_CHANGED -eq 0 ]; then
-    echo ""
-    echo "⏭ admin_app: 変更がないためスキップ"
-fi
-
-echo ""
-echo "=========================================="
-if [ $FAILED -eq 1 ]; then
+if [ "$FAILED" -eq 1 ]; then
     echo "✗ テストまたはビルドが失敗しました。push を中止します。"
     echo "=========================================="
     exit 2

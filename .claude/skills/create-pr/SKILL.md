@@ -1,39 +1,42 @@
 ---
 name: create-pr
 description: |-
-  現在のブランチからdevelopへのPull Requestを作成するスキル。差分情報の収集→変更内容の分析→PR descriptionの自動生成→`gh pr create`実行までを一括で行う。「PR作成」「プルリクエスト」「pull request」「PR出して」「developにPR」「create PR」「マージリクエスト」など、ブランチをdevelopにマージするためのPR作成依頼があった際は必ずこのスキルを使用する。
+  現在のブランチから主ブランチ（`.stdd.config.yml` の `project.primary_branch`）へのPull Requestを作成するスキル。差分情報の収集→変更内容の分析→PR descriptionの自動生成→`gh pr create`実行までを一括で行う。「PR作成」「プルリクエスト」「pull request」「PR出して」「create PR」「マージリクエスト」など、ブランチを主ブランチにマージするためのPR作成依頼があった際は必ずこのスキルを使用する。
 allowed-tools: Bash, Read, Grep
 ---
 
 # PR作成スキル
 
-現在のブランチからdevelopへのPRを作成する。差分を分析し、適切なtitle/descriptionを自動生成する。
+現在のブランチから主ブランチ（`.stdd.config.yml` の `project.primary_branch`）へのPRを作成する。差分を分析し、適切なtitle/descriptionを自動生成する。
+
+以降のコマンド例では `<primary_branch>` を `.stdd.config.yml` の `project.primary_branch` の値に置き換えて実行する。
 
 ## 1. 差分情報の収集
 
 ```bash
-git fetch origin develop
+# <primary_branch> は .stdd.config.yml の project.primary_branch
+git fetch origin <primary_branch>
 ```
 
 以下を並列で実行:
 
 ```bash
-git log --oneline origin/develop...HEAD
-git diff origin/develop...HEAD --name-only
-git diff origin/develop...HEAD --stat
+git log --oneline origin/<primary_branch>...HEAD
+git diff origin/<primary_branch>...HEAD --name-only
+git diff origin/<primary_branch>...HEAD --stat
 git branch --show-current
 ```
 
 必要に応じて変更内容の詳細も確認:
 
 ```bash
-git diff origin/develop...HEAD
+git diff origin/<primary_branch>...HEAD
 ```
 
 ## 2. 変更内容の分析
 
 1. **変更の種類を特定**: feat / fix / refactor / docs / test / style / perf / chore
-2. **影響範囲を特定**: user_app / admin_app / supabase / e2e / docs
+2. **影響範囲を特定**: `.stdd.config.yml` の各 `apps[].id` / supabase / e2e / docs（apps[] を読み、変更があったアプリを列挙する）
 3. **主要な変更点を抽出**: 新規ファイル、削除ファイル、大幅変更ファイル
 
 ## 3. Issue情報の確認
@@ -67,8 +70,7 @@ git diff origin/develop...HEAD
 
 ## 影響範囲
 
-- [ ] user_app
-- [ ] admin_app
+- [ ] <apps[].id>   <!-- .stdd.config.yml の apps[] を読み、apps[] の数だけ列挙する -->
 - [ ] supabase
 - [ ] e2e
 - [ ] docs
@@ -90,7 +92,8 @@ Closes #[issue番号]
 bodyは一時ファイル経由で渡す（ヒアドキュメントは避ける）:
 
 ```bash
-gh pr create --base develop --title "タイトル" --body-file /tmp/pr-body.md
+# <primary_branch> は .stdd.config.yml の project.primary_branch
+gh pr create --base <primary_branch> --title "タイトル" --body-file /tmp/pr-body.md
 ```
 
 ## 5. 完了

@@ -75,10 +75,11 @@ HIGH/MEDIUM の指摘がある場合は Hard Threshold とは別に判断する�
    - テストがパスすること（Green状態）を確認
    - 実装をコミット
 
-3. **型チェック**:
+3. **型チェック**: `.stdd.config.yml` の `commands.typecheck` を実行する。
 
    ```bash
-   npx tsc --noEmit
+   # 例（実際の値は .stdd.config.yml に従う）
+   <commands.typecheck>
    ```
 
 4. **ビルドエラー解決**（型チェック/ビルドでエラーが発生した場合）:
@@ -121,11 +122,11 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
 
 **QA Engineerに依頼**して、品質を確認する。
 
-1. **ユニットテスト実行**:
+1. **ユニットテスト実行**: `.stdd.config.yml` の `apps[]` を読み、各アプリについて `apps[].path` ディレクトリで `commands.test` を実行する（apps[] の数だけ繰り返す）。
 
    ```bash
-   cd user_app && npm test --no-cache
-   cd admin_app && npm test --no-cache
+   # 例（実際の値は .stdd.config.yml に従う）
+   cd <apps[].path> && <commands.test>
    ```
 
 2. **E2Eテスト実行**（関連テストがある場合）:

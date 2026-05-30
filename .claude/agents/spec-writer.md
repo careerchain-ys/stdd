@@ -123,14 +123,18 @@ model: opus
 
 ## ドキュメント配置ルール
 
+`.stdd.config.yml` の `docs.layout.*` のパステンプレートに従う。中立例:
+
 ```
-docs/<app>/<path>/REQUIREMENTS.md
-docs/<app>/<path>/TECH_DESIGN.md
-docs/<app>/<path>/SCREEN_ITEMS_DEFINITION.md（オプション）
+docs/<app.id>/<feature_path>/REQUIREMENTS.md
+docs/<app.id>/<feature_path>/TECH_DESIGN.md
+docs/<app.id>/<feature_path>/SCREEN_ITEMS_DEFINITION.md（オプション）
 ```
 
-**例**: 実装が `admin_app/app/login/page.tsx` の場合
-→ `docs/admin_app/login/REQUIREMENTS.md`, `docs/admin_app/login/TECH_DESIGN.md`
+配置先のパスは `.stdd.config.yml` の `docs.layout.*`（`docs.layout.requirements` 等）のパステンプレートに、対象アプリの `app`（`apps[].id`）と `feature_path` を適用して決定する。
+
+**Example**: 実装が `<app.id>/app/login/page.tsx`（例: `web/app/login/page.tsx`）の場合
+→ `docs/<app.id>/login/REQUIREMENTS.md`, `docs/<app.id>/login/TECH_DESIGN.md`（`docs.layout.*` テンプレートに従う）
 
 ## 参照すべきスキル
 

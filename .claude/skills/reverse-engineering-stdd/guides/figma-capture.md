@@ -129,8 +129,8 @@ docs/<app>/<feature-path>/screenshots/
 
 例:
 ```
-docs/user_app/dashboard/common/screenshots/
-docs/user_app/dashboard/projects/screenshots/
+docs/<app.id>/dashboard/common/screenshots/
+docs/<app.id>/dashboard/projects/screenshots/
 ```
 
 ⚠️ **重要: スクリーンショットはFigma取り込み後に削除すること。gitにはコミットしない。**
@@ -144,7 +144,7 @@ docs/user_app/dashboard/projects/screenshots/
 
 ```
 Figmaファイル名: <app>-<Feature-Name>
-例: user_app-Dashboard-Common
+例: <app.id>-Dashboard-Common
 
 ページ構成:
 ├── Desktop（1280px）
@@ -210,20 +210,20 @@ Projects - 削除確認ダイアログ
 
 ### Figmaデザイン
 
-**Figmaファイル**: [user_app-Dashboard-Common](https://www.figma.com/design/xxxxx/user_app-Dashboard-Common)
+**Figmaファイル**: [<app.id>-Dashboard-Common](https://www.figma.com/design/xxxxx/<app.id>-Dashboard-Common)
 
 #### OverviewTab
 
-- [実績サマリ表示](https://www.figma.com/design/xxxxx/user_app-Dashboard-Common?node-id=1-2)
+- [実績サマリ表示](https://www.figma.com/design/xxxxx/<app.id>-Dashboard-Common?node-id=1-2)
 
 #### タブ切り替え
 
-- [Overviewタブ（アクティブ）](https://www.figma.com/design/xxxxx/user_app-Dashboard-Common?node-id=2-2)
-- [Projectsタブ（アクティブ）](https://www.figma.com/design/xxxxx/user_app-Dashboard-Common?node-id=3-2)
+- [Overviewタブ（アクティブ）](https://www.figma.com/design/xxxxx/<app.id>-Dashboard-Common?node-id=2-2)
+- [Projectsタブ（アクティブ）](https://www.figma.com/design/xxxxx/<app.id>-Dashboard-Common?node-id=3-2)
 
 #### WelcomeSection
 
-- [ウェルカムバナー表示](https://www.figma.com/design/xxxxx/user_app-Dashboard-Common?node-id=4-2)
+- [ウェルカムバナー表示](https://www.figma.com/design/xxxxx/<app.id>-Dashboard-Common?node-id=4-2)
 ```
 
 ### node-idの取得方法
@@ -251,8 +251,8 @@ Projects - 削除確認ダイアログ
 rm -rf docs/<app>/<feature-path>/screenshots/
 
 # 例
-rm -rf docs/user_app/dashboard/common/screenshots/
-rm -rf docs/user_app/dashboard/projects/screenshots/
+rm -rf docs/<app.id>/dashboard/common/screenshots/
+rm -rf docs/<app.id>/dashboard/projects/screenshots/
 ```
 
 ### 削除タイミング

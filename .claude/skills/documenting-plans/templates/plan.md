@@ -56,7 +56,7 @@
 - [ ] Unit test 通過確認
 - [ ] Integration test 通過確認
 - [ ] E2E test 通過確認
-- [ ] `npx tsc --noEmit` 型チェック通過
+- [ ] `commands.typecheck`（`.stdd.config.yml`）型チェック通過
 
 ---
 
