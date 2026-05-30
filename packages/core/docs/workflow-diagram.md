@@ -84,7 +84,7 @@ flowchart TD
 ## 3. Spec → Test → Implementation の一方向フロー
 
 STDD は **常に Spec を起点とした一方向のウォーターフォール** で進む。
-矢印は決して逆流しない。
+矢印は決して遡行しない。
 
 ```mermaid
 flowchart LR

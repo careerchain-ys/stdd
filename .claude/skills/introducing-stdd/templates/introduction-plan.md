@@ -4,7 +4,7 @@
 位置づけ:
   - feature/session 単位の通常 PLAN とは別。プロジェクト全体の「導入」進捗を 1 ファイルで追跡する。
   - introducing-stdd スキルがこのファイルを読み書きしながら導入を駆動する。
-  - 導入が一巡（順流運用へ移行）したら役目を終える。
+  - 導入が一巡（順行運用へ移行）したら役目を終える。
 
 配置:
   docs/common/plans/stdd-introduction.md
@@ -43,7 +43,7 @@
 
 ### 移行
 
-- [ ] step 6: 既存機能の spec が一巡 → 以降は `auto-implement`（順流運用）へ
+- [ ] step 6: 既存機能の spec が一巡 → 以降は `auto-implement`（順行運用）へ
 
 ---
 

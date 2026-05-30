@@ -1,7 +1,7 @@
 ---
 name: introducing-stdd
 description: |-
-  既存（稼働中）プロジェクトへの STDD 導入を、Claude セッションで段階的に駆動するスキル。導入ガイドに従い、共通spec生成→機能インベントリ→代表機能リバース→フォーマット策定→機能ループ→順流運用への移行までを、既存スキル（reverse-engineering-common-spec / reverse-engineering-feature-spec / auto-implement / verify-consistency）を順に呼びながら進める。進捗は導入PLANで保持し、セッションを跨いで再開できる。「STDD導入」「stdd導入を進める」「既存プロジェクトにstddを入れる」「導入の続き」「introduce stdd」「導入ブートストラップ」に関する作業で使用。単一機能のリバースのみなら reverse-engineering-feature-spec を直接使う。
+  既存（稼働中）プロジェクトへの STDD 導入を、Claude セッションで段階的に駆動するスキル。導入ガイドに従い、共通spec生成→機能インベントリ→代表機能リバース→フォーマット策定→機能ループ→順行運用への移行までを、既存スキル（reverse-engineering-common-spec / reverse-engineering-feature-spec / auto-implement / verify-consistency）を順に呼びながら進める。進捗は導入PLANで保持し、セッションを跨いで再開できる。「STDD導入」「stdd導入を進める」「既存プロジェクトにstddを入れる」「導入の続き」「introduce stdd」「導入ブートストラップ」に関する作業で使用。単一機能のリバースのみなら reverse-engineering-feature-spec を直接使う。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
@@ -50,7 +50,7 @@ docs/common/plans/stdd-introduction.md
 | 2 | 代表機能 1 つをリバース | `reverse-engineering-feature-spec` | ★ Spec 粒度・スコープ |
 | 3-4 | フォーマット策定 → テンプレ特化 | — | ★★ フォーマット決定（テーラリング） |
 | 5 | 残り機能を優先順でループ | `reverse-engineering-feature-spec` | ★ 機能ごとの粒度 |
-| 6 | 順流運用へ移行 | `auto-implement`（以降） | 導入完了の確認 |
+| 6 | 順行運用へ移行 | `auto-implement`（以降） | 導入完了の確認 |
 
 各機能リバース後は `verify-consistency` で spec ⇔ test ⇔ 実装 の整合を確認する。
 
@@ -81,7 +81,7 @@ docs/common/plans/stdd-introduction.md
 
 - **一度に 1 ステップ**。複数機能を無確認で連続処理しない。
 - **★ポイントでは必ず停止**してユーザーに聞く（優先順・粒度・フォーマット）。
-- 逆流フェーズでは「実装が真実」。推測で spec を書かない。
+- 遡行フェーズでは「実装が真実」。推測で spec を書かない。
 - 導入PLAN 以外に進捗・履歴を持たない（SSOT 原則。spec 本体に「今回」「変更前」等を書かない）。
 
 ---
@@ -102,4 +102,4 @@ docs/common/plans/stdd-introduction.md
 - **common ティアのリバース**: [reverse-engineering-common-spec skill](../reverse-engineering-common-spec/SKILL.md)
 - **機能単位のリバース**: [reverse-engineering-feature-spec skill](../reverse-engineering-feature-spec/SKILL.md)
 - **整合性チェック**: [verify-consistency skill](../verify-consistency/SKILL.md)
-- **順流運用（新機能実装）**: [auto-implement skill](../auto-implement/SKILL.md)
+- **順行運用（新機能実装）**: [auto-implement skill](../auto-implement/SKILL.md)
