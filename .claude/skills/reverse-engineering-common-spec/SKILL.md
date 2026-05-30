@@ -28,7 +28,7 @@ STDD 導入フロー（既存プロジェクト）
         ↓  common ティアが揃う
 2. reverse-engineering-feature-spec ← 機能ごとに繰り返す
         ↓
-3. auto-implement                    ← 以降の新機能は順流 STDD
+3. auto-implement                    ← 以降の新機能は順行 STDD
 ```
 
 **順序の理由**: 先に common ティア（レイヤ規約・共有ドメインモデル・テーブル一覧）を固定しておくと、後続の機能単位リバース（`reverse-engineering-feature-spec`）の精度と速度が上がる。
@@ -123,7 +123,7 @@ feature ティアと違い、確認する一次情報は **UI 文言ではなく
 ## 次のステップ
 
 1. **機能単位のリバース** → `reverse-engineering-feature-spec`（common ティアを前提に、機能ごとに繰り返す）
-2. **新機能の実装** → `auto-implement`（以降は Spec → Test → 実装 の順流 STDD）
+2. **新機能の実装** → `auto-implement`（以降は Spec → Test → 実装 の順行 STDD）
 
 ---
 
