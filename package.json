@@ -1,0 +1,13 @@
+{
+  "name": "stdd-monorepo",
+  "version": "0.1.0-dev",
+  "private": true,
+  "description": "STDD (Spec and Test Driven Development) — monorepo root",
+  "license": "Apache-2.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present"
+  }
+}

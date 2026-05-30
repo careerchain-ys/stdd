@@ -21,7 +21,17 @@ v0.1.0 時点で公式に対応している AI エージェントは以下です
 
 ## Quick Start
 
-> **重要**: v0.1.0 時点では `create-stdd-project` 等の CLI は未実装です。CLI は Phase 2-B で提供予定です。それまでは **git clone してテンプレートを手動コピーする方式** で利用してください。
+> **重要**: v0.1.0 時点で `create-stdd-project` CLI が利用できます。ただし npm への公開は今後の Phase で行うため、現状は **このリポジトリを clone してローカルから CLI を実行する** 方式で利用してください（`npx create-stdd-project` での直接実行は npm 公開後に対応）。
+
+### 0. CLI で新規プロジェクトを作成する（推奨）
+
+```bash
+git clone https://github.com/careerchain-ys/stdd.git
+cd stdd && npm install && npm run build
+node packages/create-stdd-project/dist/cli.js <project-name>
+```
+
+`<project-name>/` に `.stdd.config.yml`・`.claude/`（skill / agent / hook）・`docs/`・`README.md` が展開されます。以降の手順 1〜4 は CLI を使わず手動で構成する場合の参考です。
 
 ### 1. リポジトリを取得する
 
@@ -54,7 +64,7 @@ cp stdd/packages/core/templates/PLAN.md         docs/web/<feature_path>/plans/$(
 
 - `.claude/agents/*.md` および `.claude/skills/**/*.md` の一部に、二系統アプリ構成（例: `user_app` / `admin_app`）を前提とした具体コマンド（`cd user_app && npm test` 等）が残存しています。これらは Phase 1-B でテンプレート変数（`{{apps[].path}}` 等）に置換予定です。
 - 現状、stdd を別レイアウトのプロジェクト（単一アプリ・別命名等）で使う場合は、当該箇所を手動で書き換えてください。
-- CLI (`create-stdd-project`) は Phase 2-B で提供予定です。
+- CLI (`create-stdd-project`) は Phase 2-B で実装済みですが、npm への公開（`npx` での直接実行）は今後の Phase で対応予定です。現状はローカル clone から `node packages/create-stdd-project/dist/cli.js <project-name>` で実行してください。
 
 ---
 
@@ -69,10 +79,13 @@ stdd/
 ├── LICENSE                    # Apache License 2.0
 ├── NOTICE                     # 著作権表記
 ├── packages/
-│   └── core/                  # 方法論ドキュメント / テンプレ / JSON Schema
-│       ├── docs/
-│       ├── templates/
-│       └── schema/
+│   ├── core/                  # 方法論ドキュメント / テンプレ / JSON Schema
+│   │   ├── docs/
+│   │   ├── templates/
+│   │   └── schema/
+│   └── create-stdd-project/   # プロジェクト生成 CLI（create-stdd-project）
+├── templates/                 # CLI が展開するプロジェクトテンプレート
+│   └── minimal/               # 最小構成テンプレート
 ├── plugins/                   # 技術スタック別プラグイン
 │   ├── nextjs-supabase/       # Next.js + Supabase 向け skill
 │   ├── playwright/            # Playwright E2E 向け skill
@@ -92,6 +105,7 @@ stdd/
 - [`AGENTS.md`](AGENTS.md) — AI エージェント向けのプロジェクト情報
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — 貢献フロー（DCO sign-off など）
 - [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) — 行動規範
+- [`SECURITY.md`](SECURITY.md) — セキュリティ脆弱性の報告経路
 - [`packages/core/README.md`](packages/core/README.md) — core パッケージの詳細
 - [`packages/core/docs/stdd-methodology.md`](packages/core/docs/stdd-methodology.md) — STDD 方法論
 - [`packages/core/docs/workflow-diagram.md`](packages/core/docs/workflow-diagram.md) — 開発フロー図
