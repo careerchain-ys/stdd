@@ -39,7 +39,7 @@ git log --oneline origin/<baseRef>...HEAD
 集める情報：
 
 - PR番号・タイトル・概要（body）
-- base ブランチ（通常 `develop`）
+- base ブランチ（`.stdd.config.yml` の `project.primary_branch`）
 - 対象コミット一覧（`origin/<base>...HEAD`）
 - 主要な変更ファイル
 

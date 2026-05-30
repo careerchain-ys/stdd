@@ -24,7 +24,7 @@
 ## 違反例1: テスト作成をスキップして実装開始
 
 **発生日**: 2026-01-04
-**機能**: パスワード再設定機能（user_app）
+**機能**: パスワード再設定機能（`<app.id>`）
 
 ### ❌ 何が間違っていたか
 
@@ -104,8 +104,8 @@ test('利用規約リンクが別タブで開く', async ({ page }) => {
 ```
 1. タスク受領: "ログイン機能のE2Eテストを作成して"
 2. ドキュメント確認:
-   - docs/user_app/login/REQUIREMENTS.md を読む
-   - docs/user_app/login/TECH_DESIGN.md を読む
+   - docs/<app.id>/login/REQUIREMENTS.md を読む
+   - docs/<app.id>/login/TECH_DESIGN.md を読む
    - TECH_DESIGN.mdの「Journey別テスト戦略」セクションを確認
 3. 実装:
    - TECH_DESIGN.mdに記載されたテストケースのみを実装
@@ -194,7 +194,7 @@ test('利用規約リンクが別タブで開く', async ({ page }) => {
 ✅ **良い例**（現在の仕様のみ記述）:
 
 ```markdown
-**SignupForm（`user_app/components/auth/SignupForm.test.tsx`）**:
+**SignupForm（`<app.path>/components/auth/SignupForm.test.tsx`）**:
 
 1. メール検証リンク送信（正常系）
 2. Googleアカウントで新規登録（正常系）

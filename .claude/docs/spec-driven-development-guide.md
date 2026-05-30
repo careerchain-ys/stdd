@@ -328,8 +328,8 @@ TECH_DESIGN.mdのTest Strategyに従ってテストを作成:
 **Red確認の手順**:
 
 ```bash
-# テストを実行してRedを確認
-npm test -- <test-file>
+# テストを実行してRedを確認（<commands.test> は .stdd.config.yml の commands.test）
+<commands.test> -- <test-file>
 
 # 期待される結果: テストが失敗する（Red状態）
 # ❌ FAIL: "実装がないため失敗" → 正常
@@ -364,8 +364,8 @@ PLANドキュメントに従って順次実装:
 **Greenになったら**:
 
 ```bash
-# すべてのテストを実行
-npm test
+# すべてのテストを実行（<commands.test> は .stdd.config.yml の commands.test）
+<commands.test>
 
 # 期待される結果: すべてのテストが通る（Green状態）
 # ✅ PASS: すべてのテスト → Phase 6へ進む
@@ -426,8 +426,8 @@ npm test
 
 ### 5. ドキュメントは実装ディレクトリに従う
 
-実装ファイル: `admin_app/app/login/page.tsx`
-→ ドキュメント: `docs/admin_app/login/REQUIREMENTS.md`, `TECH_DESIGN.md`
+実装ファイル: `<app.path>/app/login/page.tsx`（`app.path` は `.stdd.config.yml` の `apps[].path`）
+→ ドキュメント: `docs/<app.id>/login/REQUIREMENTS.md`, `TECH_DESIGN.md`（`docs.layout.*` テンプレートに従う。`<app.id>` は `apps[].id`）
 
 ### 6. セッション開始時にスコープを確認する
 

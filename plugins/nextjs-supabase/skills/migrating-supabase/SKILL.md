@@ -39,19 +39,21 @@ touch supabase/migrations/$(date +%Y%m%d%H%M%S)_alter_table_name.sql
 ### ローカルでテスト
 
 ```bash
-npm run reset          # マイグレーション再実行
-npm run generate-types # 型定義を再生成（user_app/admin_app両方）
+# 実際のコマンドは .stdd.config.yml に従う
+<commands.db_reset>   # マイグレーション再実行（DBリセット）
+<commands.db_types>   # 型定義を再生成（全 apps[] 分）
 ```
 
 ## 主要コマンド
 
-| コマンド | 説明 |
-|---------|------|
-| `npm run start` | ローカル環境起動 |
-| `npm run stop` | ローカル環境停止 |
-| `npm run reset` | DBリセット（migration + seed再実行） |
-| `npm run generate-types` | TypeScript型定義生成（user_app/admin_app両方） |
-| `npm run dev:full` | フルセットアップ（起動 + 型生成） |
+実際のコマンドは `.stdd.config.yml` の `commands.*` に従う。
+
+| 用途 | config キー |
+|------|------------|
+| DBリセット（migration + seed再実行） | `commands.db_reset` |
+| TypeScript型定義生成（全 apps[] 分） | `commands.db_types` |
+
+ローカル環境の起動・停止やフルセットアップ（起動 + 型生成）など、上記以外のプロジェクト固有コマンドは各プロジェクトの npm scripts 等を参照すること。
 
 ## ファイル命名規則
 
@@ -79,8 +81,8 @@ npm run generate-types # 型定義を再生成（user_app/admin_app両方）
 □ 4. authenticatedユーザー用RLSポリシー作成
 □ 5. service_role用RLSポリシー作成
 □ 6. GRANT ALL ON ... TO service_role（忘れると403エラー）
-□ 7. npm run reset でエラーなし
-□ 8. npm run generate-types で型が生成される
+□ 7. `commands.db_reset`（.stdd.config.yml）でエラーなし
+□ 8. `commands.db_types`（.stdd.config.yml）で型が生成される
 ```
 
 詳細は [テーブル作成テンプレート](templates/table-creation.md) を参照。
@@ -120,12 +122,12 @@ ALTER TABLE public.table_name DROP COLUMN column_name;
 ### ALTER後のチェックリスト
 
 ```
-□ npm run reset でマイグレーション成功
-□ npm run generate-types で型定義が更新される
+□ `commands.db_reset`（.stdd.config.yml）でマイグレーション成功
+□ `commands.db_types`（.stdd.config.yml）で型定義が更新される
 □ domain/models/ のEntity型を更新
 □ domain/repository/ のCRUD関数を更新
 □ 関連するServer Action・コンポーネントを確認
-□ npx tsc --noEmit で型チェック
+□ `commands.typecheck`（.stdd.config.yml）で型チェック
 ```
 
 ## RLSポリシー設計
@@ -210,12 +212,12 @@ GRANT ALL ON public.table_name TO service_role;
 
 ### ローカル環境での失敗
 
-ローカルでは`npm run reset`がDB全体を再作成するため、SQLを修正して再実行すればよい:
+ローカルでは`commands.db_reset`（.stdd.config.yml）がDB全体を再作成するため、SQLを修正して再実行すればよい:
 
 ```bash
 # 1. マイグレーションファイルのSQLエラーを修正
-# 2. リセットして再適用
-npm run reset
+# 2. リセットして再適用（実際のコマンドは .stdd.config.yml に従う）
+<commands.db_reset>
 ```
 
 ### 本番/STG環境で失敗した場合
@@ -264,7 +266,7 @@ DB変更後にアプリケーションコードも更新する:
 □ domain/repository/XXX.ts のcreateXXX関数を更新
 □ domain/repository/XXX.ts のupdateXXX関数を更新
 □ 関連するServer Actionを確認
-□ npx tsc --noEmit で型チェック
+□ `commands.typecheck`（.stdd.config.yml）で型チェック
 ```
 
 ## 参照ファイル
@@ -279,7 +281,7 @@ DB変更後にアプリケーションコードも更新する:
 
 - **データの参照のみ**: SQLクエリの実行（マイグレーション不要）
 - **アプリケーションコードの変更のみ**: DB変更を伴わない場合
-- **型定義の修正のみ**: `npm run generate-types`で自動生成される
+- **型定義の修正のみ**: `commands.db_types`（.stdd.config.yml）で自動生成される
 
 ## よくあるミス
 

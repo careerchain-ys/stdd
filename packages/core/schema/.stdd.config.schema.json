@@ -7,6 +7,11 @@
   "required": ["project", "apps", "commands", "docs"],
   "additionalProperties": false,
   "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Config format version. Currently 1. Used for future migration of the config layout. Optional."
+    },
     "project": {
       "type": "object",
       "description": "Top-level metadata about the project.",
@@ -79,6 +84,10 @@
           "minLength": 1,
           "description": "Default test runner command. Example: 'npm test', 'pnpm test', 'vitest run'."
         },
+        "build": {
+          "type": "string",
+          "description": "Production build command. Used by the pre-push hook and QA flow. Example: 'npm run build'. Optional."
+        },
         "lint": {
           "type": "string",
           "description": "Lint command. Optional."
@@ -133,6 +142,10 @@
       "description": "Optional workflow toggles. Skills consult these to enable / disable worktree- and devcontainer-aware code paths.",
       "additionalProperties": false,
       "properties": {
+        "branch_prefix": {
+          "type": "string",
+          "description": "Prefix applied to branches created by stdd skills (e.g. 'claude/'). Skills read this instead of hardcoding a prefix. Optional; defaults to 'claude/'."
+        },
         "worktree": {
           "type": "object",
           "additionalProperties": false,

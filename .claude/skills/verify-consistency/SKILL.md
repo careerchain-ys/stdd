@@ -13,10 +13,13 @@ allowed-tools: Read, Grep, Glob, Bash
 
 ### ブランチ分岐点からの差分を特定
 
+`.stdd.config.yml` の `project.primary_branch`（PR/統合先ブランチ）を読み、その分岐点からの差分を特定する。
+
 ```bash
-git fetch origin develop
-git log --oneline origin/develop...HEAD
-git diff origin/develop...HEAD --name-only
+# <primary_branch> は .stdd.config.yml の project.primary_branch（例: main / develop）
+git fetch origin <primary_branch>
+git log --oneline origin/<primary_branch>...HEAD
+git diff origin/<primary_branch>...HEAD --name-only
 ```
 
 以下を特定:

@@ -56,11 +56,14 @@ GitHub MCP toolsまたは `gh issue view` を使ってissue情報を取得する
 
 ## Step 4: ブランチ作成・Worktree準備
 
+`.stdd.config.yml` の `project.primary_branch` を統合先ブランチとして読み取る。
+
 ```bash
-git fetch origin develop
+# <primary_branch> は .stdd.config.yml の project.primary_branch
+git fetch origin <primary_branch>
 ```
 
-issueタイトルからブランチ名を生成（`claude/<kebab-case-summary>`）。
+issueタイトルからブランチ名を生成（`<branch_prefix><kebab-case-summary>`。`branch_prefix` は `.stdd.config.yml` の `workflow.branch_prefix`、既定 `claude/`）。
 Worktree作成スクリプトを実行:
 
 ```bash

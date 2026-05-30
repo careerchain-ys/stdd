@@ -72,15 +72,17 @@ TECH_DESIGN.mdのTest Strategyに従い、以下の順序でタスクを作成:
 
 ## 配置ルール
 
-```
-docs/<app>/<feature-path>/plans/[yyyy-mm-dd].md
-```
-
-**例**:
+配置先のパスは `.stdd.config.yml` の `docs.layout.*` のパステンプレートに、対象アプリの `app.id`（`apps[].id`）と `feature_path` を適用して決定する。中立例:
 
 ```
-docs/admin_app/projects/project-list/plans/2026-03-24.md
-docs/user_app/profile/skills/plans/2026-03-24.md
+docs/<app.id>/<feature_path>/plans/[yyyy-mm-dd].md
+```
+
+**Example**:
+
+```
+docs/<app.id>/projects/project-list/plans/2026-03-24.md
+docs/<app.id>/profile/skills/plans/2026-03-24.md
 ```
 
 ## テンプレート参照

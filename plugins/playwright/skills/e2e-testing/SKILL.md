@@ -13,30 +13,33 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 
 ### 1. テストファイルの配置
 
+`.stdd.config.yml` の各 `apps[]` ごとにサブディレクトリを分けて配置する（`apps[].id` をディレクトリ名に用いる）。
+
 ```
 e2e/tests/
-├── user-app/          # user_app E2Eテスト
+├── <apps[].id>/       # 各 apps[] の E2Eテスト（apps[] の数だけ繰り返す）
 │   └── *.spec.ts
-└── admin-app/         # admin_app E2Eテスト
-    └── *.spec.ts
+└── ...
 ```
 
 ### 2. 基本的なテスト構造
+
+対象アプリのベースURLは `.stdd.config.yml` の `apps[].port` から組み立てる（`http://localhost:<apps[].port>`）。ハードコードしないこと。
 
 ```typescript
 import {
   test,
   expect,
-  loginWithCredentialsUserApp,
-} from '../../fixtures/user-app/test-fixtures';
+  loginWithCredentials,
+} from '../../fixtures/<apps[].id>/test-fixtures';
 
 test.describe('機能名', () => {
   test('テストケース名', async ({ page, testUser }) => {
     // 認証が必要な場合はUIからログイン
-    await loginWithCredentialsUserApp(page, testUser.email, testUser.password);
+    await loginWithCredentials(page, testUser.email, testUser.password);
 
-    // テスト実行
-    await page.goto('http://localhost:3000/dashboard');
+    // テスト実行（ベースURLは apps[].port から組み立てる）
+    await page.goto(`http://localhost:${process.env.PORT}/dashboard`);
     await expect(
       page.getByRole('heading', { name: 'ダッシュボード' }),
     ).toBeVisible();
@@ -48,7 +51,7 @@ test.describe('機能名', () => {
 
 ```bash
 cd e2e
-npx playwright test tests/user-app/login.spec.ts --headed
+npx playwright test tests/<apps[].id>/login.spec.ts --headed
 ```
 
 ## Locator選択の優先順位
@@ -125,7 +128,7 @@ await page.waitForTimeout(2000); // 禁止！
 ```typescript
 test('ユーザー情報を更新できる', async ({ page, testUser }) => {
   // このテスト用にログイン
-  await loginWithCredentialsUserApp(page, testUser.email, testUser.password);
+  await loginWithCredentials(page, testUser.email, testUser.password);
 
   // テスト実行
   await page.goto('/profile');
@@ -253,14 +256,14 @@ await supabase.from('skills').delete().eq('user_id', testUser.id);
 ### 検証手順（テスト追加・修正後）
 
 ```bash
-# 1. DBリセット
-cd supabase && npm run reset
+# 1. DBリセット（実際のコマンドは .stdd.config.yml の commands.db_reset に従う）
+<commands.db_reset>
 
-# 2. 全テスト並列実行（flakyの再現条件）
-cd e2e && npx playwright test --project=user-app
+# 2. 全テスト並列実行（flakyの再現条件）。--project は対象 apps[].id を指定
+cd e2e && npx playwright test --project=<apps[].id>
 
 # 3. 失敗があれば --workers=1 で再実行し、flaky vs 真の bug を切り分け
-cd e2e && npx playwright test --project=user-app --workers=1
+cd e2e && npx playwright test --project=<apps[].id> --workers=1
 ```
 
 `workers=1` で pass するが `workers=2` で fail → 並列干渉のflaky → 上記ルールで対応。
@@ -304,16 +307,16 @@ npx playwright show-report
 
 ## 認証が必要なテスト
 
-**重要原則**: 新規登録/ログイン導線のテスト以外では、必ず`loginWithCredentialsUserApp`を使用。
+**重要原則**: 新規登録/ログイン導線のテスト以外では、必ず対象アプリのログインヘルパー（例: `loginWithCredentials`）を使用。
 
 ```typescript
 import {
   test,
-  loginWithCredentialsUserApp,
-} from '../../fixtures/user-app/test-fixtures';
+  loginWithCredentials,
+} from '../../fixtures/<apps[].id>/test-fixtures';
 
 test('認証が必要な機能のテスト', async ({ page, testUser }) => {
-  await loginWithCredentialsUserApp(page, testUser.email, testUser.password);
+  await loginWithCredentials(page, testUser.email, testUser.password);
   // ...
 });
 ```
@@ -339,9 +342,9 @@ WT_ID=2
 WF=/path/to/worktree-$WT_ID
 OC=$WF/.devcontainer/devcontainer.override.json
 
-# 1. DBリセット（テストデータ投入）
+# 1. DBリセット（テストデータ投入）。実際のコマンドは .stdd.config.yml の commands.db_reset に従う
 devcontainer exec --workspace-folder $WF --override-config $OC \
-  bash -c "cd /workspace/supabase && npm run reset"
+  bash -c "cd /workspace/supabase && <commands.db_reset>"
 
 # 2. Playwrightブラウザインストール（chromiumのみで十分）
 # ※ e2eの依存パッケージはルートのnpm install（workspaces）で一括インストール済み
@@ -352,23 +355,19 @@ devcontainer exec --workspace-folder $WF --override-config $OC \
 ### テスト実行
 
 ```bash
-# admin_app E2Eテスト
+# 各アプリの E2Eテスト（--project には対象 apps[].id を指定。apps[] の数だけ繰り返す）
 devcontainer exec --workspace-folder $WF --override-config $OC \
-  bash -c "cd /workspace/e2e && npx playwright test --project=admin-app"
-
-# user_app E2Eテスト
-devcontainer exec --workspace-folder $WF --override-config $OC \
-  bash -c "cd /workspace/e2e && npx playwright test --project=user-app"
+  bash -c "cd /workspace/e2e && npx playwright test --project=<apps[].id>"
 
 # 特定テストファイルのみ
 devcontainer exec --workspace-folder $WF --override-config $OC \
-  bash -c "cd /workspace/e2e && npx playwright test tests/user-app/login.spec.ts"
+  bash -c "cd /workspace/e2e && npx playwright test tests/<apps[].id>/login.spec.ts"
 ```
 
 ### 注意事項
 
 - e2e/.env.localはworktree作成スクリプトがポート番号を自動調整済み
-- devcontainerの`postStartCommand`でuser_app/admin_appは自動起動される（`SKIP_EMAIL_SEND=true` が設定された状態で起動される）
+- devcontainerの`postStartCommand`で各 `apps[]` は自動起動される（`SKIP_EMAIL_SEND=true` が設定された状態で起動される）
 - Supabaseもdevcontainer起動時に自動起動される
 
 ---
@@ -381,25 +380,22 @@ Claude Code上でE2Eテストの実行を指示された場合、以下の手順
 
 1. **テスト実行用ブランチを作成してpush**
 
-   ```bash
-   # user_app のE2Eテスト
-   git checkout -b claude/execute-user-app-e2e/[change_name]
-   git push -u origin claude/execute-user-app-e2e/[change_name]
+   各アプリについて、対象の `apps[].id`（`.stdd.config.yml`）をブランチ名・ワークフロー名に用いる（apps[] の数だけ繰り返す）。
 
-   # admin_app のE2Eテスト
-   git checkout -b claude/execute-admin-app-e2e/[change_name]
-   git push -u origin claude/execute-admin-app-e2e/[change_name]
+   ```bash
+   # 対象アプリ（<apps[].id>）のE2Eテスト
+   git checkout -b claude/execute-<apps[].id>-e2e/[change_name]
+   git push -u origin claude/execute-<apps[].id>-e2e/[change_name]
    ```
 
 2. **ワークフローが自動実行される**
-   - `claude/execute-user-app-e2e/**` → `e2e-user-app.yml`
-   - `claude/execute-admin-app-e2e/**` → `e2e-admin-app.yml`
+   - `claude/execute-<apps[].id>-e2e/**` → `e2e-<apps[].id>.yml`
 
 3. **結果を確認**
 
    ```bash
    git fetch origin
-   git checkout origin/claude/results-e2e/[change_name]/user-app-{run_id} -- result.json test-output.log
+   git checkout origin/claude/results-e2e/[change_name]/<apps[].id>-{run_id} -- result.json test-output.log
    cat result.json
    cat test-output.log
    ```
@@ -412,10 +408,10 @@ Claude Code上でE2Eテストの実行を指示された場合、以下の手順
 
 ```json
 {
-  "workflow_name": "E2E Tests - User App",
+  "workflow_name": "E2E Tests - <apps[].id>",
   "workflow_run_id": "12345678",
   "test_outcome": "success" | "failure",
-  "target_app": "user_app" | "admin_app"
+  "target_app": "<apps[].id>"
 }
 ```
 

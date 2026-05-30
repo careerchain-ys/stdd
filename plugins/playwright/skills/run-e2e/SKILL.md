@@ -70,8 +70,8 @@ WORKTREE_DIR = {{worktree.base_path}}/worktree-<INSTANCE_ID>
 OVERRIDE_CONFIG = ${WORKTREE_DIR}/.devcontainer/devcontainer.override.json
 
 # ポート計算（INSTANCE_IDに応じてオフセット）
-USER_APP_PORT = 3000 + INSTANCE_ID * 100    (例: ID=1 → 3100, ID=2 → 3200)
-ADMIN_APP_PORT = 3001 + INSTANCE_ID * 100   (例: ID=1 → 3101, ID=2 → 3201)
+# 各アプリのベースポートは .stdd.config.yml の apps[].port を用いる（apps[] の数だけ繰り返す）
+APP_PORT(<apps[].id>) = <apps[].port> + INSTANCE_ID * 100   (例: base=3000, ID=1 → 3100, ID=2 → 3200)
 SUPABASE_API_PORT = 54321 + INSTANCE_ID * 1000
 SUPABASE_DB_PORT = 54322 + INSTANCE_ID * 1000
 ```
@@ -91,7 +91,7 @@ devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_
 ### 3-1. DBリセット（テストデータ準備）
 
 ```bash
-devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_CONFIG> bash -c "cd /workspace/supabase && npm run reset"
+devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_CONFIG> bash -c "cd /workspace/supabase && <commands.db_reset>"
 ```
 
 ### 3-2. Playwrightブラウザインストール
@@ -102,22 +102,24 @@ devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_
 
 ### 3-3. アプリケーションサーバー起動確認
 
+`.stdd.config.yml` の各 `apps[]` について、算出した `APP_PORT(<apps[].id>)` で疎通確認する（apps[] の数だけ繰り返す）。
+
 ```bash
-devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_CONFIG> bash -c "curl -s -o /dev/null -w '%{http_code}' http://localhost:<USER_APP_PORT> && echo ' user_app OK' || echo ' user_app NOT RUNNING'"
-devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_CONFIG> bash -c "curl -s -o /dev/null -w '%{http_code}' http://localhost:<ADMIN_APP_PORT> && echo ' admin_app OK' || echo ' admin_app NOT RUNNING'"
+devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_CONFIG> bash -c "curl -s -o /dev/null -w '%{http_code}' http://localhost:<APP_PORT> && echo ' <apps[].id> OK' || echo ' <apps[].id> NOT RUNNING'"
 ```
 
 起動していない場合はバックグラウンドで起動する:
 
+各 `apps[]` について、`apps[].path` ディレクトリで dev サーバを起動する（apps[] の数だけ繰り返す）。
+
 ```bash
-devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_CONFIG> bash -c "cd /workspace/user_app && SKIP_EMAIL_SEND=true nohup npm run dev > /tmp/user_app.log 2>&1 &"
-devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_CONFIG> bash -c "cd /workspace/admin_app && SKIP_EMAIL_SEND=true nohup npm run dev > /tmp/admin_app.log 2>&1 &"
+devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_CONFIG> bash -c "cd /workspace/<apps[].path> && SKIP_EMAIL_SEND=true nohup npm run dev > /tmp/<apps[].id>.log 2>&1 &"
 ```
 
-起動後、アプリが応答するまで待機:
+起動後、全 `apps[]` が応答するまで待機（各 `APP_PORT(<apps[].id>)` を列挙）:
 
 ```bash
-devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_CONFIG> bash -c "npx wait-on http://localhost:<USER_APP_PORT> http://localhost:<ADMIN_APP_PORT> --timeout 120000"
+devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_CONFIG> bash -c "npx wait-on http://localhost:<APP_PORT> ... --timeout 120000"
 ```
 
 ## 4. E2Eテスト実行
@@ -126,14 +128,14 @@ devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_
 
 ### 引数のパターン
 
-| 引数                   | 実行内容                                 |
-| ---------------------- | ---------------------------------------- |
-| なし / `all`           | 全テスト実行                             |
-| `user-app`             | user-appプロジェクトのみ                 |
-| `admin-app`            | admin-appプロジェクトのみ                |
-| `user-app login`       | user-appの特定specファイル               |
-| `admin-app agent-list` | admin-appの特定specファイル              |
-| その他の文字列         | Playwrightの `--grep` パターンとして使用 |
+プロジェクト名には `.stdd.config.yml` の `apps[].id` を用いる。
+
+| 引数                       | 実行内容                                 |
+| -------------------------- | ---------------------------------------- |
+| なし / `all`               | 全テスト実行                             |
+| `<apps[].id>`              | 指定アプリのプロジェクトのみ             |
+| `<apps[].id> <spec名>`     | 指定アプリの特定specファイル             |
+| その他の文字列             | Playwrightの `--grep` パターンとして使用 |
 
 ### 実行コマンド
 
@@ -152,7 +154,7 @@ devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_
 **プロジェクト＋specファイル指定:**
 
 ```bash
-devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_CONFIG> bash -c "cd /workspace/e2e && npx playwright test --project=user-app tests/user-app/<SPEC>.spec.ts"
+devcontainer exec --workspace-folder <WORKTREE_DIR> --override-config <OVERRIDE_CONFIG> bash -c "cd /workspace/e2e && npx playwright test --project=<apps[].id> tests/<apps[].id>/<SPEC>.spec.ts"
 ```
 
 **grepパターン指定:**

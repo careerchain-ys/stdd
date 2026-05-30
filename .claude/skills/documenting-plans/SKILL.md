@@ -37,8 +37,8 @@ docs/<app>/<feature-path>/plans/[yyyy-mm-dd].md
 **例**:
 
 ```
-docs/admin_app/projects/project-list/plans/2026-01-30.md
-docs/user_app/profile/skills/plans/2026-01-30.md
+docs/<app.id>/projects/project-list/plans/2026-01-30.md
+docs/<app.id>/profile/skills/plans/2026-01-30.md
 ```
 
 ## 作成タイミング

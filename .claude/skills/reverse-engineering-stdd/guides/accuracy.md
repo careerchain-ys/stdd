@@ -207,8 +207,9 @@ Spec・テスト・実装の3点整合性を自動チェックする。不整合
 
 ```bash
 # REQUIREMENTS.mdに書いたボタンラベルが実装に存在するか確認
-grep -r "保存して次へ" user_app/app/
+# <app.path> は .stdd.config.yml の apps[].path（複数アプリは apps[] をループ）
+grep -r "保存して次へ" <app.path>/app/
 
 # TECH_DESIGN.mdに書いたバリデーションルールが実装に存在するか確認
-grep -r "min(10" user_app/app/
+grep -r "min(10" <app.path>/app/
 ```

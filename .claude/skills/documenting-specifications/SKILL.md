@@ -55,11 +55,11 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
 
 **例**:
 
-- 実装: `admin_app/app/login/page.tsx`
-- ドキュメント:
-  - `docs/admin_app/login/REQUIREMENTS.md`（必須）
-  - `docs/admin_app/login/TECH_DESIGN.md`（必須）
-  - `docs/admin_app/login/SCREEN_ITEMS_DEFINITION.md`（任意）
+- 実装: `<app.path>/app/login/page.tsx`（`app.path` は `.stdd.config.yml` の `apps[].path`）
+- ドキュメント（`docs.layout.*` テンプレートに従う。`<app.id>` は `apps[].id`）:
+  - `docs/<app.id>/login/REQUIREMENTS.md`（必須）
+  - `docs/<app.id>/login/TECH_DESIGN.md`（必須）
+  - `docs/<app.id>/login/SCREEN_ITEMS_DEFINITION.md`（任意）
 
 ## 絶対ルール: SSOT原則（最優先）
 

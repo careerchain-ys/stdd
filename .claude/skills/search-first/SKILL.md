@@ -25,12 +25,10 @@ allowed-tools: Read, Grep, Glob, Bash
 既存コードベースに同等機能がないか確認する。
 
 ```
-検索対象:
-- user_app/lib/ — ユーティリティ・ヘルパー関数
-- admin_app/lib/ — 管理側のユーティリティ
-- packages/shared/ — 共有コード
-- user_app/domain/service/ — ビジネスロジック
-- admin_app/domain/service/ — 管理側ビジネスロジック
+検索対象（.stdd.config.yml の apps[] を読み、各 apps[].path について繰り返す）:
+- <apps[].path>/lib/ — ユーティリティ・ヘルパー関数
+- packages/shared/ — 共有コード（モノレポの共有パッケージがある場合）
+- <apps[].path>/domain/service/ — ビジネスロジック
 ```
 
 **チェックポイント**:
