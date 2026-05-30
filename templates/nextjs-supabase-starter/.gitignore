@@ -1,0 +1,26 @@
+node_modules/
+dist/
+build/
+.next/
+.turbo/
+out/
+
+.env
+.env.local
+.env.*.local
+
+# Supabase ローカル環境
+supabase/.branches/
+supabase/.temp/
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
+.DS_Store
+*.log
+.cache/
+
+.claude/settings.local.json
+session-logs/

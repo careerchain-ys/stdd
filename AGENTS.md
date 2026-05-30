@@ -63,7 +63,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 
 - **言語**: ドキュメント・コメントは日本語を基本とする
 - **Markdown**: 見出しは `#`（H1）から始まり、コード塊は ` ``` ` でフェンス
-- **JSON**: インデント 2 スペース。`plugin.json` は `PluginManifest` interface（[`docs/phase2/specs/TECH_DESIGN.md`](docs/phase2/specs/TECH_DESIGN.md) §3 参照）に準拠
+- **JSON**: インデント 2 スペース。`plugin.json` は各プラグインのメタデータ（`id` / `name` / `version` / `skills` / `description`）を記述する
 - **YAML**: インデント 2 スペース。`.stdd.config.yml` は kebab-case
 - **ファイル名**: skill / agent / plugin の ID は kebab-case
 - **Spec / PLAN ドキュメント**: `packages/core/templates/` 配下の構造を踏襲
@@ -88,7 +88,7 @@ STDD では **Spec → Test → Implementation** の順序を厳守します。
 | Integration | 複数モジュール間の連携（DB / API / Server Action 等）         |
 | E2E          | ユーザー視点のシナリオ（Playwright を用いる場合は plugins/playwright を参照） |
 
-stdd 本体（ドキュメント・テンプレート）は監査スクリプト（grep / JSON validation / schema validation）でテストを構成します。詳細は [`docs/phase2/specs/TECH_DESIGN.md`](docs/phase2/specs/TECH_DESIGN.md) §8 を参照してください。
+stdd 本体（ドキュメント・テンプレート）は監査スクリプト（grep / JSON validation / schema validation）でテストを構成します。具体的な検証コマンドは [`CONTRIBUTING.md`](CONTRIBUTING.md) を参照してください。
 
 ---
 

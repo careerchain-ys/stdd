@@ -28,10 +28,24 @@ v0.1.0 時点で公式に対応している AI エージェントは以下です
 ```bash
 git clone https://github.com/careerchain-ys/stdd.git
 cd stdd && npm install && npm run build
+
+# 最小構成（デフォルト）
 node packages/create-stdd-project/dist/cli.js <project-name>
+
+# Next.js + Supabase スターター（nextjs-supabase / playwright プラグイン同梱）
+node packages/create-stdd-project/dist/cli.js <project-name> --template nextjs-supabase-starter
 ```
 
-`<project-name>/` に `.stdd.config.yml`・`.claude/`（skill / agent / hook）・`docs/`・`README.md` が展開されます。以降の手順 1〜4 は CLI を使わず手動で構成する場合の参考です。
+`<project-name>/` に `.stdd.config.yml`・`.claude/`（skill / agent / hook）・`docs/`・`README.md` が展開されます。`--template` を指定すると、テンプレートが宣言するプラグインの skill も `.claude/skills/` に展開されます。
+
+利用可能なテンプレート:
+
+| テンプレート | 内容 |
+| --- | --- |
+| `minimal`（既定） | 最小構成。コア skill / agent / hook のみ |
+| `nextjs-supabase-starter` | Next.js (App Router) + Supabase 向け。`nextjs-supabase`・`playwright` プラグインを同梱 |
+
+以降の手順 1〜4 は CLI を使わず手動で構成する場合の参考です。
 
 ### 1. リポジトリを取得する
 
@@ -62,8 +76,8 @@ cp stdd/packages/core/templates/PLAN.md         docs/web/<feature_path>/plans/$(
 
 ## 現状の制約（v0.1.0 時点）
 
-- `.claude/agents/*.md` および `.claude/skills/**/*.md` の一部に、二系統アプリ構成（例: `user_app` / `admin_app`）を前提とした具体コマンド（`cd user_app && npm test` 等）が残存しています。これらは Phase 1-B でテンプレート変数（`{{apps[].path}}` 等）に置換予定です。
-- 現状、stdd を別レイアウトのプロジェクト（単一アプリ・別命名等）で使う場合は、当該箇所を手動で書き換えてください。
+- skill / agent / hook は `.stdd.config.yml` 駆動で動作します（`apps[].path` / `commands.*` / `project.primary_branch` 等を実行時に参照）。下流プロジェクト固有値のハードコードは除去済みです。記述規約は [`docs/config-driven-authoring.md`](docs/config-driven-authoring.md) を参照してください。
+- 別レイアウトのプロジェクト（単一アプリ・複数アプリ・別命名等）で使う場合は、`.stdd.config.yml` の `apps[]` / `commands` を調整すれば対応できます。
 - CLI (`create-stdd-project`) は Phase 2-B で実装済みですが、npm への公開（`npx` での直接実行）は今後の Phase で対応予定です。現状はローカル clone から `node packages/create-stdd-project/dist/cli.js <project-name>` で実行してください。
 
 ---
@@ -85,7 +99,8 @@ stdd/
 │   │   └── schema/
 │   └── create-stdd-project/   # プロジェクト生成 CLI（create-stdd-project）
 ├── templates/                 # CLI が展開するプロジェクトテンプレート
-│   └── minimal/               # 最小構成テンプレート
+│   ├── minimal/               # 最小構成テンプレート
+│   └── nextjs-supabase-starter/ # Next.js + Supabase スターター（プラグイン同梱）
 ├── plugins/                   # 技術スタック別プラグイン
 │   ├── nextjs-supabase/       # Next.js + Supabase 向け skill
 │   ├── playwright/            # Playwright E2E 向け skill
@@ -93,7 +108,7 @@ stdd/
 ├── .claude/                   # Claude Code 用ファイル群
 │   ├── agents/                # エージェント定義
 │   └── skills/                # core skill 群
-└── docs/                      # 方針ドキュメント / 各 Phase の spec / plan
+└── docs/                      # 方針・オーサリング規約ドキュメント
 ```
 
 各プラグインディレクトリには `plugin.json`（プラグインメタデータ）と `skills/` が含まれます。プラグインの分離方針は [`docs/plugin-separation-policy.md`](docs/plugin-separation-policy.md) を参照してください。
@@ -110,6 +125,7 @@ stdd/
 - [`packages/core/docs/stdd-methodology.md`](packages/core/docs/stdd-methodology.md) — STDD 方法論
 - [`packages/core/docs/workflow-diagram.md`](packages/core/docs/workflow-diagram.md) — 開発フロー図
 - [`docs/plugin-separation-policy.md`](docs/plugin-separation-policy.md) — プラグイン分離方針
+- [`docs/config-driven-authoring.md`](docs/config-driven-authoring.md) — skill / agent / hook の設定駆動オーサリング規約
 
 ---
 

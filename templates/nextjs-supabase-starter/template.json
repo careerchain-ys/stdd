@@ -1,0 +1,5 @@
+{
+  "id": "nextjs-supabase-starter",
+  "description": "Next.js (App Router) + Supabase 向けの STDD スターター。nextjs-supabase / playwright プラグインを同梱する。",
+  "plugins": ["nextjs-supabase", "playwright"]
+}
