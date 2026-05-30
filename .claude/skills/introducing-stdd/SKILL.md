@@ -48,7 +48,7 @@ docs/common/plans/stdd-introduction.md
 | 1 | common ティア生成 | `reverse-engineering-common-spec` | 生成後の `<!-- 要確認 -->` 一覧 |
 | 1.5 | 機能インベントリ + 優先順 → 導入PLAN へ記載 | — | ★ 機能一覧と優先順（P0 から） |
 | 2 | 代表機能 1 つをリバース | `reverse-engineering-feature-spec` | ★ Spec 粒度・スコープ |
-| 3-4 | フォーマット策定 → テンプレ特化 | — | ★★ フォーマット決定（テーラリング） |
+| 3-4 | フォーマット策定 → テンプレ特化 | `tailoring-spec-format` | ★★ フォーマット決定（テーラリング） |
 | 5 | 残り機能を優先順でループ | `reverse-engineering-feature-spec` | ★ 機能ごとの粒度 |
 | 6 | 順行運用へ移行 | `auto-implement`（以降） | 導入完了の確認 |
 
@@ -178,5 +178,6 @@ docs:
 - **導入PLAN テンプレート**: [templates/introduction-plan.md](templates/introduction-plan.md)
 - **common ティアのリバース**: [reverse-engineering-common-spec skill](../reverse-engineering-common-spec/SKILL.md)
 - **機能単位のリバース**: [reverse-engineering-feature-spec skill](../reverse-engineering-feature-spec/SKILL.md)
+- **フォーマット策定・テーラリング（step 3-4 / 7）**: [tailoring-spec-format skill](../tailoring-spec-format/SKILL.md)
 - **整合性チェック**: [verify-consistency skill](../verify-consistency/SKILL.md)
 - **順行運用（新機能実装）**: [auto-implement skill](../auto-implement/SKILL.md)
