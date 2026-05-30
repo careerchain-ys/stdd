@@ -56,6 +56,20 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
 2. 変更内容に応じて両方を更新
 3. テスト戦略（テスト総数・内訳）を更新
 
+## Spec の 2 ティア構造（common / feature）
+
+本スキルが扱う REQUIREMENTS.md / TECH_DESIGN.md は **feature ティア**（機能単位）の spec である。
+その上位に、プロジェクト全体を俯瞰する **common ティア** が存在する。
+
+| ティア      | What / Why                | How                       | 配置例                                |
+| ----------- | ------------------------- | ------------------------- | ------------------------------------- |
+| **common**  | `REQUIREMENTS.md` (全体版) | `ARCHITECTURE.md` (全体版) | `docs/common/`                        |
+| **feature** | `REQUIREMENTS.md`         | `TECH_DESIGN.md`          | `docs/<app>/<feature>/`               |
+
+- feature spec は common ティア（サービス目的・アクター・システム構成・レイヤ規約・データモデル）を**前提とする**。common と矛盾しないこと。
+- 全体版テンプレートは `packages/core/templates/common/` を参照。既存実装からの common spec 作成は `reverse-engineering-common-spec` スキルを参照。
+- 詳細は `packages/core/docs/stdd-methodology.md` §3.0 を参照。
+
 ## ドキュメント配置ルール
 
 | 実装ファイル                  | ドキュメント配置先                                                                                                                                                   |
