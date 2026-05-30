@@ -71,8 +71,8 @@ cd admin_app && npm run build
 ### Phase 5: ビルドチェック
 
 ```bash
-cd /home/user/careerchain/user_app && npm run build
-cd /home/user/careerchain/admin_app && npm run build
+cd {{apps[0].path}} && npm run build
+cd {{apps[1].path}} && npm run build
 ```
 
 ## レポートフォーマット
@@ -123,14 +123,14 @@ QAチェック時に以下のスキルのガイドラインを基準として参
 
 | スキル                     | 参照パス                                     | 参照タイミング                                                     |
 | -------------------------- | -------------------------------------------- | ------------------------------------------------------------------ |
-| e2e-testing                | `.claude/skills/e2e-testing/`                | E2Eテスト実行・品質評価時                                          |
-| implementing-ui            | `.claude/skills/implementing-ui/`            | UIコンポーネントの品質チェック時（レスポンシブ、アクセシビリティ） |
+| e2e-testing                | `plugins/playwright/skills/e2e-testing/`                | E2Eテスト実行・品質評価時                                          |
+| implementing-ui            | `plugins/nextjs-supabase/skills/implementing-ui/`            | UIコンポーネントの品質チェック時（レスポンシブ、アクセシビリティ） |
 | software-architecture      | `.claude/skills/software-architecture/`      | アーキテクチャ整合性チェック時                                     |
 | documenting-specifications | `.claude/skills/documenting-specifications/` | Spec⇔実装の整合性チェック時                                        |
 
 ## 必須の事前読み込み
 
-作業開始前に以下のファイルを**必ずRead**すること:
+作業開始前に、プロジェクトルートに以下のファイルが**存在する場合は必ず Read** すること（存在しない場合はスキップして次に進む）:
 
-1. `CLAUDE.md` - プロジェクト全体規約
-2. `.claude/docs/coding-conventions.md` - コーディング規約（詳細版）
+1. `CLAUDE.md`（プロジェクト固有ルール）
+2. `.claude/docs/coding-conventions.md`（コーディング規約）

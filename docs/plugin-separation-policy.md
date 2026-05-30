@@ -45,8 +45,8 @@ Next.js + Supabase スタック向けのプラグイン。
 
 含めないもの:
 
-- CareerChain 固有の admin 権限モデル（`agent_staff_role` 等）
-- CareerChain 固有のカラーコード（`bg-[#1e3a5f]` 等）→ プラグインのデフォルト値も持たず、利用側プロジェクトのトークン参照に委ねる
+- 特定プロジェクト固有の admin 権限モデル（独自ロール名・カスタム権限テーブル等）
+- 特定プロジェクト固有のカラーコード（ブランドカラーの固定値等）→ プラグインのデフォルト値も持たず、利用側プロジェクトのトークン参照に委ねる
 
 ### 3.2 `@stdd/plugin-playwright`
 
@@ -91,7 +91,7 @@ git worktree + devcontainer を用いたマルチ環境並列開発向けのプ�
 9. `search-first`
 10. `software-architecture`
 
-これらの skill 内に含まれる CareerChain 固有値（`user_app` / `admin_app` / `develop` 等）は、
+これらの skill 内に含まれる下流プロジェクト固有値（`user_app` / `admin_app` / `develop` 等のサンプル値）は、
 Phase 1 で Handlebars 変数（`{{apps[].path}}` / `{{project.primary_branch}}` 等）に置換する。
 
 ## 5. v2.0 以降に延期する skill
@@ -102,8 +102,7 @@ Phase 1 で Handlebars 変数（`{{apps[].path}}` / `{{project.primary_branch}}`
 - `security-scan`（プロジェクト依存パッケージ・Supabase RLS 等のスキャンを含むため、プラグイン化が必要）
 - `penetration-tester`（ペネトレーションテストエージェント、汎用化検討）
 
-これらは v0.1.0 リリース時点では同梱しない（`.claude/skills/` 配下から物理的に除外する）か、
-プラグイン化の準備が整うまで非公開ブランチに退避する方針とする。
+これらの skill の最終的な扱い（プラグイン化 / 削除 / 非公開ブランチ退避）は Phase 2-B 以降で決定する。Phase 2-A 時点では `.claude/skills/` 配下に存置するが、v0.1.0 公開直前 (Phase 2-C) に再度扱いを確定する。本ポリシードキュメントも Phase 2-C で改めて見直す予定である。
 
 ## 6. プラグインインタフェース（暫定）
 

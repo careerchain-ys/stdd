@@ -11,7 +11,7 @@ model: opus
 
 ## プロジェクトコンテキスト
 
-CareerChain（キャリアチェーン）プラットフォーム:
+対象プロジェクト:
 
 - Next.js 14 with App Router
 - TypeScript + Tailwind CSS + shadcn/ui
@@ -157,14 +157,14 @@ CareerChain（キャリアチェーン）プラットフォーム:
 | スキル                | 参照パス                                | 参照タイミング                                             |
 | --------------------- | --------------------------------------- | ---------------------------------------------------------- |
 | software-architecture | `.claude/skills/software-architecture/` | アーキテクチャ・責務分離・命名規則のレビュー時             |
-| implementing-ui       | `.claude/skills/implementing-ui/`       | UIコンポーネントのレビュー時（パターン準拠、レスポンシブ） |
+| implementing-ui       | `plugins/nextjs-supabase/skills/implementing-ui/`       | UIコンポーネントのレビュー時（パターン準拠、レスポンシブ） |
 | kaizen                | `.claude/skills/kaizen/`                | 過剰設計・YAGNI違反の検出時                                |
-| migrating-supabase    | `.claude/skills/migrating-supabase/`    | マイグレーション・RLSポリシーのレビュー時                  |
+| migrating-supabase    | `plugins/nextjs-supabase/skills/migrating-supabase/`    | マイグレーション・RLSポリシーのレビュー時                  |
 | search-first          | `.claude/skills/search-first/`          | 車輪の再発明・不要な自前実装の検出時                       |
 
 ## 必須の事前読み込み
 
-作業開始前に以下のファイルを**必ずRead**すること:
+作業開始前に、プロジェクトルートに以下のファイルが**存在する場合は必ず Read** すること（存在しない場合はスキップして次に進む）:
 
-1. `CLAUDE.md` - プロジェクト全体規約
-2. `.claude/docs/coding-conventions.md` - コーディング規約（詳細版）
+1. `CLAUDE.md`（プロジェクト固有ルール）
+2. `.claude/docs/coding-conventions.md`（コーディング規約）

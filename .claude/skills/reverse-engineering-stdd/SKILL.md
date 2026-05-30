@@ -449,7 +449,7 @@ TECH_DESIGN.mdのテスト戦略で定めたテストレベルに従って作成
 ## 参照ファイル
 
 - **Specテンプレート**: [documenting-specifications skill](../documenting-specifications/SKILL.md)
-- **E2Eテストガイド**: [e2e-testing skill](../e2e-testing/SKILL.md)
+- **E2Eテストガイド**: [e2e-testing skill](../../../plugins/playwright/skills/e2e-testing/SKILL.md)（`playwright` プラグイン）
 - **PLANドキュメント**: [documenting-plans skill](../documenting-plans/SKILL.md)
 - **STDD違反例**: [stdd-violations guide](../documenting-specifications/guides/stdd-violations.md)
 - **正確性ガイド**: [accuracy guide](guides/accuracy.md)

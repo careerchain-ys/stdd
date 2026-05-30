@@ -14,7 +14,7 @@
 npm run reset
 
 # 2. ログを確認
-docker logs supabase_db_careerchain
+docker logs supabase_db_<project_name>
 
 # 3. マイグレーションファイルの構文エラーを確認
 # SQLの構文が正しいか手動でチェック

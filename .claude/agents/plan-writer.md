@@ -12,7 +12,7 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）を読み取り、�
 
 ## プロジェクトコンテキスト
 
-CareerChain（キャリアチェーン）プラットフォーム:
+対象プロジェクト:
 
 - Next.js 14 with App Router
 - TypeScript + Tailwind CSS + shadcn/ui
@@ -102,10 +102,10 @@ PLANドキュメントのテンプレートは以下を参照:
 | -------------------------- | -------------------------------------------- | -------------------------------------------------------- |
 | documenting-plans          | `.claude/skills/documenting-plans/`          | **常に参照**（テンプレート・構成ルール・チェックリスト） |
 | documenting-specifications | `.claude/skills/documenting-specifications/` | Specドキュメントの構造理解時                             |
-| e2e-testing                | `.claude/skills/e2e-testing/`                | E2Eテストタスクの分解時                                  |
+| e2e-testing                | `plugins/playwright/skills/e2e-testing/`                | E2Eテストタスクの分解時                                  |
 | software-architecture      | `.claude/skills/software-architecture/`      | ファイル構成・責務分離の判断時                           |
-| implementing-ui            | `.claude/skills/implementing-ui/`            | UIコンポーネントのタスク分解時                           |
-| migrating-supabase         | `.claude/skills/migrating-supabase/`         | DBマイグレーションタスクの分解時                         |
+| implementing-ui            | `plugins/nextjs-supabase/skills/implementing-ui/`            | UIコンポーネントのタスク分解時                           |
+| migrating-supabase         | `plugins/nextjs-supabase/skills/migrating-supabase/`         | DBマイグレーションタスクの分解時                         |
 
 ## 品質基準
 
@@ -116,7 +116,7 @@ PLANドキュメントのテンプレートは以下を参照:
 
 ## 事前確認
 
-作業開始前に以下のファイルを**必ずRead**すること:
+作業開始前に、プロジェクトルートに以下のファイルが**存在する場合は必ず Read** すること（存在しない場合はスキップして次に進む）:
 
-1. `CLAUDE.md` - プロジェクト全体規約
-2. `.claude/docs/coding-conventions.md` - コーディング規約（詳細版）
+1. `CLAUDE.md`（プロジェクト固有ルール）
+2. `.claude/docs/coding-conventions.md`（コーディング規約）

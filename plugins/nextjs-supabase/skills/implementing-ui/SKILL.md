@@ -7,7 +7,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 
 # UI実装スキル
 
-CareerChainプロジェクトにおけるUI実装の包括的ガイド。
+対象プロジェクトにおけるUI実装の包括的ガイド。
 
 ## 重要: 仕様書の参照
 

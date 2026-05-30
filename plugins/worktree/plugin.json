@@ -1,0 +1,7 @@
+{
+  "id": "worktree",
+  "name": "git worktree + devcontainer 向けプラグイン",
+  "version": "0.1.0",
+  "skills": ["remove-worktree"],
+  "description": "git worktree と devcontainer を併用した並列開発フロー向けの skill を提供する。worktree の安全な削除手順を含む。"
+}

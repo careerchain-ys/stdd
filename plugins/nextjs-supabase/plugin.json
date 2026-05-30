@@ -1,0 +1,7 @@
+{
+  "id": "nextjs-supabase",
+  "name": "Next.js + Supabase スタック向けプラグイン",
+  "version": "0.1.0",
+  "skills": ["implementing-ui", "migrating-supabase"],
+  "description": "Next.js (App Router) と Supabase を組み合わせた Web アプリケーション向けの UI 実装ガイド・マイグレーション運用ガイドを提供する。"
+}

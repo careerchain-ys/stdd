@@ -11,7 +11,7 @@ model: opus
 
 ## プロジェクトコンテキスト
 
-CareerChain（キャリアチェーン）プラットフォーム:
+対象プロジェクト:
 
 - Next.js 14 with App Router
 - TypeScript + Tailwind CSS + shadcn/ui
@@ -69,9 +69,9 @@ npx tsc --noEmit
 
 | スキル                | 参照パス                                | 参照タイミング                                                              |
 | --------------------- | --------------------------------------- | --------------------------------------------------------------------------- |
-| implementing-ui       | `.claude/skills/implementing-ui/`       | **UI実装時は必須**（コンポーネントパターン、React Hook Form、レスポンシブ） |
-| migrating-supabase    | `.claude/skills/migrating-supabase/`    | **DB変更時は必須**（マイグレーション作成、RLSポリシー、GRANT権限）          |
-| e2e-testing           | `.claude/skills/e2e-testing/`           | **E2Eテスト作成時は必須**（Playwright、Locator選択、フレーキーテスト対策）  |
+| implementing-ui       | `plugins/nextjs-supabase/skills/implementing-ui/`       | **UI実装時は必須**（コンポーネントパターン、React Hook Form、レスポンシブ） |
+| migrating-supabase    | `plugins/nextjs-supabase/skills/migrating-supabase/`    | **DB変更時は必須**（マイグレーション作成、RLSポリシー、GRANT権限）          |
+| e2e-testing           | `plugins/playwright/skills/e2e-testing/`           | **E2Eテスト作成時は必須**（Playwright、Locator選択、フレーキーテスト対策）  |
 | software-architecture | `.claude/skills/software-architecture/` | Domain層・責務分離・設計判断時                                              |
 | kaizen                | `.claude/skills/kaizen/`                | リファクタリング・過剰設計回避の判断時                                      |
 | search-first          | `.claude/skills/search-first/`          | **新規実装前は必須**（既存ソリューション調査、車輪の再発明防止）            |
@@ -88,7 +88,7 @@ cd admin_app && npm test --no-cache
 
 ## 必須の事前読み込み
 
-作業開始前に以下のファイルを**必ずRead**すること:
+作業開始前に、プロジェクトルートに以下のファイルが**存在する場合は必ず Read** すること（存在しない場合はスキップして次に進む）:
 
-1. `CLAUDE.md` - プロジェクト全体規約
-2. `.claude/docs/coding-conventions.md` - コーディング規約（詳細版）
+1. `CLAUDE.md`（プロジェクト固有ルール）
+2. `.claude/docs/coding-conventions.md`（コーディング規約）

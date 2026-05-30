@@ -17,15 +17,15 @@ allowed-tools: Bash, Read
 pwd
 ```
 
-- `careerchain-worktree-N` の形式が含まれていれば、N がINSTANCE_ID
-- そうでない場合（careerchain_main等）は、Environment情報の "Additional working directories" を確認し、`careerchain-worktree-N` にマッチするものからINSTANCE_IDを特定する
+- `worktree-N` の形式が含まれていれば、N がINSTANCE_ID
+- そうでない場合（プロジェクトの main worktree 等）は、Environment情報の "Additional working directories" を確認し、`worktree-N` にマッチするものからINSTANCE_IDを特定する
 - 複数ある場合はユーザーに確認する
 
 ## 2. 稼働中のworktreeと関連コンテナを確認
 
 ```bash
 for i in 1 2 3 4; do
-  dir="../careerchain-worktree-${i}"
+  dir="../worktree-${i}"
   if [ -d "$dir" ]; then
     branch=$(git -C "$dir" branch --show-current 2>/dev/null || echo "不明")
     container=$(docker ps -a --filter "label=devcontainer.local_folder=$(cd "$dir" && pwd)" --format "{{.Names}} ({{.Status}})" 2>/dev/null || echo "なし")
@@ -39,8 +39,8 @@ done
 特定したINSTANCE_IDを使って確認する:
 
 ```bash
-git -C "../careerchain-worktree-<INSTANCE_ID>" status
-git -C "../careerchain-worktree-<INSTANCE_ID>" log develop..HEAD --oneline 2>/dev/null
+git -C "../worktree-<INSTANCE_ID>" status
+git -C "../worktree-<INSTANCE_ID>" log develop..HEAD --oneline 2>/dev/null
 ```
 
 ## 4. 破棄を実行
@@ -55,8 +55,8 @@ git -C "../careerchain-worktree-<INSTANCE_ID>" log develop..HEAD --oneline 2>/de
 ## 5. 破棄後の確認
 
 ```bash
-docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" | grep -E "REPOSITORY|vsc-careerchain"
-docker volume ls --format "table {{.Name}}" | grep -E "NAME|careerchain|dind"
+docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" | grep -E "REPOSITORY|vsc-<project_name>"
+docker volume ls --format "table {{.Name}}" | grep -E "NAME|<project_name>|dind"
 ```
 
 ## 注意事項
