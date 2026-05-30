@@ -1,0 +1,497 @@
+<!-- 汎用サンプル（toB 管理画面）: サイドバー + 2 カラム編集フォーム。固有名詞なし。 -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>レコード編集（toB） - ワイヤーフレーム</title>
+  <style>
+/*
+ * wireframe.css — STDD 汎用ワイヤーフレーム デザインシステム
+ *
+ * 目的:
+ *   低忠実度（low-fidelity）のワイヤーフレームを、技術スタック非依存の
+ *   素の HTML + CSS で表現するための共通スタイル。
+ *
+ * 方針:
+ *   - グレースケール基調。ブランドカラー・装飾は持たない（実装の自由度を縛らない）。
+ *   - レイアウト・情報設計・主要文言（タイトル / ボタン / 項目ラベル）の合意形成に用いる。
+ *   - モバイルファースト。768px 以上でデスクトップレイアウトに展開する。
+ *   - 各画面 HTML の <head> 内に <style> として直接埋め込む（CSS 単体ファイルは作らない / 自己完結 HTML）。
+ *
+ * 使い方:
+ *   components の各クラス（wf-*）を組み合わせて画面を組む。
+ *   クラス一覧は同ディレクトリの SKILL.md / templates/screen.html を参照。
+ */
+
+/* ===== Reset / Base ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --wf-ink: #2b2b2b;        /* 主要テキスト */
+  --wf-muted: #777;         /* 補助テキスト・プレースホルダ */
+  --wf-line: #c9c9c9;       /* 枠線 */
+  --wf-fill: #f2f2f2;       /* 面（薄） */
+  --wf-fill-2: #e4e4e4;     /* 面（中） */
+  --wf-fill-3: #d2d2d2;     /* 面（濃）/ primary ボタン */
+  --wf-bg: #ffffff;
+  --wf-radius: 4px;
+  --wf-gap: 12px;
+  --wf-pad: 16px;
+}
+
+body {
+  font-family: -apple-system, "Segoe UI", "Noto Sans JP", "Hiragino Sans", sans-serif;
+  color: var(--wf-ink);
+  background: #eaeaea;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+/* ===== ラベル（画面名・状態名の注記） ===== */
+.wf-screen-label {
+  max-width: 1100px;
+  margin: 16px auto 0;
+  padding: 0 16px;
+  font-size: 12px;
+  color: var(--wf-muted);
+  letter-spacing: 0.04em;
+}
+.wf-screen-label strong {
+  color: var(--wf-ink);
+  font-size: 13px;
+}
+
+/* ===== Page shell ===== */
+.wf-page {
+  max-width: 1100px;
+  margin: 8px auto 32px;
+  background: var(--wf-bg);
+  border: 1px solid var(--wf-line);
+  border-radius: var(--wf-radius);
+  overflow: hidden;
+}
+/* モバイル枠（幅 390px 固定）でプレビューしたい場合に付与 */
+.wf-page--mobile {
+  max-width: 390px;
+}
+
+/* ===== Header（グローバルヘッダー） ===== */
+.wf-header {
+  display: flex;
+  align-items: center;
+  gap: var(--wf-gap);
+  padding: 12px var(--wf-pad);
+  border-bottom: 1px solid var(--wf-line);
+  background: var(--wf-fill);
+}
+.wf-header__logo {
+  font-weight: 700;
+  padding: 6px 10px;
+  border: 1px solid var(--wf-line);
+  border-radius: var(--wf-radius);
+  background: var(--wf-bg);
+}
+.wf-header__nav {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  color: var(--wf-muted);
+}
+.wf-header__spacer { flex: 1; }
+
+/* ===== Body layout（サイドバー + メイン） ===== */
+.wf-body {
+  display: flex;
+  min-height: 360px;
+}
+.wf-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--wf-line);
+  background: var(--wf-fill);
+  padding: var(--wf-pad);
+}
+.wf-sidebar__item {
+  padding: 8px 10px;
+  border-radius: var(--wf-radius);
+  color: var(--wf-muted);
+}
+.wf-sidebar__item--active {
+  background: var(--wf-fill-2);
+  color: var(--wf-ink);
+  font-weight: 600;
+}
+.wf-main {
+  flex: 1;
+  padding: var(--wf-pad);
+  min-width: 0;
+}
+
+/* モバイル: サイドバーは隠してハンバーガー前提（注記用ダミー） */
+@media (max-width: 767px) {
+  .wf-sidebar { display: none; }
+}
+
+/* ===== 見出し / パンくず / タブ ===== */
+.wf-breadcrumb {
+  color: var(--wf-muted);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.wf-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.wf-subtitle {
+  color: var(--wf-muted);
+  margin-bottom: var(--wf-pad);
+}
+.wf-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--wf-line);
+  margin-bottom: var(--wf-pad);
+}
+.wf-tabs__item {
+  padding: 8px 14px;
+  color: var(--wf-muted);
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+.wf-tabs__item--active {
+  color: var(--wf-ink);
+  font-weight: 600;
+  border-color: var(--wf-line);
+  border-radius: var(--wf-radius) var(--wf-radius) 0 0;
+  background: var(--wf-fill);
+  margin-bottom: -1px;
+}
+
+/* ===== ツールバー（件数 + アクション） ===== */
+.wf-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--wf-gap);
+  flex-wrap: wrap;
+  margin-bottom: var(--wf-pad);
+}
+.wf-toolbar__spacer { flex: 1; }
+.wf-count { color: var(--wf-muted); }
+
+/* ===== 検索 / フィルタ ===== */
+.wf-search {
+  border: 1px solid var(--wf-line);
+  border-radius: var(--wf-radius);
+  margin-bottom: var(--wf-pad);
+  overflow: hidden;
+}
+.wf-search__head {
+  padding: 8px var(--wf-pad);
+  background: var(--wf-fill-2);
+  font-weight: 600;
+}
+.wf-search__body {
+  padding: var(--wf-pad);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wf-gap);
+}
+@media (min-width: 768px) {
+  .wf-search__body { grid-template-columns: 1fr 1fr; }
+}
+.wf-search__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ===== Form / Field ===== */
+.wf-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wf-gap);
+}
+@media (min-width: 768px) {
+  .wf-form--2col { grid-template-columns: 1fr 1fr; }
+}
+.wf-field { display: flex; flex-direction: column; gap: 4px; }
+.wf-field--full { grid-column: 1 / -1; }
+.wf-label { font-size: 12px; color: var(--wf-ink); font-weight: 600; }
+.wf-label--required::after { content: " *"; color: var(--wf-muted); }
+.wf-input,
+.wf-select,
+.wf-textarea {
+  border: 1px solid var(--wf-line);
+  border-radius: var(--wf-radius);
+  background: var(--wf-bg);
+  padding: 8px 10px;
+  color: var(--wf-muted);
+  min-height: 36px;
+}
+.wf-textarea { min-height: 88px; }
+/* セレクトのプルダウン矢印は HTML 側に「▾」を明示的に書く（例: <span class="wf-select">すべて ▾</span>） */
+.wf-help { font-size: 11px; color: var(--wf-muted); }
+.wf-error { font-size: 11px; color: var(--wf-ink); font-weight: 600; }
+
+/* ===== Buttons ===== */
+.wf-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 8px 16px;
+  border: 1px solid var(--wf-line);
+  border-radius: var(--wf-radius);
+  background: var(--wf-bg);
+  color: var(--wf-ink);
+  font: inherit;
+  cursor: default;
+}
+.wf-button--primary { background: var(--wf-fill-3); font-weight: 600; }
+.wf-button--ghost { border-color: transparent; color: var(--wf-muted); }
+.wf-button--sm { min-height: 28px; padding: 4px 10px; font-size: 12px; }
+
+/* ===== Table ===== */
+.wf-table-wrap {
+  border: 1px solid var(--wf-line);
+  border-radius: var(--wf-radius);
+  overflow-x: auto;
+}
+.wf-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+.wf-table th,
+.wf-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--wf-line);
+  white-space: nowrap;
+}
+.wf-table thead th {
+  background: var(--wf-fill-2);
+  font-weight: 600;
+}
+.wf-table tbody tr:last-child td { border-bottom: none; }
+.wf-table td.wf-td--muted { color: var(--wf-muted); }
+
+/* ===== Cards / Grid ===== */
+.wf-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wf-gap);
+}
+@media (min-width: 768px)  { .wf-grid--2 { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .wf-grid--3 { grid-template-columns: repeat(3, 1fr); } }
+.wf-card {
+  border: 1px solid var(--wf-line);
+  border-radius: var(--wf-radius);
+  padding: var(--wf-pad);
+  background: var(--wf-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wf-card__title { font-weight: 600; }
+.wf-card__meta { color: var(--wf-muted); font-size: 12px; }
+
+/* ===== Kanban ===== */
+.wf-kanban {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--wf-gap);
+}
+@media (min-width: 768px) {
+  .wf-kanban--3 { grid-template-columns: repeat(3, 1fr); }
+}
+.wf-kanban__col {
+  background: var(--wf-fill);
+  border: 1px solid var(--wf-line);
+  border-radius: var(--wf-radius);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.wf-kanban__head { font-weight: 600; }
+
+/* ===== Tag / Badge ===== */
+.wf-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid var(--wf-line);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--wf-muted);
+  background: var(--wf-fill);
+}
+
+/* ===== Placeholder（画像 / アバター） ===== */
+.wf-img {
+  position: relative;
+  background: var(--wf-fill);
+  border: 1px solid var(--wf-line);
+  border-radius: var(--wf-radius);
+  min-height: 96px;
+}
+.wf-img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top right, transparent calc(50% - 1px), var(--wf-line), transparent calc(50% + 1px)),
+    linear-gradient(to top left, transparent calc(50% - 1px), var(--wf-line), transparent calc(50% + 1px));
+}
+.wf-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--wf-fill-2);
+  border: 1px solid var(--wf-line);
+  flex-shrink: 0;
+}
+
+/* ===== Pagination ===== */
+.wf-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: var(--wf-pad);
+}
+.wf-pagination__item {
+  min-width: 32px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--wf-line);
+  border-radius: var(--wf-radius);
+  color: var(--wf-muted);
+}
+.wf-pagination__item--active {
+  background: var(--wf-fill-2);
+  color: var(--wf-ink);
+  font-weight: 600;
+}
+
+/* ===== 空状態 / エラー状態 ===== */
+.wf-empty {
+  border: 1px dashed var(--wf-line);
+  border-radius: var(--wf-radius);
+  padding: 40px var(--wf-pad);
+  text-align: center;
+  color: var(--wf-muted);
+}
+
+/* ===== Modal / Dialog（重ね表示はせず、注記付きで並置） ===== */
+.wf-modal {
+  max-width: 480px;
+  margin: 0 auto;
+  border: 1px solid var(--wf-line);
+  border-radius: var(--wf-radius);
+  background: var(--wf-bg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+.wf-modal__head {
+  padding: 12px var(--wf-pad);
+  border-bottom: 1px solid var(--wf-line);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+.wf-modal__head .wf-toolbar__spacer { flex: 1; }
+.wf-modal__body { padding: var(--wf-pad); display: grid; gap: var(--wf-gap); }
+.wf-modal__foot {
+  padding: 12px var(--wf-pad);
+  border-top: 1px solid var(--wf-line);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ===== 注記（インタラクション説明など） ===== */
+.wf-note {
+  font-size: 11px;
+  color: var(--wf-muted);
+  border-left: 3px solid var(--wf-line);
+  padding: 2px 8px;
+  margin-top: 6px;
+}
+
+/* ===== ユーティリティ ===== */
+.wf-row { display: flex; align-items: center; gap: var(--wf-gap); flex-wrap: wrap; }
+.wf-stack { display: flex; flex-direction: column; gap: 8px; }
+.wf-mt { margin-top: var(--wf-pad); }
+.wf-muted { color: var(--wf-muted); }
+  </style>
+</head>
+<body>
+  <p class="wf-screen-label"><strong>レコード編集（toB）</strong> ／ 状態: 編集中</p>
+
+  <div class="wf-page">
+    <header class="wf-header">
+      <span class="wf-header__logo">Admin Console</span>
+      <span class="wf-header__spacer"></span>
+      <span class="wf-muted">管理者</span>
+      <span class="wf-button wf-button--sm">ログアウト</span>
+    </header>
+
+    <div class="wf-body">
+      <aside class="wf-sidebar">
+        <div class="wf-sidebar__item wf-sidebar__item--active">レコード管理</div>
+        <div class="wf-sidebar__item">ユーザー管理</div>
+        <div class="wf-sidebar__item">設定</div>
+      </aside>
+
+      <main class="wf-main">
+        <div class="wf-breadcrumb">レコード管理 / 編集</div>
+        <h1 class="wf-title">レコード編集</h1>
+
+        <div class="wf-tabs">
+          <span class="wf-tabs__item wf-tabs__item--active">基本情報</span>
+          <span class="wf-tabs__item">詳細</span>
+          <span class="wf-tabs__item">履歴</span>
+        </div>
+
+        <form class="wf-form wf-form--2col">
+          <div class="wf-field">
+            <span class="wf-label wf-label--required">名称</span>
+            <span class="wf-input">レコード名</span>
+          </div>
+          <div class="wf-field">
+            <span class="wf-label wf-label--required">カテゴリ</span>
+            <span class="wf-select">カテゴリA ▾</span>
+          </div>
+          <div class="wf-field">
+            <span class="wf-label">ステータス</span>
+            <span class="wf-select">公開 ▾</span>
+          </div>
+          <div class="wf-field">
+            <span class="wf-label">公開日</span>
+            <span class="wf-input">2026/05/30</span>
+          </div>
+          <div class="wf-field wf-field--full">
+            <span class="wf-label">説明</span>
+            <span class="wf-textarea">説明文を入力</span>
+          </div>
+        </form>
+
+        <div class="wf-row wf-mt" style="justify-content:flex-end">
+          <span class="wf-button">キャンセル</span>
+          <span class="wf-button">下書き保存</span>
+          <span class="wf-button wf-button--primary">保存</span>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
