@@ -11,6 +11,7 @@ Spec → Test → Implementation の流れを視覚的に把握したい場合�
 flowchart TD
     Start([新機能の着手])
     Req[REQUIREMENTS.md 作成<br/>User Journey + Priority]
+    WF[ワイヤーフレーム生成<br/>HTML / 低忠実度]
     StakeholderReview{ステークホルダー<br/>レビュー}
     Tech[TECH_DESIGN.md 作成<br/>アーキテクチャ + Test Strategy]
     ArchReview{アーキテクト<br/>レビュー}
@@ -25,7 +26,8 @@ flowchart TD
     Merge([マージ])
 
     Start --> Req
-    Req --> StakeholderReview
+    Req --> WF
+    WF --> StakeholderReview
     StakeholderReview -- 修正必要 --> Req
     StakeholderReview -- 承認 --> Tech
     Tech --> ArchReview
@@ -88,8 +90,10 @@ STDD は **常に Spec を起点とした一方向のウォーターフォール
 flowchart LR
     subgraph SSoT["Single Source of Truth (Spec)"]
         Req[REQUIREMENTS.md<br/>What & Why]
+        WF[ワイヤーフレーム<br/>HTML / 画面の合意]
         Tech[TECH_DESIGN.md<br/>How + Test Strategy]
-        Req --> Tech
+        Req --> WF
+        WF --> Tech
     end
 
     Tech --> Test[テスト<br/>E2E / Integration / Unit]

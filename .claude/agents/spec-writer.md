@@ -74,7 +74,8 @@ model: opus
 
 - 概要（解決する問題、対象ユーザー、ビジネス目標）
 - すべてのユーザージャーニー（正常系・エラーケース・エッジケース）に Priority（P0/P1/P2）を付与
-- UI/UXデザイン（ASCIIワイヤーフレーム、表示要素、空状態・エラー状態）
+- UI/UXデザイン（HTMLワイヤーフレームへのリンク、表示要素、空状態・エラー状態）
+  - UI機能の場合は `generating-wireframes` スキルでHTMLワイヤーフレームを `docs/<app>/<path>/wireframes/` に生成し、「3. UI/UXデザイン」から `./wireframes/index.html` にリンクする（ASCIIアートは使わない）
 - エッジケース
 - 成功基準
 - スコープ外
@@ -143,6 +144,7 @@ docs/<app.id>/<feature_path>/SCREEN_ITEMS_DEFINITION.md（オプション）
 | スキル                     | 参照パス                                     | 参照タイミング                                                         |
 | -------------------------- | -------------------------------------------- | ---------------------------------------------------------------------- |
 | documenting-specifications | `.claude/skills/documenting-specifications/` | **常に参照**（テンプレート・ガイドライン・チェックリスト・STDD違反例） |
+| generating-wireframes      | `.claude/skills/generating-wireframes/`      | UI機能のREQUIREMENTS作成時（HTMLワイヤーフレーム生成）                  |
 | implementing-ui            | `plugins/nextjs-supabase/skills/implementing-ui/`            | UI機能のSpec作成時（レスポンシブ要件、コンポーネントパターン）         |
 | migrating-supabase         | `plugins/nextjs-supabase/skills/migrating-supabase/`         | DB変更を伴うSpec作成時（データモデル設計）                             |
 | software-architecture      | `.claude/skills/software-architecture/`      | アーキテクチャ設計時（Domain層・責務分離）                             |

@@ -20,11 +20,15 @@
    - ビジネス要件の整理
    - ユーザージャーニーの定義
    - 受入基準の明確化
-3. `TECH_DESIGN.md` を作成:
+3. ワイヤーフレーム（WF）を生成（UI を持つ機能の場合）:
+   - `generating-wireframes` スキルに従い `docs/<app>/<feature-path>/wireframes/` に HTML WF を生成
+   - REQUIREMENTS.md「3. UI/UX デザイン」から `./wireframes/index.html` にリンク
+   - UI を持たない機能（バッチ・API のみ等）はスキップ
+4. `TECH_DESIGN.md` を作成:
    - 技術設計方針
    - ファイル構成
    - テスト戦略（テストケース一覧）
-4. 必要に応じて `SCREEN_ITEMS_DEFINITION.md` を作成
+5. 必要に応じて `SCREEN_ITEMS_DEFINITION.md` を作成
 
 作成したSpecをコミット。
 

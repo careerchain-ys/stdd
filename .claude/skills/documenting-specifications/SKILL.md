@@ -22,7 +22,17 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
    - ビジネス要件、ユーザージャーニー（P0/P1/P2 の優先度付き）を記述
    - [テンプレート](templates/requirements.md) を参照
 
-2. **TECH_DESIGN.md を作成**
+2. **ワイヤーフレーム（WF）を生成**（UI を持つ機能の場合）
+
+   ```
+   docs/<app>/<path>/wireframes/
+   ```
+
+   - REQUIREMENTS.md のジャーニーから HTML ワイヤーフレームを生成（低忠実度・主要文言は実値）
+   - [generating-wireframes Skill](../generating-wireframes/SKILL.md) を参照
+   - 生成後、REQUIREMENTS.md「3. UI/UX デザイン」から `./wireframes/index.html` にリンクする
+
+3. **TECH_DESIGN.md を作成**
 
    ```
    docs/<app>/<path>/TECH_DESIGN.md
@@ -31,7 +41,7 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
    - 技術設計、テスト戦略（ジャーニーを E2E/Integration/Unit にマッピング）を記述
    - [テンプレート](templates/tech-design.md) を参照
 
-3. **SCREEN_ITEMS_DEFINITION.md を作成（オプション）**
+4. **SCREEN_ITEMS_DEFINITION.md を作成（オプション）**
 
    ```
    docs/<app>/<path>/SCREEN_ITEMS_DEFINITION.md
@@ -148,7 +158,7 @@ HTMLテンプレートは `lib/email/templates/` で管理。
 - ユーザー視点（What & Why）
 - **ユーザーから見える挙動のみ**
 - すべてのユーザージャーニーに Priority（P0/P1/P2）を付与
-- UI/UX デザイン（ASCII ワイヤーフレーム）
+- UI/UX デザイン（HTML ワイヤーフレームへのリンク） … `generating-wireframes` スキルで生成
 
 **記述しない内容**:
 
@@ -216,6 +226,8 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）の作成・レビ�
 - **テンプレート**
   - [REQUIREMENTS.md テンプレート](templates/requirements.md)
   - [TECH_DESIGN.md テンプレート](templates/tech-design.md)
+- **関連スキル**
+  - [generating-wireframes Skill](../generating-wireframes/SKILL.md) ← UI を持つ機能の WF 生成
 - **ガイド**
   - [STDD違反例と対策](guides/stdd-violations.md) ← 実装開始前に必読
   - [エラーハンドリングガイド](guides/error-handling.md)
@@ -238,7 +250,7 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）の作成・レビ�
 ```
 □ 概要（解決する問題、対象ユーザー、ビジネス目標）
 □ すべてのユーザージャーニーに Priority（P0/P1/P2）を付与
-□ UI/UX デザイン（ASCII ワイヤーフレーム）
+□ UI/UX デザイン（HTML ワイヤーフレームを生成し「3. UI/UX デザイン」からリンク）→ generating-wireframes Skill
 □ エッジケース
 □ スコープ外
 □ SCREEN_ITEMS_DEFINITION.md が必要か検討（フォーム項目が多い場合）

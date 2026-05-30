@@ -38,14 +38,30 @@ STDD は TDD の前に **Spec フェーズ** を追加することで、これ�
 
 ## 3. Spec ドキュメントの構成
 
-Spec は 2 つのファイルに分けて記述する。
+### 3.0 Spec の 2 ティア構造 (common / feature)
+
+Spec は **プロジェクト全体 (common ティア)** と **機能単位 (feature ティア)** の 2 つの高度を持つ。
+どちらも「What/Why = REQUIREMENTS」「How = 技術設計」という同じ二項構造を、異なる高度で繰り返す。
+
+| ティア      | What / Why                | How                          | 配置例                                                    |
+| ----------- | ------------------------- | ---------------------------- | --------------------------------------------------------- |
+| **common**  | `REQUIREMENTS.md` (全体版) | `ARCHITECTURE.md` (全体版)    | `docs/common/REQUIREMENTS.md` / `ARCHITECTURE.md`         |
+| **feature** | `REQUIREMENTS.md`         | `TECH_DESIGN.md`             | `docs/<app>/<feature>/REQUIREMENTS.md` / `TECH_DESIGN.md` |
+
+- **common ティア**は、サービスの目的・登場アクター・アプリ構成 (REQUIREMENTS) と、システム構成・リポジトリ構成・レイヤ規約・データモデル (ARCHITECTURE) を俯瞰する正典。複数 feature が前提とする横断的な文脈を一箇所に集約する。
+- **feature ティア**は、個々の機能のユーザージャーニーと技術設計・テスト戦略を記述する。common ティアを**下方参照**する側であり、common と矛盾しないこと。
+- 全体版の技術設計を `TECH_DESIGN.md` ではなく `ARCHITECTURE.md` と呼ぶのは、システム全体 (ARCHITECTURE) と機能単位 (TECH_DESIGN) を名前で区別するため。
+- 配置は `.stdd.config.yml` の `docs.layout.common_requirements` / `docs.layout.common_architecture` で設定する (任意。common ティアを使わないプロジェクトでは省略可)。
+- テンプレートは `packages/core/templates/common/REQUIREMENTS.md` / `ARCHITECTURE.md` を参照する。
+
+以下 3.1〜3.3 は **feature ティア**の各ファイルの中身を述べる。
 
 ### 3.1 REQUIREMENTS.md (ビジネス要件 / ユーザー視点)
 
 - 解決する問題、対象ユーザー、ビジネス目標
 - すべての User Journey (正常系、エラーケース、エッジケース)
 - 各 Journey に Priority (P0 / P1 / P2) を付与
-- UI / UX デザイン (ASCII ワイヤーフレーム、表示要素、空状態 / エラー状態)
+- UI / UX デザイン (HTML ワイヤーフレームへのリンク、表示要素、空状態 / エラー状態。WF は `generating-wireframes` スキルで生成)
 - 成功基準、スコープ外
 
 **読者**: ステークホルダー、PM、デザイナー、エンジニア
@@ -122,23 +138,25 @@ P0 のフローのみ E2E で守り、それ以外は Integration / Unit に役�
 ```
 1. REQUIREMENTS.md 作成 (Journey と Priority を網羅)
         ↓
-2. ステークホルダーレビュー
+2. ワイヤーフレーム生成 (HTML / 低忠実度。UI を持つ機能のみ)
         ↓
-3. TECH_DESIGN.md 作成 (アーキテクチャ + Test Strategy)
+3. ステークホルダーレビュー
         ↓
-4. アーキテクトレビュー
+4. TECH_DESIGN.md 作成 (アーキテクチャ + Test Strategy)
         ↓
-5. PLAN ドキュメント作成 (今セッションのスコープ合意)
+5. アーキテクトレビュー
         ↓
-6. テスト作成 (Red) — Unit → Integration → E2E の順
+6. PLAN ドキュメント作成 (今セッションのスコープ合意)
         ↓
-7. 実装 (Green) — テストを通す最小限の実装
+7. テスト作成 (Red) — Unit → Integration → E2E の順
         ↓
-8. リファクタ (必要に応じて)
+8. 実装 (Green) — テストを通す最小限の実装
         ↓
-9. テスト全件パス確認
+9. リファクタ (必要に応じて)
         ↓
-10. PR 作成 → レビュー → マージ
+10. テスト全件パス確認
+        ↓
+11. PR 作成 → レビュー → マージ
 ```
 
 ### 6.2 既存機能への追加 / 変更
