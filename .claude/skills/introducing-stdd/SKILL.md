@@ -34,7 +34,7 @@ docs/common/plans/stdd-introduction.md
 
 ### 2. 設定確認
 
-`.stdd.config.yml` を読み、`apps[]` / `docs.layout`（`common_requirements` / `common_architecture` 含む）を把握する。無ければ step 0 を案内する。
+`.stdd.config.yml` を読み、`apps[]` / `docs.layout`（`common_requirements` / `common_architecture` 含む）を把握する。無ければ **step 0（対話的セットアップ）** を実行する（下記「step 0」詳細）。
 
 ---
 
@@ -44,7 +44,7 @@ docs/common/plans/stdd-introduction.md
 
 | step | 実行内容 | 呼ぶスキル | ★停止して確認 |
 | ---- | -------- | ---------- | ------------- |
-| 0 | `.stdd.config.yml` 作成 / テンプレ・skill 配置 | — | 構成（単一/複数アプリ・パス規約） |
+| 0 | `.stdd.config.yml` を対話的に作成（下記「step 0」詳細）/ テンプレ・skill 配置 | — | 構成（単一/複数アプリ・パス規約） |
 | 1 | common ティア生成 | `reverse-engineering-common-spec` | 生成後の `<!-- 要確認 -->` 一覧 |
 | 1.5 | 機能インベントリ + 優先順 → 導入PLAN へ記載 | — | ★ 機能一覧と優先順（P0 から） |
 | 2 | 代表機能 1 つをリバース | `reverse-engineering-feature-spec` | ★ Spec 粒度・スコープ |
@@ -59,7 +59,7 @@ docs/common/plans/stdd-introduction.md
 ## 初回フロー（導入PLAN が無いとき）
 
 1. **プロジェクト点検**: ディレクトリ構成・`package.json`・ルーティングをざっと把握。
-2. **step 0 確認**: `.stdd.config.yml` が無ければ作成を案内（`apps` / `commands` / `docs.layout`）。
+2. **step 0（対話的セットアップ）**: `.stdd.config.yml` が無ければ、下記「step 0」手順で 点検 → 草案 → 確認 → 書き込み を対話的に行う。
 3. **step 1 実行**: `reverse-engineering-common-spec` を呼び、common ティアを生成。`<!-- 要確認 -->` を一覧化して人間に提示。
 4. **step 1.5（★人間判断）**: ルーティング・主要ドメインから機能を洗い出し、**優先順をユーザーと合意**。
 5. **導入PLAN 生成**: `templates/introduction-plan.md` を雛形に `docs/common/plans/stdd-introduction.md` を作成し、機能を優先順で並べる。
@@ -74,6 +74,83 @@ docs/common/plans/stdd-introduction.md
 3. ユーザーの了承後、該当ステップのスキルを呼んで実行。
 4. 完了したら導入PLAN の該当項目を `- [x]` に更新し、フォーマット決定があれば「決定ログ」に追記。
 5. 次の未着手を提示して停止（**一度に 1 ステップ**。バッチ全自動にしない）。
+
+---
+
+## step 0: 対話的セットアップ（詳細）
+
+`.stdd.config.yml` が無いときは、skill 自身が **点検 → 草案 → 確認 → 書き込み** を対話的に行う（サブスキルは呼ばない）。
+
+### 0-1. リポジトリ点検（自動）
+
+読み取って構成を推定する:
+
+```
+□ トップレベル構成 / package.json の workspaces → apps[] 候補（id・path）
+   - monorepo: workspaces 各エントリ、apps/* や packages/* 配下のアプリ
+   - 単一アプリ: ルート構成（id は project 名 または "web" 等）
+□ package.json の scripts → commands（test / typecheck(tsc) / lint / format）
+□ DB 型生成コマンド（例: supabase gen types）→ commands.db_types 候補
+□ git のデフォルトブランチ → project.primary_branch
+□ framework（next / remix / vite / sveltekit 等）→ apps[].framework
+□ 既存 docs/ 構成 → docs.layout のパターン推定
+```
+
+### 0-2. 草案を提示
+
+点検結果から `.stdd.config.yml` の草案を生成して提示する。先頭に `yaml-language-server` の schema ディレクティブを付ける。**推定できなかった項目は「要確認」として明示し、ユーザーに尋ねる**。
+
+```yaml
+# yaml-language-server: $schema=<schema の URL または相対パス>
+project:
+  name: <推定>
+  primary_branch: <git のデフォルトブランチ>
+apps:
+  - id: <推定>          # ^[a-z][a-z0-9_-]*$
+    path: <推定>
+commands:
+  typecheck: <推定>
+  test: <推定>
+docs:
+  layout:
+    common_requirements: docs/common/REQUIREMENTS.md    # common ティアを使う場合のみ
+    common_architecture: docs/common/ARCHITECTURE.md
+    requirements: docs/{{app.id}}/{{feature_path}}/REQUIREMENTS.md
+    tech_design: docs/{{app.id}}/{{feature_path}}/TECH_DESIGN.md
+    plan: docs/{{app.id}}/{{feature_path}}/plans/{{date}}.md
+```
+
+### 0-3. ★確認（停止）
+
+書き込み前に、特に次をユーザーに確認する:
+
+```
+□ 単一 / 複数アプリ、各アプリの id・path
+□ docs.layout のパス規約（単一アプリなら {{app.id}} を省く等の調整）
+□ test / typecheck コマンドが実際に動くか
+□ common ティアを使うか（使うなら common_requirements / common_architecture を含める）
+□ worktree / devcontainer を使うか（workflow セクションを足すか）
+```
+
+### 0-4. 書き込み & 検証
+
+- 合意後 `.stdd.config.yml` をリポジトリルートに書き込む。
+- スキーマ検証（`packages/core/README.md`「JSON Schema のローカル検証」の手順）:
+  ```
+  npx -y js-yaml .stdd.config.yml > /tmp/stdd.json
+  npx -y ajv-cli validate -s packages/core/schema/.stdd.config.schema.json -d /tmp/stdd.json
+  ```
+- skill / agent / テンプレの配置（vendoring または参照）が未了なら案内する。
+- 検証が通ったら step 1 へ進む。
+
+### 完了条件
+
+```
+□ .stdd.config.yml が存在し schema 検証を通る
+□ 後続ステップが参照する apps / commands / docs.layout が揃っている
+```
+
+> 将来 CLI（`create-stdd-project`、Phase 2-B 予定）が提供されたら、step 0 はそれに委譲してよい。
 
 ---
 

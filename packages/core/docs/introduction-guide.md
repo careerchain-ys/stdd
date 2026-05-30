@@ -55,6 +55,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向（順行）。
 - `.stdd.config.yml` をプロジェクト構成に合わせて作成（`apps[]`, `commands`, `docs.layout`）。
 - 単一アプリか複数アプリかで `docs.layout` のパス規約が変わる。
 - common ティアを使うなら `docs.layout.common_requirements` / `common_architecture` を設定。
+- 具体的な対話手順（点検 → 草案 → 確認 → 書き込み → schema 検証）は `introducing-stdd` スキルの「step 0: 対話的セットアップ」を参照。
 
 ### step 1: common spec のリバース
 
