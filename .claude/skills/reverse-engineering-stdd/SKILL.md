@@ -42,6 +42,77 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 ---
 
+## 対象の 2 ティア（common / feature）
+
+リバースエンジニアリングには、リバースする高度が 2 つある。どちらも「実装が真実」という原則は共通で、**読む対象だけが違う**。
+
+| モード             | 出力                                                                | 主に読む対象                                                                 |
+| ------------------ | ------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **共通spec (Phase 0)** | `docs/common/REQUIREMENTS.md` + `docs/common/ARCHITECTURE.md`       | リポジトリ構成・workspaces・DB 型定義・CI/CD・レイヤ規約・外部サービス連携    |
+| **feature spec (Phase 1〜)** | `docs/<app>/<feature>/REQUIREMENTS.md` + `TECH_DESIGN.md`           | ページ・Client・schema・Server Action・domain (単一機能のコード)             |
+
+**順序**: 既存プロジェクト導入時は **共通spec (Phase 0) を先に作る**。プロジェクト全体のレイヤ規約・共有ドメインモデル・テーブル一覧が common ティアに揃っていると、各 feature のリバース精度が上がる。共通spec が既にある場合は Phase 0 をスキップして Phase 1 から始める。
+
+`docs/common/` のテンプレートは `packages/core/templates/common/REQUIREMENTS.md` / `ARCHITECTURE.md` を参照。
+
+---
+
+## Phase 0: プロジェクト全体（共通spec）のリバース
+
+コードベース全体を input に、サービス全体の俯瞰 spec を 2 ファイルで作成する。
+
+### 読む順序とチェックリスト
+
+`ARCHITECTURE.md` の目次がそのまま読む順序になる。
+
+**1. システム構成**（`REQUIREMENTS.md` のサービス概要・アクターもここで把握）
+```
+□ README / トップレベルディレクトリ構成 → サービスの目的・アプリ構成
+□ デプロイ設定 (vercel.json / Dockerfile / .github/workflows) → 環境とブランチ戦略
+□ 環境変数・SDK の import → 外部サービス連携 (認証 / DB / ストレージ / メール / 監視 等)
+```
+
+**2. リポジトリ構成**
+```
+□ package.json の workspaces / モジュール分割
+□ 依存管理ルール (どの依存がどこに置かれているか、アプリ間 import 制限の有無)
+□ 共有パッケージ (packages/shared 等) の責務
+```
+
+**3. レイヤードアーキテクチャ**
+```
+□ domain/ 配下の構成 (models / repository / service / ports)
+□ 依存方向ルール (UI → Service → Repository → DB 等)、禁止依存
+□ 代表的なデータフロー 1 本 (Server Action / API → Service → Repository)
+```
+
+**4. データモデル・DB設計**
+```
+□ 生成された DB 型定義 (database.types.ts 等) を正としてテーブルを列挙
+□ ドメイングループへの分類、中心テーブルごとの ER 図
+□ 設計方針 (論理削除 / 主キー / 時系列カラム / マイグレーション規約)
+```
+
+### 確信が持てない箇所は要確認マーカーを残す
+
+実装からの読み取りに確信が持てない箇所は `<!-- 要確認: ... -->` のインラインコメントで明示する。
+これは**一時的な注記**であり、人間レビューで確定したら除去する（恒久的に残さない）。SSoT 原則上、確定済みの spec に作成プロセスや未確定メモを残してはならない。
+
+```markdown
+- **NFT / ウォレット**: wallets / nft_management テーブルが存在する。<!-- 要確認: 外部ウォレット連携の現行稼働範囲 -->
+```
+
+### Phase 0 完了条件
+
+```
+□ docs/common/REQUIREMENTS.md を作成（サービス概要 / アクター / アプリ構成）
+□ docs/common/ARCHITECTURE.md を作成（システム構成 / リポジトリ / レイヤ / データモデル）
+□ テーブル一覧は生成された型定義ファイルと一致している
+□ 要確認マーカーは「人間に確認すべき項目」としてレビュー依頼にまとめた
+```
+
+---
+
 ## Quick Start
 
 ### 前提条件

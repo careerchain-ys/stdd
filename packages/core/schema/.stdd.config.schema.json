@@ -118,6 +118,16 @@
           "required": ["requirements", "tech_design", "plan"],
           "additionalProperties": false,
           "properties": {
+            "common_requirements": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Optional path template for the project-wide (common tier) REQUIREMENTS.md — the whole-service business requirements overview. No app/feature variables apply. Example: 'docs/common/REQUIREMENTS.md'. Omit when the project does not use a common tier."
+            },
+            "common_architecture": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Optional path template for the project-wide (common tier) ARCHITECTURE.md — the whole-service technical design overview (the project-level counterpart of TECH_DESIGN.md). No app/feature variables apply. Example: 'docs/common/ARCHITECTURE.md'. Omit when the project does not use a common tier."
+            },
             "requirements": {
               "type": "string",
               "minLength": 1,
