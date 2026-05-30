@@ -1,7 +1,5 @@
 # 設定駆動オーサリング規約（config-driven authoring）
 
-関連 issue: [CareerChain #1312](https://github.com/careerchain-ys/careerchain/issues/1312)（skill / agent / hook の設定駆動化）
-
 stdd の skill / agent / hook は、下流プロジェクト固有の値（アプリのパス、ビルド/テストコマンド、PR ターゲットブランチ等）を**ハードコードしてはならない**。これらは利用者プロジェクトのルートにある `.stdd.config.yml` に宣言され、各 skill / agent / hook が**実行時に読み取って**使用する。
 
 本ドキュメントは、その記述方法（オーサリング規約）を定める。markdown（skill / agent）と bash（hook）でアプローチが異なる。

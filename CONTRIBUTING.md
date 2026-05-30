@@ -97,21 +97,7 @@ npx -y ajv-cli compile -s packages/core/schema/.stdd.config.schema.json
 for f in plugins/*/plugin.json; do
   python3 -m json.tool "$f" > /dev/null && echo "OK $f"
 done
-
-# 旧プロジェクト名がライセンス/NOTICE/公開URL以外に混入していないか確認
-grep -rIn -E '(careerchain|CareerChain|キャリアチェーン)' \
-  --exclude-dir='.git' \
-  --exclude-dir='node_modules' \
-  --exclude='LICENSE' \
-  --exclude='NOTICE' \
-  .
 ```
-
-上記コマンドのヒットのうち、以下は意図的な許容例外であり修正不要です:
-
-- `packages/core/README.md` のスキーマ URL と組織名の中立性に関する注記
-- `packages/core/schema/.stdd.config.schema.json` の `$id` フィールド
-- リポジトリルートの `README.md` および `AGENTS.md` の git clone URL
 
 ---
 

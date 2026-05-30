@@ -7,9 +7,11 @@ import prompts from "prompts";
 import { scaffold, ScaffoldError } from "./scaffold.js";
 
 const PROJECT_NAME_PATTERN = /^[a-z0-9][a-z0-9._-]*$/i;
+const DEFAULT_TEMPLATE = "minimal";
 
 interface ParsedArgs {
   projectName: string | undefined;
+  template: string | undefined;
   ignoredFlags: string[];
 }
 
@@ -17,12 +19,17 @@ function parseArgs(argv: string[]): ParsedArgs {
   const args = argv.slice(2);
   const ignoredFlags: string[] = [];
   let projectName: string | undefined;
+  let template: string | undefined;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === "--template") {
-      ignoredFlags.push("--template");
+      template = args[i + 1];
       i++;
+      continue;
+    }
+    if (arg.startsWith("--template=")) {
+      template = arg.slice("--template=".length);
       continue;
     }
     if (arg.startsWith("--")) {
@@ -34,10 +41,11 @@ function parseArgs(argv: string[]): ParsedArgs {
     }
   }
 
-  return { projectName, ignoredFlags };
+  return { projectName, template, ignoredFlags };
 }
 
-function isValidProjectName(name: string): boolean {
+// プロジェクト名・テンプレート名ともパストラバーサルを防ぐため同じ規則で検証する
+function isValidName(name: string): boolean {
   if (!PROJECT_NAME_PATTERN.test(name)) return false;
   if (name === "." || name === "..") return false;
   if (name.includes("/") || name.includes("\\")) return false;
@@ -45,7 +53,11 @@ function isValidProjectName(name: string): boolean {
 }
 
 async function main(): Promise<void> {
-  const { projectName: argProjectName, ignoredFlags } = parseArgs(process.argv);
+  const {
+    projectName: argProjectName,
+    template: argTemplate,
+    ignoredFlags,
+  } = parseArgs(process.argv);
 
   console.log("");
   console.log("  stdd v0.1.0  STDD ベースのプロジェクトを作成します");
@@ -59,6 +71,14 @@ async function main(): Promise<void> {
     console.warn("");
   }
 
+  const template = argTemplate ?? DEFAULT_TEMPLATE;
+  if (!isValidName(template)) {
+    console.error(
+      `  エラー: テンプレート名 "${template}" に使用不可な文字が含まれています`,
+    );
+    process.exit(1);
+  }
+
   let projectName = argProjectName;
 
   if (!projectName) {
@@ -67,12 +87,12 @@ async function main(): Promise<void> {
       name: "projectName",
       message: "プロジェクト名:",
       validate: (value: string) =>
-        isValidProjectName(value)
+        isValidName(value)
           ? true
           : "英数字・ハイフン・ドット・アンダースコアのみ使用可能です",
     });
     projectName = response.projectName as string | undefined;
-  } else if (!isValidProjectName(projectName)) {
+  } else if (!isValidName(projectName)) {
     console.error(
       `  エラー: プロジェクト名 "${projectName}" に使用不可な文字が含まれています`,
     );
@@ -97,12 +117,15 @@ async function main(): Promise<void> {
     "..",
   );
 
+  let copiedPlugins: string[] = [];
   try {
-    await scaffold({
+    const result = await scaffold({
       projectName,
       targetDir,
       repoRoot,
+      template,
     });
+    copiedPlugins = result.plugins;
   } catch (err) {
     if (err instanceof ScaffoldError) {
       console.error(`  エラー: ${err.message}`);
@@ -112,7 +135,10 @@ async function main(): Promise<void> {
   }
 
   console.log("");
-  console.log(`  ✔ ${projectName}/ を作成しました`);
+  console.log(`  ✔ ${projectName}/ を作成しました（テンプレート: ${template}）`);
+  if (copiedPlugins.length > 0) {
+    console.log(`    プラグイン: ${copiedPlugins.join(", ")}`);
+  }
   console.log("");
   console.log("  次の手順:");
   console.log(`    cd ${projectName}`);
