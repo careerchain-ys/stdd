@@ -67,7 +67,7 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
 | **feature** | `REQUIREMENTS.md`         | `TECH_DESIGN.md`          | `docs/<app>/<feature>/`               |
 
 - feature spec は common ティア（サービス目的・アクター・システム構成・レイヤ規約・データモデル）を**前提とする**。common と矛盾しないこと。
-- 全体版テンプレートは `packages/core/templates/common/` を参照。既存実装からの common spec 作成は `reverse-engineering-stdd` スキルの Phase 0 を参照。
+- 全体版テンプレートは `packages/core/templates/common/` を参照。既存実装からの common spec 作成は `reverse-engineering-common-spec` スキルを参照。
 - 詳細は `packages/core/docs/stdd-methodology.md` §3.0 を参照。
 
 ## ドキュメント配置ルール
