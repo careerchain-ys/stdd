@@ -218,7 +218,8 @@ Red を確認する目的:
 ## 9. 関連ドキュメント
 
 - `workflow-diagram.md` — 各フローを Mermaid で図示
-- `introduction-guide.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
+- `guide-for-existing-project.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
+- `guide-for-new-project.md` — 新規プロジェクトの STDD 立ち上げ手順（最初から順行）
 - `../templates/REQUIREMENTS.md` — ビジネス要件テンプレ
 - `../templates/TECH_DESIGN.md` — 技術設計テンプレ
 - `../templates/PLAN.md` — 実装計画テンプレ

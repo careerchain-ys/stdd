@@ -10,7 +10,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 既存プロジェクトへの STDD 導入を、セッションで 1 ステップずつ進めるための**薄い駆動役**。
 自前の実装ロジックは持たず、各ステップで**既存スキルを順に呼び**、人間判断ポイントで停止し、進捗を**導入PLAN**に記録する。
 
-> 「なぜ」「各ステップで何を判断するか」は [`introduction-guide.md`](../../../packages/core/docs/introduction-guide.md) を参照。
+> 「なぜ」「各ステップで何を判断するか」は [`guide-for-existing-project.md`](../../../packages/core/docs/guide-for-existing-project.md) を参照。
 > 本スキルはその operational な実行役。
 
 ## 設計方針（重要）
@@ -168,13 +168,13 @@ docs:
 - **単一機能のリバースだけ**したい: `reverse-engineering-feature-spec` を直接使う
 - **common ティアだけ**作りたい: `reverse-engineering-common-spec` を直接使う
 - **新規機能を実装**したい（導入済みプロジェクト）: `auto-implement` を使う
-- **新規プロジェクト**（コードがまだ無い）への導入: 本スキルの対象外
+- **新規プロジェクト**（コードがまだ無い）の立ち上げ: `starting-new-with-stdd` を使う
 
 ---
 
 ## 参照ファイル
 
-- **導入ガイド（なぜ/判断基準）**: [introduction-guide.md](../../../packages/core/docs/introduction-guide.md)
+- **導入ガイド（なぜ/判断基準）**: [guide-for-existing-project.md](../../../packages/core/docs/guide-for-existing-project.md)
 - **導入PLAN テンプレート**: [templates/introduction-plan.md](templates/introduction-plan.md)
 - **common ティアのリバース**: [reverse-engineering-common-spec skill](../reverse-engineering-common-spec/SKILL.md)
 - **機能単位のリバース**: [reverse-engineering-feature-spec skill](../reverse-engineering-feature-spec/SKILL.md)

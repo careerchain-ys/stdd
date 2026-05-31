@@ -25,6 +25,10 @@ commands:
 
 docs:
   layout:
+    # common ティア（プロジェクト全体の俯瞰 spec）
+    common_requirements: "docs/common/REQUIREMENTS.md"
+    common_architecture: "docs/common/ARCHITECTURE.md"
+    # feature ティア（機能単位の spec）
     requirements: "docs/{{feature_path}}/REQUIREMENTS.md"
     tech_design: "docs/{{feature_path}}/TECH_DESIGN.md"
     plan: "docs/{{feature_path}}/plans/{{date}}.md"
