@@ -16,17 +16,6 @@ npx @careerchain/stdd init   # 既存・新規どちらのプロジェクトに�
 
 ---
 
-## 対応 AI エージェント
-
-v0.1.0 時点で公式に対応している AI エージェントは以下です。
-
-| エージェント   | サポート状況 | 備考                                                                    |
-| -------------- | ------------ | ----------------------------------------------------------------------- |
-| Claude Code    | 公式サポート | `.claude/agents/` および `.claude/skills/` 配下のファイルがそのまま動作 |
-| 他エージェント | 検討中       | agents.md 標準に準拠した `AGENTS.md` を提供しているため、随時対応予定   |
-
----
-
 ## STDD の始め方
 
 **新規・既存のどちらでも手順は同じ**です。STDD を導入して Claude Code に「導入して」と伝えるだけ。
@@ -71,15 +60,6 @@ claude                        # ② Claude Code を起動
 4. `.claude/agents/` および `.claude/skills/` を配置（またはコピー）して Claude Code で実行。
 
 </details>
-
----
-
-## 現状の制約（v0.1.0 時点）
-
-- skill / agent / hook は `.stdd.config.yml` 駆動で動作します（`apps[].path` / `commands.*` / `project.primary_branch` 等を実行時に参照）。下流プロジェクト固有値のハードコードは除去済みです。記述規約は [`docs/config-driven-authoring.md`](docs/config-driven-authoring.md) を参照してください。
-- 別レイアウトのプロジェクト（単一アプリ・複数アプリ・別命名等）で使う場合は、`.stdd.config.yml` の `apps[]` / `commands` を調整すれば対応できます。
-- `npx @careerchain/stdd init` は STDD ツール（`.claude/` / `.stdd.config.yml` / `docs/`）の導入に専念します。アプリの骨組み（Next.js + Supabase + Playwright 等）は `starting-new-with-stdd` スキルが Claude セッション内で構築します。`starting-new-with-stdd` / `guide-for-new-project.md` は Next.js + Supabase + Playwright を主な対象としています。
-- CLI の npm パッケージ名は `@careerchain/stdd`（`npx @careerchain/stdd init`）。ローカルで試す場合は、clone 後 `npm install && npm run build` し、対象ディレクトリで `node <stdd>/packages/stdd/dist/cli.js init` を実行してください。
 
 ---
 
@@ -136,9 +116,13 @@ stdd/
 
 ---
 
-## 公開リポジトリの所在地について
+## 現状の制約（v0.1.0 時点）
 
-このリポジトリは GitHub 上で公開されており、Quick Start に記載された clone URL のホスト組織名は **公開リポジトリのホスト組織名** にすぎず、stdd の利用に特定組織への依存はありません。`.stdd.config.yml` の JSON Schema `$id` や `yaml-language-server` ディレクティブで参照される URL も同じ理由で当該パスを含みます。詳細は [`packages/core/README.md`](packages/core/README.md) の注記を参照してください。将来 GitHub org / repo のリネームが行われた場合は別 Phase で URL を更新します。
+- 公式に対応している AI エージェントは **Claude Code** のみです（`.claude/agents/` および `.claude/skills/` 配下のファイルがそのまま動作）。他エージェントは agents.md 標準に準拠した `AGENTS.md` を提供しているため随時対応を検討中です。
+- skill / agent / hook は `.stdd.config.yml` 駆動で動作します（`apps[].path` / `commands.*` / `project.primary_branch` 等を実行時に参照）。下流プロジェクト固有値のハードコードは除去済みです。記述規約は [`docs/config-driven-authoring.md`](docs/config-driven-authoring.md) を参照してください。
+- 別レイアウトのプロジェクト（単一アプリ・複数アプリ・別命名等）で使う場合は、`.stdd.config.yml` の `apps[]` / `commands` を調整すれば対応できます。
+- `npx @careerchain/stdd init` は STDD ツール（`.claude/` / `.stdd.config.yml` / `docs/`）の導入に専念します。アプリの骨組み（Next.js + Supabase + Playwright 等）は `starting-new-with-stdd` スキルが Claude セッション内で構築します。`starting-new-with-stdd` / `guide-for-new-project.md` は Next.js + Supabase + Playwright を主な対象としています。
+- CLI の npm パッケージ名は `@careerchain/stdd`（`npx @careerchain/stdd init`）。ローカルで試す場合は、clone 後 `npm install && npm run build` し、対象ディレクトリで `node <stdd>/packages/stdd/dist/cli.js init` を実行してください。
 
 ---
 
