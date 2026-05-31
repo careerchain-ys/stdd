@@ -17,7 +17,11 @@ packages/core/
 ├── templates/
 │   ├── REQUIREMENTS.md           # ビジネス要件テンプレ (コピーして使用)
 │   ├── TECH_DESIGN.md            # 技術設計テンプレ (コピーして使用)
-│   └── PLAN.md                   # 実装計画テンプレ (コピーして使用)
+│   ├── SCREEN_ITEMS_DEFINITION.md # 画面項目定義テンプレ (オプション / コピーして使用)
+│   ├── PLAN.md                   # 実装計画テンプレ (コピーして使用)
+│   └── common/                   # common ティア (プロジェクト全体) テンプレ
+│       ├── REQUIREMENTS.md       # サービス全体のビジネス要件
+│       └── ARCHITECTURE.md       # サービス全体の技術設計
 ├── schema/
 │   └── .stdd.config.schema.json  # .stdd.config.yml の JSON Schema (Draft 2020-12)
 └── README.md                     # 本ファイル
