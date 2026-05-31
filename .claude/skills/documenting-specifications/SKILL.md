@@ -240,6 +240,7 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）の作成・レビ�
 - **テンプレート**
   - [REQUIREMENTS.md テンプレート](templates/requirements.md)
   - [TECH_DESIGN.md テンプレート](templates/tech-design.md)
+  - [SCREEN_ITEMS_DEFINITION.md テンプレート](templates/screen-items-definition.md) ← 画面項目定義（オプション）
 - **関連スキル**
   - [generating-wireframes Skill](../generating-wireframes/SKILL.md) ← UI を持つ機能の WF 生成
 - **ガイド**
