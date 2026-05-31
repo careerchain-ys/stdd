@@ -1,11 +1,13 @@
 ---
 name: generating-wireframes
 description: |-
-  REQUIREMENTS.md のユーザージャーニーから、低忠実度（low-fidelity）の HTML ワイヤーフレームを生成するスキル。技術スタック非依存の素の HTML（CSS は各 HTML に `<style>` で埋め込み・自己完結）で、画面レイアウト・情報設計・主要文言（タイトル / ボタン / 項目ラベル）を合意形成用に可視化する。「ワイヤーフレーム」「WF」「wireframe」「画面設計」「画面イメージ」「モックの前段」「UI/UX デザインのHTML化」「REQUIREMENTS の画面を作る」に関する作業で使用。
+  REQUIREMENTS.md のユーザージャーニーから、低忠実度（low-fidelity）の HTML ワイヤーフレームを生成する。技術スタック非依存の素の HTML（CSS は各 HTML に `<style>` で埋め込み・自己完結）で、画面レイアウト・情報設計・主要文言（タイトル / ボタン / 項目ラベル）を合意形成用に可視化する。
+when_to_use: |-
+  「ワイヤーフレーム」「WF」「wireframe」「画面設計」「画面イメージ」「モックの前段」「UI/UX デザインのHTML化」「REQUIREMENTS の画面を作る」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
-# ワイヤーフレーム生成スキル
+# ワイヤーフレーム生成
 
 REQUIREMENTS.md の **ユーザージャーニー**と**画面要素**をもとに、低忠実度の HTML ワイヤーフレーム（WF）を生成する。WF は REQUIREMENTS.md の「3. UI/UX デザイン」セクションの実体となり、ステークホルダーが画面構成・遷移・主要文言を合意するために使う。
 

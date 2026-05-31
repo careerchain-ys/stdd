@@ -1,7 +1,9 @@
 ---
 name: kaizen
 description: |-
-  継続的改善・過剰設計回避のための開発原則。Poka-Yoke（エラー防止）、YAGNI、Rule of Three、段階的リファクタリングを提供。「リファクタリング」「改善」「過剰設計」「YAGNI」「シンプル」「エラー防止」「コード品質」「設計改善」「段階的改善」に関する作業で使用。
+  継続的改善・過剰設計回避のための開発原則。Poka-Yoke（エラー防止）、YAGNI、Rule of Three、段階的リファクタリングを提供する。
+when_to_use: |-
+  「リファクタリング」「改善」「過剰設計」「YAGNI」「シンプル」「エラー防止」「コード品質」「設計改善」「段階的改善」に関する作業のとき。
 allowed-tools: Read, Edit, Grep, Glob
 ---
 

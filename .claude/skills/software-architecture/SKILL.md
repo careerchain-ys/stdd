@@ -1,11 +1,13 @@
 ---
 name: software-architecture
 description: |-
-  Clean Architecture・DDDベースのソフトウェア設計ガイドライン。Library-Firstアプローチ、命名規則、アンチパターン回避を提供。「アーキテクチャ」「設計」「Clean Architecture」「DDD」「ドメイン駆動設計」「リファクタリング」「コード品質」「命名規則」「責務分離」に関する作業で使用。
+  Clean Architecture・DDD ベースのソフトウェア設計ガイドライン。Library-First アプローチ、命名規則、アンチパターン回避を提供する。
+when_to_use: |-
+  「アーキテクチャ」「設計」「Clean Architecture」「DDD」「ドメイン駆動設計」「リファクタリング」「コード品質」「命名規則」「責務分離」に関する作業のとき。
 allowed-tools: Read, Edit, Grep, Glob
 ---
 
-# ソフトウェアアーキテクチャスキル
+# ソフトウェアアーキテクチャ
 
 Clean ArchitectureとDDD（ドメイン駆動設計）の原則に基づく、対象プロジェクトの設計ガイドライン。
 

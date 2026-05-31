@@ -1,11 +1,13 @@
 ---
 name: tailoring-spec-format
 description: |-
-  このプロジェクト固有の spec フォーマット / ラインナップを策定し、テンプレートや設定へ反映するスキル。STDD 導入（既存）・立ち上げ（新規）の初期フォーマット策定と、運用中のブラッシュアップの両方を担う。common spec と最初の feature spec を素材に、必須/任意の spec ファイル構成・固有セクション・docs.layout・Priority 基準・テスト層責務・命名を決め、決定を導入PLAN / 立ち上げPLANに記録してテンプレ/設定へ反映する。「specフォーマット策定」「テンプレ特化」「テーラリング」「spec構成を決める」「specフォーマットのブラッシュアップ」「STDDをプロジェクトに合わせる」に関する作業で使用。個別機能の spec 作成は documenting-specifications を使う。
+  このプロジェクト固有の spec フォーマット / ラインナップを策定し、テンプレートや設定へ反映する。STDD 導入（既存）・立ち上げ（新規）の初期フォーマット策定と、運用中のブラッシュアップの両方を担う。common spec と最初の feature spec を素材に、必須/任意の spec ファイル構成・固有セクション・docs.layout・Priority 基準・テスト層責務・命名を決め、決定を導入PLAN / 立ち上げPLANに記録してテンプレ/設定へ反映する。個別機能の spec 作成は documenting-specifications を使う。
+when_to_use: |-
+  「specフォーマット策定」「テンプレ特化」「テーラリング」「spec構成を決める」「specフォーマットのブラッシュアップ」「STDDをプロジェクトに合わせる」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
-# spec フォーマット テーラリングスキル
+# spec フォーマットのテーラリング
 
 STDD のテンプレートを**このプロジェクト固有**に仕立て直す（テーラリング）。
 STDD 導入（既存プロジェクト, step 3-4）・立ち上げ（新規プロジェクト, step 4）の **初期フォーマット策定** と、運用中の **ブラッシュアップ**（step 7）を担う。

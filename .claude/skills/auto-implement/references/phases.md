@@ -139,7 +139,7 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
    cd e2e && npm run test
    ```
 
-3. **整合性チェック**: `verify-consistency` skill と同等のチェックを実施
+3. **整合性チェック**: `verifying-consistency` skill と同等のチェックを実施
 
 4. **コード品質チェック**: `simplify` skill と同等のレビューを実施
 

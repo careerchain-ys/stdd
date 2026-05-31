@@ -34,7 +34,7 @@
 
 ### feature ループ（step 5）
 
-優先順（P0 → P1 → P2）。各 feature = `documenting-plans` → `auto-implement` → `verify-consistency`。
+優先順（P0 → P1 → P2）。各 feature = `documenting-plans` → `auto-implement` → `verifying-consistency`。
 
 - [ ] [機能A]  (P0)
 - [ ] [機能B]  (P0)

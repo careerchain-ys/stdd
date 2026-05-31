@@ -1,11 +1,13 @@
 ---
 name: reverse-engineering-feature-spec
 description: |-
-  既存の機能/ページの実装からfeatureティアのSpecドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）とテスト（E2E / Unit / Integration）をリバースエンジニアリングで作成するためのガイドライン。新規機能の仕様策定ではなく、既に動いている機能を正確にドキュメント化・テスト化する場合に使用。「リバースエンジニアリング」「既存コードからspec」「既存機能のドキュメント化」「機能のドキュメント化」「実装からテスト作成」「specカバー率向上」に関する作業で使用。プロジェクト全体（commonティア）のリバースには reverse-engineering-common-spec を使用する。
+  既存の機能/ページの実装から feature ティアの Spec ドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）とテスト（E2E / Unit / Integration）をリバースエンジニアリングで作成するためのガイドライン。新規機能の仕様策定ではなく、既に動いている機能を正確にドキュメント化・テスト化する場合に使う。プロジェクト全体（common ティア）のリバースには reverse-engineering-common-spec を使用する。
+when_to_use: |-
+  「リバースエンジニアリング」「既存コードからspec」「既存機能のドキュメント化」「機能のドキュメント化」「実装からテスト作成」「specカバー率向上」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
-# 機能 feature spec リバースエンジニアリングスキル
+# feature spec のリバースエンジニアリング
 
 既に動いている **機能 / ページ単位**の実装コードを精読し、その挙動を正確に反映した feature ティアの Spec ドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）とテスト（E2E / Unit / Integration）を作成する。
 
@@ -66,7 +68,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
    ↓
 6. Unit / Integrationテスト作成（必要に応じて）
    ↓
-7. /verify-consistency で整合性チェック
+7. /verifying-consistency で整合性チェック
    ↓
 8. 不整合の修正（Specを実装に合わせる）
 ```
@@ -243,7 +245,7 @@ REQUIREMENTS.md作成後、Playwright MCPを使って実装済みUIのスクリ�
 
 ---
 
-## Phase 4: TECH_DESIGN.md作成（旧Phase 3）
+## Phase 4: TECH_DESIGN.md作成
 
 `documenting-specifications` skillのテンプレートに従って作成する。
 
@@ -303,7 +305,7 @@ grep -c "test(" e2e/tests/user-app/feature.spec.ts
 
 ---
 
-## Phase 5: テスト作成（旧Phase 4）
+## Phase 5: テスト作成
 
 ### E2Eテスト
 
@@ -335,11 +337,11 @@ TECH_DESIGN.mdのテスト戦略で定めたテストレベルに従って作成
 
 ---
 
-## Phase 6: 整合性チェック（旧Phase 5）
+## Phase 6: 整合性チェック
 
-### `/verify-consistency` の実行
+### `/verifying-consistency` の実行
 
-すべてのドキュメント・テスト作成後、`/verify-consistency` コマンドで整合性を確認する。
+すべてのドキュメント・テスト作成後、`/verifying-consistency` コマンドで整合性を確認する。
 
 ### 不整合発見時の修正方針
 
@@ -430,7 +432,7 @@ TECH_DESIGN.mdのテスト戦略で定めたテストレベルに従って作成
 ### 最終確認
 
 ```
-□ /verify-consistency を実行した
+□ /verifying-consistency を実行した
 □ 検出された不整合をすべて修正した（Specを実装に合わせる方向で）
 □ TypeScript型チェック（`.stdd.config.yml` の `commands.typecheck`）がクリーン
 ```

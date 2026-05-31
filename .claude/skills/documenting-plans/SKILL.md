@@ -1,11 +1,13 @@
 ---
 name: documenting-plans
 description: |-
-  PLANドキュメント（実装タスクリスト）の作成・管理ガイドラインを提供。STDD方法論において、セッションごとの実装計画を管理。「PLAN」「タスクリスト」「実装計画」「セッション計画」「実装開始」「STDD実装」「機能実装」に関する作業で使用。
+  PLAN ドキュメント（実装タスクリスト）の作成・管理ガイドライン。STDD 方法論において、セッションごとの実装計画を管理する。
+when_to_use: |-
+  「PLAN」「タスクリスト」「実装計画」「セッション計画」「実装開始」「STDD実装」「機能実装」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
-# PLANドキュメント作成スキル
+# PLAN ドキュメントの作成・管理
 
 STDD（Spec and Test Driven Development）方法論において、セッションごとの実装タスクを管理するPLANドキュメントを作成・管理します。
 

@@ -1,11 +1,13 @@
 ---
 name: create-pr
 description: |-
-  現在のブランチから主ブランチ（`.stdd.config.yml` の `project.primary_branch`）へのPull Requestを作成するスキル。差分情報の収集→変更内容の分析→PR descriptionの自動生成→`gh pr create`実行までを一括で行う。「PR作成」「プルリクエスト」「pull request」「PR出して」「create PR」「マージリクエスト」など、ブランチを主ブランチにマージするためのPR作成依頼があった際は必ずこのスキルを使用する。
+  現在のブランチから主ブランチ（`.stdd.config.yml` の `project.primary_branch`）への Pull Request を作成する。差分情報の収集→変更内容の分析→PR description の自動生成→`gh pr create` 実行までを一括で行う。
+when_to_use: |-
+  「PR作成」「プルリクエスト」「pull request」「PR出して」「create PR」「マージリクエスト」など、ブランチを主ブランチにマージするための PR 作成依頼があったとき。
 allowed-tools: Bash, Read, Grep
 ---
 
-# PR作成スキル
+# Pull Request 作成
 
 現在のブランチから主ブランチ（`.stdd.config.yml` の `project.primary_branch`）へのPRを作成する。差分を分析し、適切なtitle/descriptionを自動生成する。
 

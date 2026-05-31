@@ -1,11 +1,13 @@
 ---
 name: documenting-specifications
 description: |-
-  REQUIREMENTS.md（ビジネス要件・ユーザージャーニー）とTECH_DESIGN.md（技術設計・テスト戦略）のテンプレートとガイドラインを提供。STDD方法論に従った仕様ドキュメントの作成・更新時に使用。「spec」「仕様書」「設計書」「要件定義」「REQUIREMENTS.md」「TECH_DESIGN.md」「Spec and Test Driven Development」「STDD」「仕様駆動」に関する作業で使用。
+  REQUIREMENTS.md（ビジネス要件・ユーザージャーニー）と TECH_DESIGN.md（技術設計・テスト戦略）のテンプレートとガイドラインを提供する。STDD 方法論に従った仕様ドキュメントの作成・更新を支援する。
+when_to_use: |-
+  「spec」「仕様書」「設計書」「要件定義」「REQUIREMENTS.md」「TECH_DESIGN.md」「Spec and Test Driven Development」「STDD」「仕様駆動」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
-# 仕様ドキュメント作成スキル
+# 仕様ドキュメント（REQUIREMENTS / TECH_DESIGN）の作成
 
 STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.md と TECH_DESIGN.md を作成・更新します。
 

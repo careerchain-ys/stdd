@@ -1,11 +1,13 @@
 ---
 name: auto-implement
 description: |-
-  GitHub issueを起点として、Spec作成→PLAN作成→実装（STDD）→QA→コードレビュー→Figma更新→PR作成までを専門エージェント（Spec Writer / Implementer / QA Engineer / Code Reviewer 等）にオーケストレーションして自動実行するスキル。「auto implement」「自動実装」「issueから実装」「issue番号を指定して実装」「Agent Teamsで実装」「issueを元にPRまで」「#123を実装して」など、GitHub issueを起点とした包括的な自動実装の依頼があった際に使用する。
+  GitHub issue を起点として、Spec 作成→PLAN 作成→実装（STDD）→QA→コードレビュー→Figma 更新→PR 作成までを専門エージェント（Spec Writer / Implementer / QA Engineer / Code Reviewer 等）にオーケストレーションして自動実行する。
+when_to_use: |-
+  「auto implement」「自動実装」「issue から実装」「issue 番号を指定して実装」「Agent Teams で実装」「issue を元に PR まで」「#123 を実装して」など、GitHub issue を起点とした包括的な自動実装の依頼があったとき。
 allowed-tools: Bash, Read, Write, Edit, Grep, Glob, Agent
 ---
 
-# Auto Implement - Agent Teamsによる自動実装スキル
+# issue 起点の自動実装オーケストレーション
 
 GitHub issueを受け取り、Spec作成→実装→QA→コードレビュー→PR作成までを自動で実行するオーケストレーションスキル。
 

@@ -33,7 +33,7 @@ cd e2e && npm run test
 
 ### Phase 2: Spec⇔テスト⇔実装 整合性チェック
 
-`/verify-consistency` コマンドを実行して整合性チェックを行う。
+`/verifying-consistency` コマンドを実行して整合性チェックを行う。
 
 チェック内容:
 

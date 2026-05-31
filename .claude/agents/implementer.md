@@ -35,7 +35,7 @@ model: opus
 3. **Supabase組み込み機能**: RLS、Storage、Auth、Edge Functions等で対応できないか
 4. 上記で見つからない場合のみ自前実装を行う
 
-詳細: `.claude/skills/search-first/SKILL.md`
+詳細: `.claude/skills/searching-existing-solutions/SKILL.md`
 
 ### Step 1: Specドキュメント確認
 
@@ -77,7 +77,7 @@ cd <apps[].path> && <commands.typecheck>
 | e2e-testing           | `plugins/playwright/skills/e2e-testing/`           | **E2Eテスト作成時は必須**（Playwright、Locator選択、フレーキーテスト対策）  |
 | software-architecture | `.claude/skills/software-architecture/` | Domain層・責務分離・設計判断時                                              |
 | kaizen                | `.claude/skills/kaizen/`                | リファクタリング・過剰設計回避の判断時                                      |
-| search-first          | `.claude/skills/search-first/`          | **新規実装前は必須**（既存ソリューション調査、車輪の再発明防止）            |
+| searching-existing-solutions          | `.claude/skills/searching-existing-solutions/`          | **新規実装前は必須**（既存ソリューション調査、車輪の再発明防止）            |
 
 ## テストコマンド
 
