@@ -83,7 +83,7 @@ git worktree + devcontainer を用いたマルチ環境並列開発向けのプ�
 1. `documenting-specifications`
 2. `documenting-plans`
 3. `auto-implement`
-4. `verify-consistency`
+4. `verifying-consistency`
 5. `reverse-engineering-common-spec`
 6. `reverse-engineering-feature-spec`
 7. `introducing-stdd`
@@ -92,7 +92,7 @@ git worktree + devcontainer を用いたマルチ環境並列開発向けのプ�
 10. `create-pr`
 11. `review-pr-with-agents`
 12. `kaizen`
-13. `search-first`
+13. `searching-existing-solutions`
 14. `software-architecture`
 
 これらの skill 内に含まれる下流プロジェクト固有値（`user_app` / `admin_app` / `develop` 等のサンプル値）は、

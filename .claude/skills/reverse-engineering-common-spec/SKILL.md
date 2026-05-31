@@ -1,11 +1,13 @@
 ---
 name: reverse-engineering-common-spec
 description: |-
-  既存プロジェクトにSTDDを導入する際、コードベース全体をリバースエンジニアリングしてcommonティアのSpec（docs/common/REQUIREMENTS.md + docs/common/ARCHITECTURE.md）を作成するスキル。サービス概要・システム構成・リポジトリ構成・レイヤ規約・データモデルを俯瞰する正典を、導入時に一度だけ生成する。「STDD導入」「stdd導入」「共通spec生成」「commonティア」「プロジェクト全体のリバースエンジニアリング」「ARCHITECTURE.md作成」「アーキテクチャのドキュメント化」「既存プロジェクトにstdd」に関する作業で使用。機能/ページ単位のリバースエンジニアリングには reverse-engineering-feature-spec を使用する。
+  既存プロジェクトに STDD を導入する際、コードベース全体をリバースエンジニアリングして common ティアの Spec（docs/common/REQUIREMENTS.md + docs/common/ARCHITECTURE.md）を作成する。サービス概要・システム構成・リポジトリ構成・レイヤ規約・データモデルを俯瞰する正典を、導入時に一度だけ生成する。機能/ページ単位のリバースエンジニアリングには reverse-engineering-feature-spec を使用する。
+when_to_use: |-
+  「STDD導入」「stdd導入」「共通spec生成」「commonティア」「プロジェクト全体のリバースエンジニアリング」「ARCHITECTURE.md作成」「アーキテクチャのドキュメント化」「既存プロジェクトにstdd」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
-# 共通spec リバースエンジニアリングスキル
+# common spec のリバースエンジニアリング
 
 既存（稼働中）プロジェクトに STDD を導入する際、コードベース全体を input にして **common ティア**の Spec を作成する。
 

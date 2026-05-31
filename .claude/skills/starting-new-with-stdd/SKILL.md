@@ -1,11 +1,13 @@
 ---
 name: starting-new-with-stdd
 description: |-
-  新規（コードがまだ無い）プロジェクトを STDD で立ち上げる作業を、Claude セッションで段階的に駆動するスキル。立ち上げガイドに従い、アプリ骨組み生成→common ティアの前方設計→最初の feature→フォーマット策定→feature ループ→通常運用への移行までを、既存スキル（documenting-specifications / generating-wireframes / tailoring-spec-format / documenting-plans / auto-implement / verify-consistency）を順に呼びながら進める。進捗は立ち上げPLANで保持し、セッションを跨いで再開できる。「新規プロジェクトをstddで立ち上げる」「stddで新規開発を始める」「立ち上げの続き」「start new project with stdd」「greenfield stdd」に関する作業で使用。既に稼働しているコードへの導入は introducing-stdd を使う。
+  新規（コードがまだ無い）プロジェクトを STDD で立ち上げる作業を、Claude セッションで段階的に駆動する。立ち上げガイドに従い、アプリ骨組み生成→common ティアの前方設計→最初の feature→フォーマット策定→feature ループ→通常運用への移行までを、既存スキル（documenting-specifications / generating-wireframes / tailoring-spec-format / documenting-plans / auto-implement / verifying-consistency）を順に呼びながら進める。進捗は立ち上げPLANで保持し、セッションを跨いで再開できる。既に稼働しているコードへの導入は introducing-stdd を使う。
+when_to_use: |-
+  「新規プロジェクトをstddで立ち上げる」「stddで新規開発を始める」「立ち上げの続き」「start new project with stdd」「greenfield stdd」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
-# STDD 立ち上げドライバースキル（新規プロジェクト）
+# STDD 立ち上げドライバー（新規プロジェクト）
 
 新規プロジェクトの STDD 立ち上げを、セッションで 1 ステップずつ進めるための**薄い駆動役**。
 自前の実装ロジックは持たず、各ステップで**既存スキルを順に呼び**、人間判断ポイントで停止し、進捗を**立ち上げPLAN**に記録する。
@@ -54,7 +56,7 @@ docs/common/plans/stdd-bootstrap.md
 | 5 | feature を順行 STDD でループ | `documenting-plans` → `auto-implement` | ★ 機能ごとの粒度 |
 | 6 | 通常運用へ移行 | `auto-implement`（以降） | 立ち上げ完了の確認 |
 
-各 feature 実装後は `verify-consistency` で spec ⇔ test ⇔ 実装 の整合を確認する。
+各 feature 実装後は `verifying-consistency` で spec ⇔ test ⇔ 実装 の整合を確認する。
 
 ---
 
@@ -136,5 +138,5 @@ docs/common/plans/stdd-bootstrap.md
 - **フォーマット策定・テーラリング**: [tailoring-spec-format skill](../tailoring-spec-format/SKILL.md)
 - **PLAN 作成**: [documenting-plans skill](../documenting-plans/SKILL.md)
 - **順行実装**: [auto-implement skill](../auto-implement/SKILL.md)
-- **整合性チェック**: [verify-consistency skill](../verify-consistency/SKILL.md)
+- **整合性チェック**: [verifying-consistency skill](../verifying-consistency/SKILL.md)
 - **既存プロジェクトへの導入**: [introducing-stdd skill](../introducing-stdd/SKILL.md)

@@ -96,7 +96,7 @@ step 1・2 の実物を見ながら、このプロジェクト固有の spec フ
 
 - 導入PLANの優先順で、残り機能を `reverse-engineering-feature-spec` で順に処理。
 - 機能ごとに粒度・スコープを確認（バッチ全自動にしない）。
-- 各機能完了で導入PLANのチェックを更新。`/verify-consistency` で spec ⇔ test ⇔ 実装 を確認。
+- 各機能完了で導入PLANのチェックを更新。`/verifying-consistency` で spec ⇔ test ⇔ 実装 を確認。
 
 ### step 6: 順行運用へ
 

@@ -1,11 +1,13 @@
 ---
-name: verify-consistency
+name: verifying-consistency
 description: |-
-  Spec（REQUIREMENTS.md / TECH_DESIGN.md）⇔ テスト ⇔ 実装 の整合性を機能単位でチェックするスキル。ブランチ分岐点からの差分を抽出し、要件・設計・テスト・実装の不整合（機能漏れ、テスト漏れ、設計と実装の乖離など）を検出する。「整合性チェック」「verify consistency」「Spec準拠確認」「テスト漏れ確認」「STDD整合性」「要件と実装の乖離」「Specと実装の差分」など、STDDに基づく品質確認の依頼があった際に使用する。
+  Spec（REQUIREMENTS.md / TECH_DESIGN.md）⇔ テスト ⇔ 実装 の整合性を機能単位でチェックする。ブランチ分岐点からの差分を抽出し、要件・設計・テスト・実装の不整合（機能漏れ、テスト漏れ、設計と実装の乖離など）を検出する。
+when_to_use: |-
+  「整合性チェック」「verify consistency」「Spec準拠確認」「テスト漏れ確認」「STDD整合性」「要件と実装の乖離」「Specと実装の差分」など、STDD に基づく品質確認の依頼があったとき。
 allowed-tools: Read, Grep, Glob, Bash
 ---
 
-# Spec・テスト・実装の整合性チェックスキル
+# Spec・テスト・実装の整合性チェック
 
 このセッション/ブランチで作成・修正した機能について、Spec・テスト・実装の整合性を確認する。
 

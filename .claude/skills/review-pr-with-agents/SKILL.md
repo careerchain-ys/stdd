@@ -1,11 +1,13 @@
 ---
 name: review-pr-with-agents
 description: |-
-  作成済みPRを `qa-engineer` と `code-reviewer` の2つの専門エージェントに並列でレビューさせ、結果を統合報告するスキル。マージ前の最終チェックを2観点（QA観点＝整合性・テスト・論理バグ／コードレビュー観点＝規約・品質・セキュリティ・レスポンシブ）から同時に行う。「PRをqa-engineerとcode-reviewerにレビューさせて」「let qa-engineer and code-reviewer handle this pr」「専門エージェントにPRをレビューさせて」「PRをチームレビューに回して」「PRにマルチレビューかけて」「review PR with agents」「PR #123をレビューさせて」「マージ前チェック」「PR最終確認」など、既存のPRを専門エージェントにレビュー依頼する要求があった際は必ずこのスキルを使用する。`create-pr` がPR作成を担うのに対し、本スキルは**作成済みPRへのレビュー適用**に特化している。
+  作成済み PR を `qa-engineer` と `code-reviewer` の2つの専門エージェントに並列でレビューさせ、結果を統合報告する。マージ前の最終チェックを2観点（QA観点＝整合性・テスト・論理バグ／コードレビュー観点＝規約・品質・セキュリティ・レスポンシブ）から同時に行う。PR の新規作成は `create-pr` が担い、本スキルは作成済み PR へのレビュー適用に特化する。
+when_to_use: |-
+  「PRをqa-engineerとcode-reviewerにレビューさせて」「let qa-engineer and code-reviewer handle this pr」「専門エージェントにPRをレビューさせて」「PRをチームレビューに回して」「PRにマルチレビューかけて」「review PR with agents」「PR #123をレビューさせて」「マージ前チェック」「PR最終確認」など、既存の PR を専門エージェントにレビュー依頼するとき。
 allowed-tools: Bash, Read, Grep, Glob, Agent
 ---
 
-# PR マルチレビュースキル
+# Pull Request マルチエージェントレビュー
 
 作成済みのPRを `qa-engineer` と `code-reviewer` の2エージェントに**並列**でレビューさせ、結果を統合してユーザーに報告する。
 

@@ -38,7 +38,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 | **2** | common ティアを**前方設計**（docs/common を埋める） | `documenting-specifications` | ★ 目的・アクター・初期アーキ |
 | **3** | 最初の feature を順行 spec 化（P0 コアから 1 本） | `documenting-specifications` → `generating-wireframes` | ★ 粒度・スコープ |
 | **4** | spec フォーマット策定 → テンプレ特化 | `tailoring-spec-format` | ★★ フォーマット |
-| **5** | feature を順行 STDD でループ | `documenting-plans` → `auto-implement` → `verify-consistency` | ★ 粒度（機能ごと） |
+| **5** | feature を順行 STDD でループ | `documenting-plans` → `auto-implement` → `verifying-consistency` | ★ 粒度（機能ごと） |
 | **6** | 立ち上げ完了 → 通常運用へ地続き | `auto-implement`（以降） | 完了確認 |
 
 ★ = 人間主体の判断ポイント（skill はここで停止して確認する）。
@@ -77,7 +77,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 ### step 5: feature ループ
 
 - `documenting-plans` で PLAN を切り、テスト（Red）→ 実装（Green）。`auto-implement` で駆動できる。
-- 各 feature 完了で `verify-consistency`（spec ⇔ test ⇔ 実装）。E2E は P0 のみ等は `stdd-methodology.md` §5 に従う。
+- 各 feature 完了で `verifying-consistency`（spec ⇔ test ⇔ 実装）。E2E は P0 のみ等は `stdd-methodology.md` §5 に従う。
 
 ### step 6: 通常運用への地続き化
 
