@@ -76,7 +76,7 @@ git worktree + devcontainer を用いたマルチ環境並列開発向けのプ�
 
 - 特定プロジェクトのポート割り当て（`.stdd.config.yml` の `workflow.worktree.port_base` 等から取得）
 
-## 4. Core 側に残す skill（MVP 13 個）
+## 4. Core 側に残す skill（MVP 14 個）
 
 以下は技術スタックに依存しない汎用 skill として core に残す:
 
@@ -87,12 +87,13 @@ git worktree + devcontainer を用いたマルチ環境並列開発向けのプ�
 5. `reverse-engineering-common-spec`
 6. `reverse-engineering-feature-spec`
 7. `introducing-stdd`
-8. `tailoring-spec-format`
-9. `create-pr`
-10. `review-pr-with-agents`
-11. `kaizen`
-12. `search-first`
-13. `software-architecture`
+8. `starting-new-with-stdd`
+9. `tailoring-spec-format`
+10. `create-pr`
+11. `review-pr-with-agents`
+12. `kaizen`
+13. `search-first`
+14. `software-architecture`
 
 これらの skill 内に含まれる下流プロジェクト固有値（`user_app` / `admin_app` / `develop` 等のサンプル値）は、
 Phase 1 で Handlebars 変数（`{{apps[].path}}` / `{{project.primary_branch}}` 等）に置換する。

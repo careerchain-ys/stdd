@@ -16,7 +16,7 @@
 
 # STDD 導入PLAN — [サービス名]
 
-> 進捗トラッカー。詳細手順は `introducing-stdd` スキル / `introduction-guide.md` を参照。
+> 進捗トラッカー。詳細手順は `introducing-stdd` スキル / `guide-for-existing-project.md` を参照。
 > **開始**: [yyyy-mm-dd] / **基準ブランチ**: [main / develop 等]
 
 ---

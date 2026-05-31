@@ -1,28 +1,28 @@
 ---
 name: tailoring-spec-format
 description: |-
-  このプロジェクト固有の spec フォーマット / ラインナップを策定し、テンプレートや設定へ反映するスキル。STDD 導入の step 3-4（初期フォーマット策定）と step 7（運用中のブラッシュアップ）の両方を担う。common spec と代表 feature spec を素材に、必須/任意の spec ファイル構成・固有セクション・docs.layout・Priority 基準・テスト層責務・命名を決め、決定を導入PLANに記録してテンプレ/設定へ反映する。「specフォーマット策定」「テンプレ特化」「テーラリング」「spec構成を決める」「specフォーマットのブラッシュアップ」「STDDをプロジェクトに合わせる」に関する作業で使用。個別機能の spec 作成は documenting-specifications を使う。
+  このプロジェクト固有の spec フォーマット / ラインナップを策定し、テンプレートや設定へ反映するスキル。STDD 導入（既存）・立ち上げ（新規）の初期フォーマット策定と、運用中のブラッシュアップの両方を担う。common spec と最初の feature spec を素材に、必須/任意の spec ファイル構成・固有セクション・docs.layout・Priority 基準・テスト層責務・命名を決め、決定を導入PLAN / 立ち上げPLANに記録してテンプレ/設定へ反映する。「specフォーマット策定」「テンプレ特化」「テーラリング」「spec構成を決める」「specフォーマットのブラッシュアップ」「STDDをプロジェクトに合わせる」に関する作業で使用。個別機能の spec 作成は documenting-specifications を使う。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
 # spec フォーマット テーラリングスキル
 
 STDD のテンプレートを**このプロジェクト固有**に仕立て直す（テーラリング）。
-STDD 導入フローの **step 3-4（初期フォーマット策定）** と **step 7（運用中のブラッシュアップ）** の両方を担う。
+STDD 導入（既存プロジェクト, step 3-4）・立ち上げ（新規プロジェクト, step 4）の **初期フォーマット策定** と、運用中の **ブラッシュアップ**（step 7）を担う。
 
-> 導入フロー全体は [`introduction-guide.md`](../../../packages/core/docs/introduction-guide.md)、
-> 駆動役は [`introducing-stdd`](../introducing-stdd/SKILL.md) を参照。本スキルは単体でも呼べる。
+> 導入/立ち上げフロー全体は [`guide-for-existing-project.md`](../../../packages/core/docs/guide-for-existing-project.md) / [`guide-for-new-project.md`](../../../packages/core/docs/guide-for-new-project.md)、
+> 駆動役は [`introducing-stdd`](../introducing-stdd/SKILL.md)（既存）/ [`starting-new-with-stdd`](../starting-new-with-stdd/SKILL.md)（新規）を参照。本スキルは単体でも呼べる。
 
 ## 設計方針（重要）
 
 - **フォーマットの決定そのものは人間**（ビジネス・チーム判断）。本スキルはそれを**促し・記録し・反映する**手続きに徹する。
 - **agent オーケストレーションはしない**。Claude がメインセッションで決定ポイントを 1 つずつ提示し、人間に決めてもらう。
-- 決定は **導入PLAN の「フォーマット決定ログ」** に集約（SSOT）。spec 本体に経緯・履歴を書かない。
+- 決定は **導入PLAN / 立ち上げPLAN の「フォーマット決定ログ」** に集約（SSOT）。spec 本体に経緯・履歴を書かない。
 
 ## 前提（素材）
 
-- **step 3-4（初期）**: `docs/common/`（common spec, step 1）と代表 feature spec 1 つ（step 2）が既にある。
-- **step 7（ブラッシュアップ）**: 既に複数の feature spec が運用されている。
+- **初期**: `docs/common/`（common spec）と最初の feature spec 1 つが既にある（既存導入なら reverse、新規立ち上げなら順行で作成）。
+- **ブラッシュアップ**: 既に複数の feature spec が運用されている。
 
 ---
 
@@ -55,8 +55,8 @@ STDD 導入フローの **step 3-4（初期フォーマット策定）** と **s
 
 ### 3. 決定を記録
 
-`docs/common/plans/stdd-introduction.md`（導入PLAN）の **「フォーマット決定ログ」** に各決定を追記する。
-導入PLAN が無い文脈（step 7 単体実行など）では、プロジェクトの spec 規約ドキュメント（例: `docs/common/SPEC_CONVENTIONS.md`）に記録してよい。
+`docs/common/plans/` の PLAN（既存導入: `stdd-introduction.md` / 新規立ち上げ: `stdd-bootstrap.md`）の **「フォーマット決定ログ」** に各決定を追記する。
+PLAN が無い文脈（ブラッシュアップ単体実行など）では、プロジェクトの spec 規約ドキュメント（例: `docs/common/SPEC_CONVENTIONS.md`）に記録してよい。
 
 ### 4. テンプレ・設定へ反映（機械的）
 
@@ -94,7 +94,7 @@ STDD 導入フローの **step 3-4（初期フォーマット策定）** と **s
 
 ## 参照ファイル
 
-- **導入ガイド（なぜ/判断基準）**: [introduction-guide.md](../../../packages/core/docs/introduction-guide.md) §step 3-4
+- **導入ガイド（なぜ/判断基準）**: [guide-for-existing-project.md](../../../packages/core/docs/guide-for-existing-project.md) §step 3-4
 - **導入ドライバー**: [introducing-stdd skill](../introducing-stdd/SKILL.md)
 - **spec テンプレ**: `packages/core/templates/`（feature） / `packages/core/templates/common/`（common）
 - **spec 作成スキル**: [documenting-specifications skill](../documenting-specifications/SKILL.md)

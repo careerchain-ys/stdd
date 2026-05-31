@@ -19,58 +19,71 @@ v0.1.0 時点で公式に対応している AI エージェントは以下です
 
 ---
 
-## Quick Start
+## STDD の始め方
 
-> **重要**: v0.1.0 時点で `create-stdd-project` CLI が利用できます。ただし npm への公開は今後の Phase で行うため、現状は **このリポジトリを clone してローカルから CLI を実行する** 方式で利用してください（`npx create-stdd-project` での直接実行は npm 公開後に対応）。
+導入は 2 パターン。**コードがまだ無いなら【新規】、既に動くコードがあるなら【既存】** を選んでください。
+どちらも Claude Code を起動して専用スキルに任せれば、フローを 1 ステップずつ対話的に進められます。
 
-### 0. CLI で新規プロジェクトを作成する（推奨）
+| パターン | 起点コマンド | 起動するスキル | 手順ガイド |
+| --- | --- | --- | --- |
+| **新規**（コードなし） | `create-stdd-project ... --template nextjs-supabase-starter` | `starting-new-with-stdd` | [`guide-for-new-project.md`](packages/core/docs/guide-for-new-project.md) |
+| **既存**（コードあり） | `.claude/` と `.stdd.config.yml` を配置 | `introducing-stdd` | [`guide-for-existing-project.md`](packages/core/docs/guide-for-existing-project.md) |
 
-```bash
-git clone https://github.com/careerchain-ys/stdd.git
-cd stdd && npm install && npm run build
+> **前提**: 現状 CLI は npm 未公開のため、このリポジトリを clone してローカルから実行します（`npx create-stdd-project` 直接実行は npm 公開後）。
 
-# 最小構成（デフォルト）
-node packages/create-stdd-project/dist/cli.js <project-name>
+### パターンA: 新規プロジェクト（コードがまだ無い）
 
-# Next.js + Supabase スターター（nextjs-supabase / playwright プラグイン同梱）
-node packages/create-stdd-project/dist/cli.js <project-name> --template nextjs-supabase-starter
-```
+1. CLI で雛形を生成（Next.js + Supabase + Playwright スターター）:
 
-`<project-name>/` に `.stdd.config.yml`・`.claude/`（skill / agent / hook）・`docs/`・`README.md` が展開されます。`--template` を指定すると、テンプレートが宣言するプラグインの skill も `.claude/skills/` に展開されます。
+   ```bash
+   git clone https://github.com/careerchain-ys/stdd.git
+   cd stdd && npm install && npm run build
+   node packages/create-stdd-project/dist/cli.js <project-name> --template nextjs-supabase-starter
+   ```
 
-利用可能なテンプレート:
+   `<project-name>/` に `.stdd.config.yml`・`.claude/`（skill / agent / hook）・`docs/common/` 雛形が展開されます。
+   （技術スタック非依存の最小構成は `--template` 省略 = `minimal`）
 
-| テンプレート | 内容 |
-| --- | --- |
-| `minimal`（既定） | 最小構成。コア skill / agent / hook のみ |
-| `nextjs-supabase-starter` | Next.js (App Router) + Supabase 向け。`nextjs-supabase`・`playwright` プラグインを同梱 |
+2. 生成先で Claude Code を起動し、「STDD で立ち上げを進めて」と伝える:
 
-以降の手順 1〜4 は CLI を使わず手動で構成する場合の参考です。
+   ```bash
+   cd <project-name> && claude
+   ```
 
-### 1. リポジトリを取得する
+   `starting-new-with-stdd` スキルが **アプリ骨組み → common ティア設計 → 最初の feature → フォーマット策定 → feature ループ** を駆動します。進捗は `docs/common/plans/stdd-bootstrap.md` に保持され、セッションを跨いで再開できます。
+   → 手順と判断基準: [`guide-for-new-project.md`](packages/core/docs/guide-for-new-project.md)
 
-```bash
-git clone https://github.com/careerchain-ys/stdd.git
-```
+### パターンB: 既存プロジェクト（既に動くコードがある）
 
-### 2. 自プロジェクトに `.stdd.config.yml` を作成する
+1. このリポジトリの `.claude/`（skill / agent / hook）と `.stdd.config.yml` を自プロジェクトに配置（またはコピー）。`.stdd.config.yml` は構成に合わせて調整します（CLI の対話セットアップでも作成可）。
 
-`packages/core/README.md` の「`.stdd.config.yml` の最小構成例」をコピーし、自プロジェクトの構成に合わせて調整してください。
+2. Claude Code を起動し、「STDD を導入して」と伝える:
 
-### 3. テンプレートをコピーする
+   ```bash
+   claude
+   ```
 
-```bash
-mkdir -p docs/web/<feature_path>
-cp stdd/packages/core/templates/REQUIREMENTS.md docs/web/<feature_path>/
-cp stdd/packages/core/templates/TECH_DESIGN.md  docs/web/<feature_path>/
-cp stdd/packages/core/templates/PLAN.md         docs/web/<feature_path>/plans/$(date +%F).md
-```
+   `introducing-stdd` スキルが **共通spec 逆生成 → 機能インベントリ → 代表機能リバース → フォーマット策定 → 機能ループ → 順行運用** を駆動します。進捗は `docs/common/plans/stdd-introduction.md` に保持されます。
+   → 手順と判断基準: [`guide-for-existing-project.md`](packages/core/docs/guide-for-existing-project.md)
 
-### 4. Claude Code でフローを実行する
+<details>
+<summary>手動セットアップ（CLI / スキルを使わず構成する場合の参考）</summary>
 
-`.claude/agents/` および `.claude/skills/` 配下を自プロジェクトにコピーするか、参照可能な位置に配置することで、Claude Code が STDD フローを実行できるようになります。
+1. リポジトリを取得: `git clone https://github.com/careerchain-ys/stdd.git`
+2. `.stdd.config.yml` を作成（`packages/core/README.md` の「最小構成例」を調整）。
+3. テンプレートをコピー:
 
-詳細な手順は [`AGENTS.md`](AGENTS.md) と [`packages/core/docs/stdd-methodology.md`](packages/core/docs/stdd-methodology.md) を参照してください。
+   ```bash
+   mkdir -p docs/<app>/<feature_path>
+   cp stdd/packages/core/templates/REQUIREMENTS.md docs/<app>/<feature_path>/
+   cp stdd/packages/core/templates/TECH_DESIGN.md  docs/<app>/<feature_path>/
+   # 全体版（common ティア）を使う場合
+   mkdir -p docs/common && cp stdd/packages/core/templates/common/*.md docs/common/
+   ```
+
+4. `.claude/agents/` および `.claude/skills/` を配置（またはコピー）して Claude Code で実行。
+
+</details>
 
 ---
 
@@ -78,7 +91,8 @@ cp stdd/packages/core/templates/PLAN.md         docs/web/<feature_path>/plans/$(
 
 - skill / agent / hook は `.stdd.config.yml` 駆動で動作します（`apps[].path` / `commands.*` / `project.primary_branch` 等を実行時に参照）。下流プロジェクト固有値のハードコードは除去済みです。記述規約は [`docs/config-driven-authoring.md`](docs/config-driven-authoring.md) を参照してください。
 - 別レイアウトのプロジェクト（単一アプリ・複数アプリ・別命名等）で使う場合は、`.stdd.config.yml` の `apps[]` / `commands` を調整すれば対応できます。
-- CLI (`create-stdd-project`) は Phase 2-B で実装済みですが、npm への公開（`npx` での直接実行）は今後の Phase で対応予定です。現状はローカル clone から `node packages/create-stdd-project/dist/cli.js <project-name>` で実行してください。
+- 新規プロジェクトの CLI テンプレートは現状 `minimal` と `nextjs-supabase-starter` の 2 種です。`starting-new-with-stdd` / `guide-for-new-project.md` は Next.js + Supabase + Playwright を主な対象としています。
+- CLI (`create-stdd-project`) は実装済みですが、npm への公開（`npx` での直接実行）は今後の Phase で対応予定です。現状はローカル clone から `node packages/create-stdd-project/dist/cli.js <project-name>` で実行してください。
 
 ---
 
@@ -92,8 +106,8 @@ stdd/
 ├── NOTICE                     # 著作権表記
 ├── packages/
 │   ├── core/                  # 方法論ドキュメント / テンプレ / JSON Schema
-│   │   ├── docs/
-│   │   ├── templates/
+│   │   ├── docs/              # methodology / 各導入ガイド / workflow-diagram
+│   │   ├── templates/         # REQUIREMENTS / TECH_DESIGN / PLAN / common
 │   │   └── schema/
 │   └── create-stdd-project/   # プロジェクト生成 CLI（create-stdd-project）
 ├── templates/                 # CLI が展開するプロジェクトテンプレート
@@ -115,13 +129,23 @@ stdd/
 
 ## 関連ドキュメント
 
-- [`AGENTS.md`](AGENTS.md) — AI エージェント向けのプロジェクト情報
-- [`SECURITY.md`](SECURITY.md) — セキュリティ脆弱性の報告経路
-- [`packages/core/README.md`](packages/core/README.md) — core パッケージの詳細
-- [`packages/core/docs/stdd-methodology.md`](packages/core/docs/stdd-methodology.md) — STDD 方法論
+**導入ガイド（ユースケース別）**
+
+- [`packages/core/docs/guide-for-new-project.md`](packages/core/docs/guide-for-new-project.md) — 新規プロジェクトの立ち上げ（最初から順行）
+- [`packages/core/docs/guide-for-existing-project.md`](packages/core/docs/guide-for-existing-project.md) — 既存プロジェクトへの導入（遡行ブートストラップ → 順行）
+
+**方法論**
+
+- [`packages/core/docs/stdd-methodology.md`](packages/core/docs/stdd-methodology.md) — STDD 方法論（Spec の 2 ティア構造・テスト戦略・開発フロー）
 - [`packages/core/docs/workflow-diagram.md`](packages/core/docs/workflow-diagram.md) — 開発フロー図
-- [`docs/plugin-separation-policy.md`](docs/plugin-separation-policy.md) — プラグイン分離方針
+
+**開発・運用の参考**
+
+- [`AGENTS.md`](AGENTS.md) — AI エージェント向けのプロジェクト情報
+- [`packages/core/README.md`](packages/core/README.md) — core パッケージ・`.stdd.config.yml` の詳細
+- [`docs/plugin-separation-policy.md`](docs/plugin-separation-policy.md) — プラグイン分離方針・core skill 一覧
 - [`docs/config-driven-authoring.md`](docs/config-driven-authoring.md) — skill / agent / hook の設定駆動オーサリング規約
+- [`SECURITY.md`](SECURITY.md) — セキュリティ脆弱性の報告経路
 
 ---
 
