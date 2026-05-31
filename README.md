@@ -1,6 +1,14 @@
 # STDD (Spec and Test Driven Development)
 
+[![npm version](https://img.shields.io/npm/v/@careerchain/stdd)](https://www.npmjs.com/package/@careerchain/stdd)
+[![npm downloads](https://img.shields.io/npm/dm/@careerchain/stdd)](https://www.npmjs.com/package/@careerchain/stdd)
+[![license](https://img.shields.io/npm/l/@careerchain/stdd)](LICENSE)
+
 STDD は、AI エージェントと人間の開発者が協働して仕様駆動・テスト駆動でソフトウェアを開発するための **方法論・テンプレート・skill / agent 群** を提供する OSS プロジェクトです。
+
+```bash
+npx @careerchain/stdd init   # 既存・新規どちらのプロジェクトにも STDD を導入
+```
 
 「**Spec → Test → Implementation**」を一方向に流す開発フローを軸に、Spec / Plan / Test / Code の整合性を AI エージェントが継続的に検証することで、プロジェクト規模が大きくなっても破綻しない開発体験を目指しています。
 
