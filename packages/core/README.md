@@ -67,7 +67,7 @@ docs:
 `common_requirements` / `common_architecture` はプロジェクト全体を俯瞰する **common ティア** の spec
 (`REQUIREMENTS.md` の全体版と `TECH_DESIGN.md` の全体版 = `ARCHITECTURE.md`) を指す。任意項目であり、
 common ティアを使わないプロジェクトでは省略してよい。詳細は
-[`docs/stdd-methodology.md`](docs/stdd-methodology.md) §3.0 を参照。
+[`docs/stdd-methodology.md`](docs/stdd-methodology.md) §2.0 を参照。
 
 このまま `apps/web/` に Next.js / Remix / SvelteKit 等を配置すれば動作する。
 複数アプリ構成 (例: `admin` と `web`) は `apps[]` に複数項目を追加する。

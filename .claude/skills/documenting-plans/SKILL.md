@@ -213,5 +213,5 @@ C) 特定のJourneyのみ（指定してください）
 ## 参照ファイル
 
 - [PLANドキュメントテンプレート](./templates/plan.md)
-- [STDD開発ガイド](../../docs/spec-driven-development-guide.md)
+- [STDD方法論ガイド](../../../packages/core/docs/stdd-methodology.md)
 - [Specドキュメント作成スキル](../documenting-specifications/SKILL.md)

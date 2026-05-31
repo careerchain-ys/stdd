@@ -132,6 +132,6 @@ feature ティアと違い、確認する一次情報は **UI 文言ではなく
 ## 参照ファイル
 
 - **common テンプレート**: `packages/core/templates/common/REQUIREMENTS.md` / `ARCHITECTURE.md`
-- **2 ティア構造の解説**: `packages/core/docs/stdd-methodology.md` §3.0
+- **2 ティア構造の解説**: `packages/core/docs/stdd-methodology.md` §2.0
 - **機能単位リバース**: [reverse-engineering-feature-spec skill](../reverse-engineering-feature-spec/SKILL.md)
 - **Specテンプレート**: [documenting-specifications skill](../documenting-specifications/SKILL.md)
