@@ -77,11 +77,11 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 ### step 5: feature ループ
 
 - `documenting-plans` で PLAN を切り、テスト（Red）→ 実装（Green）。`auto-implement` で駆動できる。
-- 各 feature 完了で `verifying-consistency`（spec ⇔ test ⇔ 実装）。E2E は P0 のみ等は `stdd-methodology.md` §5 に従う。
+- 各 feature 完了で `verifying-consistency`（spec ⇔ test ⇔ 実装）。E2E は P0 のみ等は `stdd-methodology.md` §4 に従う。
 
 ### step 6: 通常運用への地続き化
 
-- feature が回り始めたら立ち上げは完了。以降の追加・変更は通常の順行 STDD（`stdd-methodology.md` §6）と同じ。立ち上げPLAN は役目を終える。
+- feature が回り始めたら立ち上げは完了。以降の追加・変更は通常の順行 STDD（`stdd-methodology.md` §5）と同じ。立ち上げPLAN は役目を終える。
 
 ---
 
@@ -101,6 +101,6 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 
 - セッションで立ち上げを駆動する仕組み: `.claude/skills/starting-new-with-stdd/SKILL.md`
 - 既存プロジェクトへの導入: [`guide-for-existing-project.md`](./guide-for-existing-project.md)
-- 順行の通常フロー・テスト戦略: `stdd-methodology.md`（§5 テスト戦略 / §6 開発フロー）
+- 順行の通常フロー・テスト戦略: `stdd-methodology.md`（§4 テスト戦略 / §5 開発フロー）
 - 開発フロー図: `workflow-diagram.md`
 - スタック別の骨組み手順: 使用テンプレートの README（例: `nextjs-supabase-starter`）/ 各プラグイン

@@ -114,7 +114,7 @@ step 1・2 の実物を見ながら、このプロジェクト固有の spec フ
 ## 4. 関連ドキュメント
 
 - セッションで導入を駆動する仕組み: `.claude/skills/introducing-stdd/SKILL.md`
-- 2 ティア構造と方法論: `stdd-methodology.md` §3.0
+- 2 ティア構造と方法論: `stdd-methodology.md` §2.0
 - 開発フロー図: `workflow-diagram.md`
 - common ティアのリバース: `.claude/skills/reverse-engineering-common-spec/SKILL.md`
 - 機能単位のリバース: `.claude/skills/reverse-engineering-feature-spec/SKILL.md`
