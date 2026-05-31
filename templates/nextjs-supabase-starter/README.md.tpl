@@ -1,6 +1,6 @@
 # {{project.name}}
 
-Next.js (App Router) + Supabase 向けの STDD (Spec and Test Driven Development) プロジェクトです。`npx stdd init` で導入されました。
+Next.js (App Router) + Supabase 向けの STDD (Spec and Test Driven Development) プロジェクトです。`npx @careerchain/stdd init` で導入されました。
 
 ## 同梱プラグイン
 

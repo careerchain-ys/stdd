@@ -1,4 +1,4 @@
-# stdd
+# @careerchain/stdd
 
 STDD (Spec and Test Driven Development) を**既存・新規どちらのプロジェクトにも 1 コマンドで導入**する CLI です。
 
@@ -8,7 +8,7 @@ STDD (Spec and Test Driven Development) を**既存・新規どちらのプロ�
 
 ```bash
 cd my-project        # 既存プロジェクト、または新規の空ディレクトリ
-npx stdd init        # STDD 一式を現在のディレクトリに導入
+npx @careerchain/stdd init   # STDD 一式を現在のディレクトリに導入
 claude               # Claude Code を起動
 ```
 
@@ -18,8 +18,10 @@ claude               # Claude Code を起動
 ## コマンド
 
 ```bash
-npx stdd init [options]
+npx @careerchain/stdd init [options]
 ```
+
+> グローバルにインストール（`npm i -g @careerchain/stdd`）した場合は `stdd init` として実行できます。
 
 | option | 説明 |
 | --- | --- |

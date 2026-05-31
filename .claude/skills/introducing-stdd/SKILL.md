@@ -152,7 +152,7 @@ docs:
 □ 後続ステップが参照する apps / commands / docs.layout が揃っている
 ```
 
-> 配置は `npx stdd init`（カレントディレクトリに `.claude/` と `.stdd.config.yml` を導入）に委譲してよい。未導入なら step 0 はそれを案内する。
+> 配置は `npx @careerchain/stdd init`（カレントディレクトリに `.claude/` と `.stdd.config.yml` を導入）に委譲してよい。未導入なら step 0 はそれを案内する。
 
 ---
 

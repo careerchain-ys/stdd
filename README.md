@@ -25,15 +25,15 @@ v0.1.0 時点で公式に対応している AI エージェントは以下です
 新規 / 既存の判定はルータースキル (`setup-stdd`) が自動で行い、適切な駆動スキルへ振り分けます。
 
 ```bash
-cd my-project        # 既存プロジェクト、または新規の空ディレクトリ
-npx stdd init        # ① STDD 一式を現在のディレクトリに導入
-claude               # ② Claude Code を起動
+cd my-project                 # 既存プロジェクト、または新規の空ディレクトリ
+npx @careerchain/stdd init    # ① STDD 一式を現在のディレクトリに導入
+claude                        # ② Claude Code を起動
 # ③ 「STDD を導入して」と伝える
 ```
 
 3 ステップの内訳:
 
-1. **`npx stdd init`** — `.claude/`（skill / agent / hook）・`.stdd.config.yml`・`docs/` を**現在のディレクトリ**に配置します。既存ファイルは破壊せず、追加・生成のみ行います（既存の `.stdd.config.yml` は保持）。
+1. **`npx @careerchain/stdd init`** — `.claude/`（skill / agent / hook）・`.stdd.config.yml`・`docs/` を**現在のディレクトリ**に配置します。既存ファイルは破壊せず、追加・生成のみ行います（既存の `.stdd.config.yml` は保持）。
 2. **`claude`** — Claude Code を起動します。
 3. **「STDD を導入して」** — `setup-stdd` ルーターがコードの有無を調べ、確認のうえ次へ委譲します。
 
@@ -70,8 +70,8 @@ claude               # ② Claude Code を起動
 
 - skill / agent / hook は `.stdd.config.yml` 駆動で動作します（`apps[].path` / `commands.*` / `project.primary_branch` 等を実行時に参照）。下流プロジェクト固有値のハードコードは除去済みです。記述規約は [`docs/config-driven-authoring.md`](docs/config-driven-authoring.md) を参照してください。
 - 別レイアウトのプロジェクト（単一アプリ・複数アプリ・別命名等）で使う場合は、`.stdd.config.yml` の `apps[]` / `commands` を調整すれば対応できます。
-- `npx stdd init` は STDD ツール（`.claude/` / `.stdd.config.yml` / `docs/`）の導入に専念します。アプリの骨組み（Next.js + Supabase + Playwright 等）は `starting-new-with-stdd` スキルが Claude セッション内で構築します。`starting-new-with-stdd` / `guide-for-new-project.md` は Next.js + Supabase + Playwright を主な対象としています。
-- CLI のパッケージ名は `stdd`（`npx stdd init`）。npm 公開前にローカルで試す場合は、clone 後 `npm install && npm run build` し、対象ディレクトリで `node <stdd>/packages/stdd/dist/cli.js init` を実行してください。
+- `npx @careerchain/stdd init` は STDD ツール（`.claude/` / `.stdd.config.yml` / `docs/`）の導入に専念します。アプリの骨組み（Next.js + Supabase + Playwright 等）は `starting-new-with-stdd` スキルが Claude セッション内で構築します。`starting-new-with-stdd` / `guide-for-new-project.md` は Next.js + Supabase + Playwright を主な対象としています。
+- CLI の npm パッケージ名は `@careerchain/stdd`（`npx @careerchain/stdd init`）。ローカルで試す場合は、clone 後 `npm install && npm run build` し、対象ディレクトリで `node <stdd>/packages/stdd/dist/cli.js init` を実行してください。
 
 ---
 
@@ -88,7 +88,7 @@ stdd/
 │   │   ├── docs/              # methodology / 各導入ガイド / workflow-diagram
 │   │   ├── templates/         # REQUIREMENTS / TECH_DESIGN / PLAN / common
 │   │   └── schema/
-│   └── stdd/                  # 導入 CLI（npm パッケージ `stdd` / `npx stdd init`）
+│   └── stdd/                  # 導入 CLI（npm パッケージ `@careerchain/stdd`）
 ├── templates/                 # 参照用プロジェクトテンプレート
 │   ├── minimal/               # 最小構成テンプレート
 │   └── nextjs-supabase-starter/ # Next.js + Supabase スターター（プラグイン同梱）

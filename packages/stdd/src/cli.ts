@@ -31,7 +31,7 @@ function printHelp(): void {
   stdd v${VERSION}  STDD (Spec and Test Driven Development) インストーラ
 
   使い方:
-    npx stdd init [options]    現在のディレクトリに STDD を導入する（新規・既存どちらも可）
+    npx @careerchain/stdd init [options]    現在のディレクトリに STDD を導入する（新規・既存どちらも可）
 
   options:
     --name <name>   .stdd.config.yml の project.name（既定: ディレクトリ名）

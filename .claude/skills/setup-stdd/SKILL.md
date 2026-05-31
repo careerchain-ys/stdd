@@ -70,7 +70,7 @@ git ls-files 2>/dev/null | grep -vE '^(\.claude/|docs/|\.stdd\.config\.yml|READM
 ## 前提
 
 - このスキルは `stdd init`（`.claude/` と `.stdd.config.yml` の配置）が済んだプロジェクトで使う想定。
-  `.stdd.config.yml` が無い場合は、まず `npx stdd init` を案内する。
+  `.stdd.config.yml` が無い場合は、まず `npx @careerchain/stdd init` を案内する。
 - 判定がどうしても曖昧な場合は決め打ちせず、ユーザーにどちらで進めるか尋ねる。
 
 ---

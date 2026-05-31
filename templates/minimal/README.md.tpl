@@ -1,6 +1,6 @@
 # {{project.name}}
 
-STDD (Spec and Test Driven Development) ベースのプロジェクトです。`npx stdd init` で導入されました。
+STDD (Spec and Test Driven Development) ベースのプロジェクトです。`npx @careerchain/stdd init` で導入されました。
 
 ## 次の手順
 

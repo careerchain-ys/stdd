@@ -38,7 +38,7 @@ docs/common/plans/stdd-bootstrap.md
 ### 2. 設定確認
 
 `.stdd.config.yml` を読み、`apps[]` / `commands` / `docs.layout`（`common_requirements` / `common_architecture` 含む）を把握する。
-`npx stdd init` で導入済みなら揃っている。無ければ step 0 を案内する。
+`npx @careerchain/stdd init` で導入済みなら揃っている。無ければ step 0 を案内する。
 
 ---
 
@@ -62,7 +62,7 @@ docs/common/plans/stdd-bootstrap.md
 
 ## 初回フロー（立ち上げPLAN が無いとき）
 
-1. **scaffold 確認**: `npx stdd init` の導入物（`.stdd.config.yml`・`.claude/`・`docs/`）が揃っているか点検。未導入なら `npx stdd init` を案内。
+1. **scaffold 確認**: `npx @careerchain/stdd init` の導入物（`.stdd.config.yml`・`.claude/`・`docs/`）が揃っているか点検。未導入なら `npx @careerchain/stdd init` を案内。
 2. **step 1（アプリ骨組み）**: 下記「step 1」手順で stack 固有の骨組み生成を対話駆動。
 3. **step 2（★人間判断）**: `documenting-specifications` で `docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md` を**前方設計**（仮説として埋める）。
 4. **step 3（★人間判断）**: P0 コア機能を 1 つ選び、順行で feature spec を作る。

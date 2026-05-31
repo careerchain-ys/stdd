@@ -49,7 +49,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 
 ### step 0: セットアップ
 
-- `npx stdd init` で導入済みなら `.stdd.config.yml`・`.claude/`・`docs/` が揃っている。点検のみ。
+- `npx @careerchain/stdd init` で導入済みなら `.stdd.config.yml`・`.claude/`・`docs/` が揃っている。点検のみ。
 - 単一アプリか複数アプリかで `docs.layout` のパス規約が変わる。common ティアは既定で有効（`docs.layout.common_requirements` / `common_architecture`）。
 
 ### step 1: アプリ骨組み生成（stack 固有）
