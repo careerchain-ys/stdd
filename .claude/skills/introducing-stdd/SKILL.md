@@ -3,7 +3,7 @@ name: introducing-stdd
 description: |-
   既存（稼働中）プロジェクトへの STDD 導入を、Claude セッションで段階的に駆動する。導入ガイドに従い、共通spec生成→機能インベントリ→代表機能リバース→フォーマット策定→機能ループ→順行運用への移行までを、既存スキル（reverse-engineering-common-spec / reverse-engineering-feature-spec / auto-implement / verifying-consistency）を順に呼びながら進める。進捗は導入PLANで保持し、セッションを跨いで再開できる。単一機能のリバースのみなら reverse-engineering-feature-spec を直接使う。
 when_to_use: |-
-  「STDD導入」「stdd導入を進める」「既存プロジェクトにstddを入れる」「導入の続き」「introduce stdd」「導入ブートストラップ」に関する作業のとき。
+  既存（稼働中）プロジェクトへの STDD 導入を進める／再開するとき。「既存プロジェクトにstddを入れる」「導入の続き」「導入ブートストラップ」など、既存フローと確定している場合。新規/既存が未確定の最初の入口は setup-stdd（ルーター）が判定して本スキルへ委譲する。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
@@ -152,7 +152,7 @@ docs:
 □ 後続ステップが参照する apps / commands / docs.layout が揃っている
 ```
 
-> 将来 CLI（`create-stdd-project`、Phase 2-B 予定）が提供されたら、step 0 はそれに委譲してよい。
+> 配置は `npx stdd init`（カレントディレクトリに `.claude/` と `.stdd.config.yml` を導入）に委譲してよい。未導入なら step 0 はそれを案内する。
 
 ---
 

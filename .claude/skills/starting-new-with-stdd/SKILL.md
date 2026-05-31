@@ -3,7 +3,7 @@ name: starting-new-with-stdd
 description: |-
   新規（コードがまだ無い）プロジェクトを STDD で立ち上げる作業を、Claude セッションで段階的に駆動する。立ち上げガイドに従い、アプリ骨組み生成→common ティアの前方設計→最初の feature→フォーマット策定→feature ループ→通常運用への移行までを、既存スキル（documenting-specifications / generating-wireframes / tailoring-spec-format / documenting-plans / auto-implement / verifying-consistency）を順に呼びながら進める。進捗は立ち上げPLANで保持し、セッションを跨いで再開できる。既に稼働しているコードへの導入は introducing-stdd を使う。
 when_to_use: |-
-  「新規プロジェクトをstddで立ち上げる」「stddで新規開発を始める」「立ち上げの続き」「start new project with stdd」「greenfield stdd」に関する作業のとき。
+  新規（コードがまだ無い）プロジェクトの立ち上げを進める／再開するとき。「新規プロジェクトをstddで立ち上げる」「立ち上げの続き」「greenfield stdd」など、新規フローと確定している場合。新規/既存が未確定の最初の入口は setup-stdd（ルーター）が判定して本スキルへ委譲する。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
@@ -38,7 +38,7 @@ docs/common/plans/stdd-bootstrap.md
 ### 2. 設定確認
 
 `.stdd.config.yml` を読み、`apps[]` / `commands` / `docs.layout`（`common_requirements` / `common_architecture` 含む）を把握する。
-`create-stdd-project` で生成済みなら揃っている。無ければ step 0 を案内する。
+`npx stdd init` で導入済みなら揃っている。無ければ step 0 を案内する。
 
 ---
 
@@ -62,7 +62,7 @@ docs/common/plans/stdd-bootstrap.md
 
 ## 初回フロー（立ち上げPLAN が無いとき）
 
-1. **scaffold 確認**: `create-stdd-project` 生成物（`.stdd.config.yml`・`.claude/`・`docs/common/` 雛形）が揃っているか点検。未生成なら CLI を案内。
+1. **scaffold 確認**: `npx stdd init` の導入物（`.stdd.config.yml`・`.claude/`・`docs/`）が揃っているか点検。未導入なら `npx stdd init` を案内。
 2. **step 1（アプリ骨組み）**: 下記「step 1」手順で stack 固有の骨組み生成を対話駆動。
 3. **step 2（★人間判断）**: `documenting-specifications` で `docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md` を**前方設計**（仮説として埋める）。
 4. **step 3（★人間判断）**: P0 コア機能を 1 つ選び、順行で feature spec を作る。
