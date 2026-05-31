@@ -1,0 +1,48 @@
+{
+  "name": "@careerchain/stdd",
+  "version": "0.1.0",
+  "description": "STDD (Spec and Test Driven Development) を既存・新規プロジェクトに導入する CLI",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "stdd": "./dist/cli.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "assets",
+    "README.md"
+  ],
+  "scripts": {
+    "sync-assets": "node scripts/sync-assets.mjs",
+    "build": "npm run sync-assets && tsc",
+    "start": "node dist/cli.js",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/prompts": "^2.4.9",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "stdd",
+    "spec-driven-development",
+    "test-driven-development",
+    "claude-code",
+    "ai-agent"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/careerchain-ys/stdd.git",
+    "directory": "packages/stdd"
+  },
+  "homepage": "https://github.com/careerchain-ys/stdd"
+}

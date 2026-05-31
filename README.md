@@ -21,50 +21,29 @@ v0.1.0 時点で公式に対応している AI エージェントは以下です
 
 ## STDD の始め方
 
-導入は 2 パターン。**コードがまだ無いなら【新規】、既に動くコードがあるなら【既存】** を選んでください。
-どちらも Claude Code を起動して専用スキルに任せれば、フローを 1 ステップずつ対話的に進められます。
+**新規・既存のどちらでも手順は同じ**です。STDD を導入して Claude Code に「導入して」と伝えるだけ。
+新規 / 既存の判定はルータースキル (`setup-stdd`) が自動で行い、適切な駆動スキルへ振り分けます。
 
-| パターン | 起点コマンド | 起動するスキル | 手順ガイド |
+```bash
+cd my-project                 # 既存プロジェクト、または新規の空ディレクトリ
+npx @careerchain/stdd init    # ① STDD 一式を現在のディレクトリに導入
+claude                        # ② Claude Code を起動
+# ③ 「STDD を導入して」と伝える
+```
+
+3 ステップの内訳:
+
+1. **`npx @careerchain/stdd init`** — `.claude/`（skill / agent / hook）・`.stdd.config.yml`・`docs/` を**現在のディレクトリ**に配置します。既存ファイルは破壊せず、追加・生成のみ行います（既存の `.stdd.config.yml` は保持）。
+2. **`claude`** — Claude Code を起動します。
+3. **「STDD を導入して」** — `setup-stdd` ルーターがコードの有無を調べ、確認のうえ次へ委譲します。
+
+| 判定 | 委譲先スキル | 駆動するフロー | 手順ガイド |
 | --- | --- | --- | --- |
-| **新規**（コードなし） | `create-stdd-project ... --template nextjs-supabase-starter` | `starting-new-with-stdd` | [`guide-for-new-project.md`](packages/core/docs/guide-for-new-project.md) |
-| **既存**（コードあり） | `.claude/` と `.stdd.config.yml` を配置 | `introducing-stdd` | [`guide-for-existing-project.md`](packages/core/docs/guide-for-existing-project.md) |
+| **新規**（コードなし） | `starting-new-with-stdd` | アプリ骨組み → common 設計 → 最初の feature → フォーマット策定 → feature ループ | [`guide-for-new-project.md`](packages/core/docs/guide-for-new-project.md) |
+| **既存**（コードあり） | `introducing-stdd` | 共通spec 逆生成 → 機能インベントリ → 代表機能リバース → フォーマット策定 → 機能ループ → 順行運用 | [`guide-for-existing-project.md`](packages/core/docs/guide-for-existing-project.md) |
 
-> **前提**: 現状 CLI は npm 未公開のため、このリポジトリを clone してローカルから実行します（`npx create-stdd-project` 直接実行は npm 公開後）。
-
-### パターンA: 新規プロジェクト（コードがまだ無い）
-
-1. CLI で雛形を生成（Next.js + Supabase + Playwright スターター）:
-
-   ```bash
-   git clone https://github.com/careerchain-ys/stdd.git
-   cd stdd && npm install && npm run build
-   node packages/create-stdd-project/dist/cli.js <project-name> --template nextjs-supabase-starter
-   ```
-
-   `<project-name>/` に `.stdd.config.yml`・`.claude/`（skill / agent / hook）・`docs/common/` 雛形が展開されます。
-   （技術スタック非依存の最小構成は `--template` 省略 = `minimal`）
-
-2. 生成先で Claude Code を起動し、「STDD で立ち上げを進めて」と伝える:
-
-   ```bash
-   cd <project-name> && claude
-   ```
-
-   `starting-new-with-stdd` スキルが **アプリ骨組み → common ティア設計 → 最初の feature → フォーマット策定 → feature ループ** を駆動します。進捗は `docs/common/plans/stdd-bootstrap.md` に保持され、セッションを跨いで再開できます。
-   → 手順と判断基準: [`guide-for-new-project.md`](packages/core/docs/guide-for-new-project.md)
-
-### パターンB: 既存プロジェクト（既に動くコードがある）
-
-1. このリポジトリの `.claude/`（skill / agent / hook）と `.stdd.config.yml` を自プロジェクトに配置（またはコピー）。`.stdd.config.yml` は構成に合わせて調整します（CLI の対話セットアップでも作成可）。
-
-2. Claude Code を起動し、「STDD を導入して」と伝える:
-
-   ```bash
-   claude
-   ```
-
-   `introducing-stdd` スキルが **共通spec 逆生成 → 機能インベントリ → 代表機能リバース → フォーマット策定 → 機能ループ → 順行運用** を駆動します。進捗は `docs/common/plans/stdd-introduction.md` に保持されます。
-   → 手順と判断基準: [`guide-for-existing-project.md`](packages/core/docs/guide-for-existing-project.md)
+進捗は `docs/common/plans/`（新規=`stdd-bootstrap.md` / 既存=`stdd-introduction.md`）に保持され、セッションを跨いで再開できます。
+新規 / 既存が明確な場合は、ルーターを介さず `starting-new-with-stdd` / `introducing-stdd` を直接指名しても構いません。
 
 <details>
 <summary>手動セットアップ（CLI / スキルを使わず構成する場合の参考）</summary>
@@ -91,8 +70,8 @@ v0.1.0 時点で公式に対応している AI エージェントは以下です
 
 - skill / agent / hook は `.stdd.config.yml` 駆動で動作します（`apps[].path` / `commands.*` / `project.primary_branch` 等を実行時に参照）。下流プロジェクト固有値のハードコードは除去済みです。記述規約は [`docs/config-driven-authoring.md`](docs/config-driven-authoring.md) を参照してください。
 - 別レイアウトのプロジェクト（単一アプリ・複数アプリ・別命名等）で使う場合は、`.stdd.config.yml` の `apps[]` / `commands` を調整すれば対応できます。
-- 新規プロジェクトの CLI テンプレートは現状 `minimal` と `nextjs-supabase-starter` の 2 種です。`starting-new-with-stdd` / `guide-for-new-project.md` は Next.js + Supabase + Playwright を主な対象としています。
-- CLI (`create-stdd-project`) は実装済みですが、npm への公開（`npx` での直接実行）は今後の Phase で対応予定です。現状はローカル clone から `node packages/create-stdd-project/dist/cli.js <project-name>` で実行してください。
+- `npx @careerchain/stdd init` は STDD ツール（`.claude/` / `.stdd.config.yml` / `docs/`）の導入に専念します。アプリの骨組み（Next.js + Supabase + Playwright 等）は `starting-new-with-stdd` スキルが Claude セッション内で構築します。`starting-new-with-stdd` / `guide-for-new-project.md` は Next.js + Supabase + Playwright を主な対象としています。
+- CLI の npm パッケージ名は `@careerchain/stdd`（`npx @careerchain/stdd init`）。ローカルで試す場合は、clone 後 `npm install && npm run build` し、対象ディレクトリで `node <stdd>/packages/stdd/dist/cli.js init` を実行してください。
 
 ---
 
@@ -109,8 +88,8 @@ stdd/
 │   │   ├── docs/              # methodology / 各導入ガイド / workflow-diagram
 │   │   ├── templates/         # REQUIREMENTS / TECH_DESIGN / PLAN / common
 │   │   └── schema/
-│   └── create-stdd-project/   # プロジェクト生成 CLI（create-stdd-project）
-├── templates/                 # CLI が展開するプロジェクトテンプレート
+│   └── stdd/                  # 導入 CLI（npm パッケージ `@careerchain/stdd`）
+├── templates/                 # 参照用プロジェクトテンプレート
 │   ├── minimal/               # 最小構成テンプレート
 │   └── nextjs-supabase-starter/ # Next.js + Supabase スターター（プラグイン同梱）
 ├── plugins/                   # 技術スタック別プラグイン
