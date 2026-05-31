@@ -88,8 +88,6 @@ cp stdd/packages/core/templates/PLAN.md         docs/web/<feature_path>/plans/$(
 stdd/
 ├── README.md                  # 本ファイル
 ├── AGENTS.md                  # AI エージェント設定（agents.md 標準準拠）
-├── CONTRIBUTING.md            # 貢献ガイド
-├── CODE_OF_CONDUCT.md         # 行動規範（Contributor Covenant 2.1）
 ├── LICENSE                    # Apache License 2.0
 ├── NOTICE                     # 著作権表記
 ├── packages/
@@ -118,8 +116,6 @@ stdd/
 ## 関連ドキュメント
 
 - [`AGENTS.md`](AGENTS.md) — AI エージェント向けのプロジェクト情報
-- [`CONTRIBUTING.md`](CONTRIBUTING.md) — 貢献フロー（DCO sign-off など）
-- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) — 行動規範
 - [`SECURITY.md`](SECURITY.md) — セキュリティ脆弱性の報告経路
 - [`packages/core/README.md`](packages/core/README.md) — core パッケージの詳細
 - [`packages/core/docs/stdd-methodology.md`](packages/core/docs/stdd-methodology.md) — STDD 方法論
@@ -132,6 +128,14 @@ stdd/
 ## 公開リポジトリの所在地について
 
 このリポジトリは GitHub 上で公開されており、Quick Start に記載された clone URL のホスト組織名は **公開リポジトリのホスト組織名** にすぎず、stdd の利用に特定組織への依存はありません。`.stdd.config.yml` の JSON Schema `$id` や `yaml-language-server` ディレクティブで参照される URL も同じ理由で当該パスを含みます。詳細は [`packages/core/README.md`](packages/core/README.md) の注記を参照してください。将来 GitHub org / repo のリネームが行われた場合は別 Phase で URL を更新します。
+
+---
+
+## コントリビューションについて
+
+本リポジトリは **read-only 配布** です。外部からの Issue / Pull Request / コミュニティ貢献は受け付けていません（Apache License 2.0 の範囲で自由に fork・利用できます）。
+
+例外として、**セキュリティ脆弱性の報告のみ** [`SECURITY.md`](SECURITY.md) に記載の GitHub Private Vulnerability Reporting 経由で受け付けます。
 
 ---
 

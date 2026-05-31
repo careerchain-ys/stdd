@@ -53,7 +53,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 | JSON Schema の構文検証        | `npx -y ajv-cli compile -s packages/core/schema/.stdd.config.schema.json`      |
 | `.stdd.config.yml` の妥当性検証 | YAML を JSON に変換してから `ajv-cli validate` で検証する。詳細手順は [`packages/core/README.md`](packages/core/README.md) の「JSON Schema のローカル検証」セクション（`js-yaml` を介した変換例を含む）を参照 |
 | プラグインメタデータの構文検証 | `for f in plugins/*/plugin.json; do python3 -m json.tool "$f" > /dev/null && echo "OK $f"; done` |
-| 禁止語監査                    | リポジトリの公開状態に応じて、旧名称・固有名詞が残っていないかを `grep -rI` で確認（詳細は `CONTRIBUTING.md` 参照）         |
+| 禁止語監査                    | リポジトリの公開状態に応じて、旧名称・固有名詞が残っていないかを `grep -rI` で確認                                          |
 
 下流プロジェクト側の `.stdd.config.yml` には `commands.typecheck` / `commands.test` / `commands.lint` を定義してください。stdd の skill / agent はこれらの設定を参照してコマンドを実行します。
 
@@ -88,7 +88,7 @@ STDD では **Spec → Test → Implementation** の順序を厳守します。
 | Integration | 複数モジュール間の連携（DB / API / Server Action 等）         |
 | E2E          | ユーザー視点のシナリオ（Playwright を用いる場合は plugins/playwright を参照） |
 
-stdd 本体（ドキュメント・テンプレート）は監査スクリプト（grep / JSON validation / schema validation）でテストを構成します。具体的な検証コマンドは [`CONTRIBUTING.md`](CONTRIBUTING.md) を参照してください。
+stdd 本体（ドキュメント・テンプレート）は監査スクリプト（grep / JSON validation / schema validation）でテストを構成します。具体的な検証コマンドは本ファイルの「検証コマンド」セクションを参照してください。
 
 ---
 
@@ -97,19 +97,19 @@ stdd 本体（ドキュメント・テンプレート）は監査スクリプト
 - **シークレット**: API キー・トークン・パスワードを **絶対にコミットしない**。`.env` 系ファイルは `.gitignore` で除外する
 - **個人情報**: 個人を特定可能な情報（氏名・メールアドレス・内部ホスト名等）を含むサンプルをコミットしない
 - **公開リポジトリで扱わない情報**: 社内プロジェクト固有の値・テストユーザー情報・本番ホスト名は持ち込まない
-- **行動規範**: コントリビュータは [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) を尊重すること
-- **脆弱性報告窓口**: `SECURITY.md` は Phase 2-B 〜 Phase 2-C で整備予定。それまでは GitHub Issue を使い、機密度の高い問題はメンテナ宛 DM 等で個別連絡
+- **脆弱性報告窓口**: 脆弱性は公開せず [`SECURITY.md`](SECURITY.md) に記載の GitHub Private Vulnerability Reporting 経由で報告する
 
 ---
 
-## PR ガイドライン
+## コミット / 変更ガイドライン
+
+> 本リポジトリは read-only 配布で、外部からの Issue / Pull Request は受け付けていません（[`README.md`](README.md) 参照）。以下はメンテナ内部の変更運用ルールです。
 
 - **コミット粒度**: 1 コミット = 1 論理的変更。リファクタと機能追加は分離
 - **コミットメッセージ**: 本文に「何を」「なぜ」を記載
-- **DCO sign-off**: すべてのコミットに `git commit -s` で `Signed-off-by: 名前 <email>` を付与する。詳細は [`CONTRIBUTING.md`](CONTRIBUTING.md) 参照
-- **PR テンプレート**: `.github/pull_request_template.md` に従い、変更概要 / 関連 issue / テスト結果 / 評価結果 (eval-result) / チェックリストを記入
-- **評価結果 (eval-result)**: skill / agent を変更する PR では評価スコアの添付を **強く推奨**（Phase 2-C で QA gate として必須化予定）
-- **破壊的変更**: schema / skill API / plugin interface の破壊的変更は PR 説明に明記し、レビューでメンテナの承認を得る
+- **検証**: 変更後は本ファイルの「検証コマンド」を実行し、構文・schema が通ることを確認する
+- **評価結果 (eval-result)**: skill / agent を変更する際は評価スコアの記録を **強く推奨**
+- **破壊的変更**: schema / skill API / plugin interface の破壊的変更はコミット / リリースノートに明記する
 
 ---
 
