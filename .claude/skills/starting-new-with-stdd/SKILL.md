@@ -49,12 +49,13 @@ docs/common/plans/stdd-bootstrap.md
 | step | 実行内容 | 呼ぶスキル | ★停止して確認 |
 | ---- | -------- | ---------- | ------------- |
 | 0 | scaffold / `.stdd.config.yml` 点検（common ティア前提） | — | 構成（単一/複数アプリ・パス規約） |
-| 1 | **アプリ骨組みを対話駆動**（stack 固有） | （stack 手順へ委譲。下記「step 1」詳細） | ★ 構成・コマンド疎通 |
-| 2 | **common ティアを前方設計**（docs/common を埋める） | `documenting-specifications` | ★ 目的・アクター・初期アーキ |
-| 3 | 最初の feature を順行 spec 化（P0 コアから 1 本） | `documenting-specifications` → `generating-wireframes` | ★ Spec 粒度・スコープ |
-| 4 | フォーマット策定 → テンプレ特化 | `tailoring-spec-format` | ★★ フォーマット決定 |
-| 5 | feature を順行 STDD でループ | `documenting-plans` → `auto-implement` | ★ 機能ごとの粒度 |
-| 6 | 通常運用へ移行 | `auto-implement`（以降） | 立ち上げ完了の確認 |
+| 1 | **プロダクトコンセプトのヒアリング**（下記「step 1」詳細） | — | ★ どんなアプリ／要件の概要（最低 1 レスポンス） |
+| 2 | **アプリ骨組みを対話駆動**（stack 固有） | （stack 手順へ委譲。下記「step 2」詳細） | ★ 構成・コマンド疎通 |
+| 3 | **common ティアを前方設計**（docs/common を埋める） | `documenting-specifications` | ★ 目的・アクター・初期アーキ |
+| 4 | 最初の feature を順行 spec 化（P0 コアから 1 本） | `documenting-specifications` → `generating-wireframes` | ★ Spec 粒度・スコープ |
+| 5 | フォーマット策定 → テンプレ特化 | `tailoring-spec-format` | ★★ フォーマット決定 |
+| 6 | feature を順行 STDD でループ | `documenting-plans` → `auto-implement` | ★ 機能ごとの粒度 |
+| 7 | 通常運用へ移行 | `auto-implement`（以降） | 立ち上げ完了の確認 |
 
 各 feature 実装後は `verifying-consistency` で spec ⇔ test ⇔ 実装 の整合を確認する。
 
@@ -63,11 +64,12 @@ docs/common/plans/stdd-bootstrap.md
 ## 初回フロー（立ち上げPLAN が無いとき）
 
 1. **scaffold 確認**: `npx @careerchain/stdd init` の導入物（`.stdd.config.yml`・`.claude/`・`docs/`）が揃っているか点検。未導入なら `npx @careerchain/stdd init` を案内。
-2. **step 1（アプリ骨組み）**: 下記「step 1」手順で stack 固有の骨組み生成を対話駆動。
-3. **step 2（★人間判断）**: `documenting-specifications` で `docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md` を**前方設計**（仮説として埋める）。
-4. **step 3（★人間判断）**: P0 コア機能を 1 つ選び、順行で feature spec を作る。
-5. **立ち上げPLAN 生成**: `templates/bootstrap-plan.md` を雛形に `docs/common/plans/stdd-bootstrap.md` を作成し、想定 feature を優先順で並べる。
-6. 「次は step 4（フォーマット策定）」を提示して停止。
+2. **step 1（★人間判断・最優先）**: 下記「step 1」手順で**プロダクトコンセプトをヒアリング**し、最低 1 レスポンスを得る。技術スタック等の確認より先に必ず実施する。
+3. **step 2（アプリ骨組み）**: 下記「step 2」手順で stack 固有の骨組み生成を対話駆動。step 1 で得たコンセプトを stack 選定の判断材料に使う。
+4. **step 3（★人間判断）**: `documenting-specifications` で `docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md` を**前方設計**（step 1 のコンセプトを起点に、仮説として埋める）。
+5. **step 4（★人間判断）**: P0 コア機能を 1 つ選び、順行で feature spec を作る。
+6. **立ち上げPLAN 生成**: `templates/bootstrap-plan.md` を雛形に `docs/common/plans/stdd-bootstrap.md` を作成し、step 1 で得たコンセプトを「プロダクトコンセプト」セクションに転記、想定 feature を優先順で並べる。
+7. 「次は step 5（フォーマット策定）」を提示して停止。
 
 ---
 
@@ -81,14 +83,38 @@ docs/common/plans/stdd-bootstrap.md
 
 ---
 
-## step 1: アプリ骨組みの対話駆動（詳細）
+## step 1: プロダクトコンセプトのヒアリング（詳細）
+
+**最初に必ず実施する**。技術スタック・骨組み・common ドキュメントなどあらゆる確認の**前に**ユーザーから 1 レスポンスを得る。
+ここで得た内容は step 2（stack 選定の判断材料）と step 3（common ティアの前方設計の起点）の双方に流す。
+
+### 1-1. 何を聞くか
+
+「**どんなシステム／アプリ／サービスを作りたいですか？要件の概要を教えてください**」を起点に、ユーザーの言葉でフリーフォームに聞く。
+箇条書きやフォームを強制しない。例示として以下を添えてもよいが、回答を縛らない:
+
+- 解決したい問題 / 想定ユーザー / 中核機能 / 想定スケール 等
+
+### 1-2. 進める条件（重要）
+
+- **最低 1 レスポンス**を得たら、その**詳細度に関わらず**次ステップへ進む。追加質問で深掘りしない。
+- 不足は step 3（common ティアの前方設計）以降で**仮説**として補い、feature 開発で検証して更新する前提。
+
+### 1-3. 記録
+
+- 立ち上げPLAN（`docs/common/plans/stdd-bootstrap.md`）の「プロダクトコンセプト」セクションにユーザーの 1 レスポンスを**そのまま転記**する（要約や勝手な拡張を加えない）。
+- step 3 で common `REQUIREMENTS.md` を書く際の起点になる。
+
+---
+
+## step 2: アプリ骨組みの対話駆動（詳細）
 
 新規はアプリ本体がまだ無いので、stack 固有の骨組み（フレームワーク・DB・E2E）を立てる。
 **本スキルは stack 非依存**なので、コマンドの実体は持たず、使用中の stack 手順を SSoT として参照・実行支援する。
 
-### 1-1. stack の特定
+### 2-1. stack の特定
 
-`.stdd.config.yml` の `plugins` / `apps[].framework` を読み、骨組み手順の所在を決める。
+`.stdd.config.yml` の `plugins` / `apps[].framework` を読み、骨組み手順の所在を決める。step 1 で得たコンセプトを stack 選定の判断材料に使う。
 
 ```
 □ plugins に "nextjs-supabase" / "playwright" → nextjs+supabase+playwright スターター手順
@@ -96,18 +122,18 @@ docs/common/plans/stdd-bootstrap.md
 □ それ以外 / 不明 → ユーザーに stack と骨組み手順を確認
 ```
 
-### 1-2. 骨組み生成を対話駆動
+### 2-2. 骨組み生成を対話駆動
 
 該当手順のコマンド（例: `create-next-app` / `supabase init` / Playwright 導入）を**1つずつ提示し、ユーザーの確認のもと実行**する。具体コマンドは本スキルに書かず、参照先（テンプレート README / プラグイン guide）の記述に従う。
 
-### 1-3. 設定の実体合わせ（★確認）
+### 2-3. 設定の実体合わせ（★確認）
 
 ```
 □ apps[].path / apps[].port が実体と一致
 □ commands.test / typecheck / build / db_* が実際に動く
 ```
 
-> 骨組みが既に用意されている場合は step 1 を飛ばして step 2 へ。
+> 骨組みが既に用意されている場合は step 2 を飛ばして step 3 へ。
 
 ---
 
