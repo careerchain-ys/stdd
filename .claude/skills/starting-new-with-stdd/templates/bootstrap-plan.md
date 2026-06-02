@@ -27,12 +27,13 @@
 ### 基盤
 
 - [ ] step 0: `.stdd.config.yml` 点検（common ティア前提）
-- [ ] step 1: アプリ骨組み生成（stack 固有。`apps[].path` / `commands.*` 疎通確認）
-- [ ] step 2: common ティアを前方設計（`docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md`。仮説）
-- [ ] step 3: 最初の feature を順行 spec 化（[機能名]）
-- [ ] step 4: フォーマット策定 → テンプレ特化（下記「決定ログ」へ）
+- [ ] step 1: プロダクトコンセプトのヒアリング（下記「プロダクトコンセプト」へ転記）
+- [ ] step 2: アプリ骨組み生成（stack 固有。`apps[].path` / `commands.*` 疎通確認）
+- [ ] step 3: common ティアを前方設計（`docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md`。仮説）
+- [ ] step 4: 最初の feature を順行 spec 化（[機能名]）
+- [ ] step 5: フォーマット策定 → テンプレ特化（下記「決定ログ」へ）
 
-### feature ループ（step 5）
+### feature ループ（step 6）
 
 優先順（P0 → P1 → P2）。各 feature = `documenting-plans` → `auto-implement` → `verifying-consistency`。
 
@@ -43,11 +44,19 @@
 
 ### 移行
 
-- [ ] step 6: feature が回り始めた → 以降は `auto-implement`（通常運用）へ
+- [ ] step 7: feature が回り始めた → 以降は `auto-implement`（通常運用）へ
 
 ---
 
-## フォーマット決定ログ（step 4 / 運用中のブラッシュアップ）
+## プロダクトコンセプト（step 1）
+
+ユーザーの 1 レスポンスを**そのまま**転記する（要約・拡張を加えない）。詳細度に関わらずこれを起点にして step 2 以降へ進む。
+
+> [step 1 でユーザーから得た 1 レスポンスをここに転記]
+
+---
+
+## フォーマット決定ログ（step 5 / 運用中のブラッシュアップ）
 
 このプロジェクト固有に決めた spec フォーマットの方針を記録する。
 

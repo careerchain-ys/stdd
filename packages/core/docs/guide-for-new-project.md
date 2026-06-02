@@ -34,12 +34,13 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 | step | 何をするか | 使うスキル | 人間判断 |
 | ---- | ---------- | ---------- | -------- |
 | **0** | scaffold / `.stdd.config.yml` 点検（common ティア前提で確認） | — | △ 構成確認 |
-| **1** | アプリ骨組み生成（stack 固有） | （stack 手順へ委譲） | ★ 構成・コマンド疎通 |
-| **2** | common ティアを**前方設計**（docs/common を埋める） | `documenting-specifications` | ★ 目的・アクター・初期アーキ |
-| **3** | 最初の feature を順行 spec 化（P0 コアから 1 本） | `documenting-specifications` → `generating-wireframes` | ★ 粒度・スコープ |
-| **4** | spec フォーマット策定 → テンプレ特化 | `tailoring-spec-format` | ★★ フォーマット |
-| **5** | feature を順行 STDD でループ | `documenting-plans` → `auto-implement` → `verifying-consistency` | ★ 粒度（機能ごと） |
-| **6** | 立ち上げ完了 → 通常運用へ地続き | `auto-implement`（以降） | 完了確認 |
+| **1** | **プロダクトコンセプトのヒアリング**（何を作るか / 要件概要を最低 1 レスポンス） | — | ★ どんなアプリ／要件概要 |
+| **2** | アプリ骨組み生成（stack 固有） | （stack 手順へ委譲） | ★ 構成・コマンド疎通 |
+| **3** | common ティアを**前方設計**（docs/common を埋める） | `documenting-specifications` | ★ 目的・アクター・初期アーキ |
+| **4** | 最初の feature を順行 spec 化（P0 コアから 1 本） | `documenting-specifications` → `generating-wireframes` | ★ 粒度・スコープ |
+| **5** | spec フォーマット策定 → テンプレ特化 | `tailoring-spec-format` | ★★ フォーマット |
+| **6** | feature を順行 STDD でループ | `documenting-plans` → `auto-implement` → `verifying-consistency` | ★ 粒度（機能ごと） |
+| **7** | 立ち上げ完了 → 通常運用へ地続き | `auto-implement`（以降） | 完了確認 |
 
 ★ = 人間主体の判断ポイント（skill はここで停止して確認する）。
 
@@ -52,34 +53,40 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 - `npx @careerchain/stdd init` で導入済みなら `.stdd.config.yml`・`.claude/`・`docs/` が揃っている。点検のみ。
 - 単一アプリか複数アプリかで `docs.layout` のパス規約が変わる。common ティアは既定で有効（`docs.layout.common_requirements` / `common_architecture`）。
 
-### step 1: アプリ骨組み生成（stack 固有）
+### step 1: プロダクトコンセプトのヒアリング ★
+
+- **技術スタック等の確認より前に必ず実施する**。「どんなシステム／アプリ／サービスを作りたいか／要件の概要は？」を聞き、**最低 1 レスポンス**を得る。
+- **詳細度は問わない**。1 レスポンス得たら、追加質問で深掘りせず次ステップへ進める（不足は step 3 で仮説として補い、feature 開発で検証して更新する前提）。
+- 得た回答は立ち上げPLAN の「プロダクトコンセプト」セクションに**そのまま転記**し、step 2（stack 選定の判断材料）と step 3（common ティア前方設計の起点）の双方で参照する。
+
+### step 2: アプリ骨組み生成（stack 固有）
 
 - **stack 依存のため本ガイドにはコマンドを書かない**。具体手順は使用テンプレートの README（nextjs+supabase+playwright なら starter README の「次の手順」）と各プラグイン guide を SSoT とする。
-- `starting-new-with-stdd` スキルが、`.stdd.config.yml` の `plugins` / `framework` を見て該当手順を対話的に提示・実行支援する。
+- `starting-new-with-stdd` スキルが、`.stdd.config.yml` の `plugins` / `framework` を見て該当手順を対話的に提示・実行支援する。step 1 のコンセプトを stack 選定の判断材料に使う。
 - 骨組み生成後、`apps[].path` / `commands.*` を実体に合わせて確認（実際に `commands.test` / `typecheck` が動くか）。
 
-### step 2: common ティアの前方設計 ★
+### step 3: common ティアの前方設計 ★
 
-- `docs/common/REQUIREMENTS.md`（サービス目的・登場アクター・アプリ構成）と `ARCHITECTURE.md`（システム構成・レイヤ規約・初期データモデル）を人間と起こす。
+- `docs/common/REQUIREMENTS.md`（サービス目的・登場アクター・アプリ構成）と `ARCHITECTURE.md`（システム構成・レイヤ規約・初期データモデル）を人間と起こす。step 1 のコンセプトを起点にする。
 - **前方設計ゆえ「実装が真実」は効かない**。確定し切らない部分は**仮説**として置き、feature 開発で検証して更新する前提で書く（過度に作り込まない）。
 
-### step 3: 最初の feature
+### step 4: 最初の feature
 
 - P0 のコア機能を 1 つ選び、順行で spec 化（REQUIREMENTS → 必要なら wireframe → TECH_DESIGN）。
-- ここで作った spec が step 4 のフォーマット策定の素材になる。**まず 1 本通してから一般化**する（Rule of Three）。
+- ここで作った spec が step 5 のフォーマット策定の素材になる。**まず 1 本通してから一般化**する（Rule of Three）。
 - **Spec 粒度（どの画面・機能を 1 Spec にまとめるか）は必ず確認**。
 
-### step 4: フォーマット策定とテンプレ特化 ★★
+### step 5: フォーマット策定とテンプレ特化 ★★
 
-- step 2・3 の実物を見ながら、このプロジェクト固有の spec フォーマットを決め反映する。`tailoring-spec-format` スキルが駆動する。
-- 新規では common ティアがまだ薄い前提で、決定は仮置きでよい（step 6 以降の運用で `tailoring-spec-format` を再実行して育てる）。
+- step 3・4 の実物を見ながら、このプロジェクト固有の spec フォーマットを決め反映する。`tailoring-spec-format` スキルが駆動する。
+- 新規では common ティアがまだ薄い前提で、決定は仮置きでよい（step 7 以降の運用で `tailoring-spec-format` を再実行して育てる）。
 
-### step 5: feature ループ
+### step 6: feature ループ
 
 - `documenting-plans` で PLAN を切り、テスト（Red）→ 実装（Green）。`auto-implement` で駆動できる。
 - 各 feature 完了で `verifying-consistency`（spec ⇔ test ⇔ 実装）。E2E は P0 のみ等は `stdd-methodology.md` §4 に従う。
 
-### step 6: 通常運用への地続き化
+### step 7: 通常運用への地続き化
 
 - feature が回り始めたら立ち上げは完了。以降の追加・変更は通常の順行 STDD（`stdd-methodology.md` §5）と同じ。立ち上げPLAN は役目を終える。
 
