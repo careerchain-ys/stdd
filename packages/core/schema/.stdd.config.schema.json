@@ -165,6 +165,12 @@
           "type": "string",
           "description": "Prefix applied to branches created by stdd skills (e.g. 'claude/'). Skills read this instead of hardcoding a prefix. Optional; defaults to 'claude/'."
         },
+        "enforce_spec_first": {
+          "type": "string",
+          "enum": ["off", "warn", "block"],
+          "default": "warn",
+          "description": "Behavior of the spec-first PreToolUse hook (.claude/hooks/spec-first-check.sh) that nudges the Spec -> Test -> Implementation order on ad-hoc edits. 'off': disabled. 'warn' (default): inject a non-blocking reminder when editing an implementation file. 'block': deny implementation edits when the current branch has no Spec / test change yet. Spec, test, docs, .claude, and config / lockfile edits are always exempt."
+        },
         "worktree": {
           "type": "object",
           "additionalProperties": false,

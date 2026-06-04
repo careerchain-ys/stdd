@@ -28,6 +28,7 @@ docs:
 
 workflow:
   branch_prefix: "claude/"
+  enforce_spec_first: "warn"   # off | warn | block — 実装編集時に Spec→テスト→実装 の順序を促す PreToolUse フック
   worktree:
     enabled: false
   devcontainer:
