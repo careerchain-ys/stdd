@@ -12,11 +12,13 @@ project:
 apps:
   - id: app
     path: "."
+    # port: 3000   # dev サーバのポート。QA の Playwright MCP 動作確認で URL 構築に使う
 
 commands:
   typecheck: "npx tsc --noEmit"
   test: "npm test"
   build: "npm run build"
+  # dev: "npm run dev"   # 任意。定義すると QA がブラウザ動作確認（Playwright MCP）を実施。未定義ならスキップ
 
 docs:
   layout:

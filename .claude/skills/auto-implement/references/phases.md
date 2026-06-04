@@ -143,6 +143,8 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
 
 4. **コード品質チェック**: `simplify` skill と同等のレビューを実施
 
+5. **動作確認（Playwright MCP）**: `commands.dev` が定義され UI を持つ場合、dev サーバを起動し Playwright MCP（`mcp__playwright__*`）で主要ユーザージャーニーのハッピーパスをブラウザ操作で確認する（主要要素の存在・console エラーなし・画面遷移）。`commands.dev` 未定義 / UIなし / Playwright MCP 利用不可ならスキップする。詳細は QA Engineer の Phase 6 を参照。
+
 問題がある場合:
 
 - **ビルド・型エラー**: Build Error Resolverに修正を依頼

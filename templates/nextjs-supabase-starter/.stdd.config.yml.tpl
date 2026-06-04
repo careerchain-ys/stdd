@@ -19,6 +19,7 @@ commands:
   typecheck: "npx tsc --noEmit"
   test: "npm test"
   build: "npm run build"
+  dev: "npm run dev"
   lint: "npm run lint"
   db_reset: "npx supabase db reset"
   db_types: "npx supabase gen types typescript --local"
