@@ -61,6 +61,16 @@
             "timeout": 600
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/spec-first-check.sh",
+            "timeout": 30
+          }
+        ]
       }
     ]
   }
