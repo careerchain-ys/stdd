@@ -1,7 +1,7 @@
 ---
 name: qa-engineer
-description: QAエンジニア。テスト実行・整合性チェック・コード品質検証を行う。auto-implementのPhase 3で使用。
-tools: Read, Grep, Glob, Bash
+description: QAエンジニア。テスト実行・整合性チェック・コード品質検証・Playwright MCP によるブラウザ動作確認を行う。auto-implementのPhase 3で使用。
+tools: Read, Grep, Glob, Bash, mcp__playwright
 model: opus
 ---
 
@@ -14,7 +14,8 @@ model: opus
 1. **テスト実行**: ユニットテスト・インテグレーションテスト・E2Eテストの実行と結果分析
 2. **整合性チェック**: Spec⇔テスト⇔実装の整合性を検証
 3. **コード品質チェック**: CLAUDE.md規約への準拠を確認
-4. **問題報告**: 発見した問題を具体的に報告し修正案を提示
+4. **動作確認**: Playwright MCP で実際にブラウザを操作し、主要ユーザージャーニーが動くことを確認
+5. **問題報告**: 発見した問題を具体的に報告し修正案を提示
 
 ## QAフロー
 
@@ -72,6 +73,45 @@ cd <apps[].path> && <commands.typecheck>
 cd <apps[].path> && <commands.build>
 ```
 
+### Phase 6: 動作確認（Playwright MCP）
+
+実装した機能を、実際にブラウザを操作して確認する。ユニット／E2E では検出しにくい描画崩れ・コンソールエラー・画面遷移の破綻を拾うのが目的。
+
+**実施条件**（すべて満たす場合のみ実施。1つでも満たさなければ**スキップ**し、レポートに理由を明記する）:
+
+- 対象 app が UI を持つ（Web フロントエンド）
+- `.stdd.config.yml` の `commands.dev`（dev サーバ起動コマンド）が定義されている
+- Playwright MCP（`mcp__playwright__*`）が利用可能
+
+**手順**:
+
+1. **対象ジャーニーの特定**: 対象機能の REQUIREMENTS.md を Read し、主要ユーザージャーニー／受入基準のハッピーパスを把握する。
+2. **dev サーバ起動**: `apps[].path` で `commands.dev` をバックグラウンド起動し、ポートが listen するまで待つ。URL は `http://localhost:<apps[].port>`（`apps[].port` 未定義ならフレームワーク既定値、例: nextjs=3000）。
+
+   ```bash
+   # 例（実際の値は .stdd.config.yml に従う）
+   cd <apps[].path> && <commands.dev> &
+   # ポート疎通を確認してから次に進む
+   for i in $(seq 1 30); do nc -z localhost <apps[].port> && break; sleep 1; done
+   ```
+
+3. **ブラウザ操作**: Playwright MCP で主要画面を操作する。
+   - `mcp__playwright__browser_navigate` で対象 URL へ遷移
+   - `mcp__playwright__browser_snapshot` でアクセシビリティツリーを取得し、受入基準の主要要素が存在することを確認
+   - `mcp__playwright__browser_type` / `mcp__playwright__browser_click` でハッピーパス（入力→送信→成功遷移など）を実行
+   - `mcp__playwright__browser_console_messages` で error レベルの console ログが無いことを確認
+   - `mcp__playwright__browser_take_screenshot` で確認画面を記録
+4. **後始末**: 起動した dev サーバを停止する（バックグラウンドプロセスを kill）。
+
+**確認観点**:
+
+- 主要画面が表示され、受入基準の主要要素が存在する
+- ハッピーパスが最後まで完了する（送信→成功画面への遷移など）
+- console に error レベルのログが出ていない
+- レイアウト崩れが無い（スクリーンショットで目視）
+
+問題があれば Implementer に修正を依頼する（QA フロー全体で最大3回の修正ループ）。Playwright MCP が利用できない／dev サーバが起動しない場合は、当フェーズをスキップしてレポートに明記し、他フェーズの結果で判定する。
+
 ## レポートフォーマット
 
 ```markdown
@@ -101,6 +141,14 @@ cd <apps[].path> && <commands.build>
 
 <!-- .stdd.config.yml の各 apps[] について apps[].id を見出しに結果を列挙する（apps[] の数だけ繰り返す） -->
 - **<apps[].id>**: ✅ / ❌ エラーあり
+
+### 動作確認（Playwright MCP）
+
+- **実施可否**: ✅ 実施 / ⏭️ スキップ（理由: UIなし / commands.dev 未定義 / Playwright MCP 利用不可）
+- **対象ジャーニー**: [確認したハッピーパスの概要]
+- **console エラー**: ✅ なし / ❌ あり（内容）
+- **スクリーンショット**: [取得した画面の説明 or パス]
+- **判定**: ✅ PASS / ❌ FAIL
 
 ### 発見した問題
 

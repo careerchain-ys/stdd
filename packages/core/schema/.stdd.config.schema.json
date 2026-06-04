@@ -88,6 +88,10 @@
           "type": "string",
           "description": "Production build command. Used by the pre-push hook and QA flow. Example: 'npm run build'. Optional."
         },
+        "dev": {
+          "type": "string",
+          "description": "Command that starts the local dev server (long-running). Used by the QA flow for browser smoke verification via Playwright MCP, combined with apps[].port to build the URL. Example: 'npm run dev'. Optional — when omitted, the browser verification step is skipped."
+        },
         "lint": {
           "type": "string",
           "description": "Lint command. Optional."

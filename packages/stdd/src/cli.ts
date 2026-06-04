@@ -118,6 +118,7 @@ async function runInit(args: string[]): Promise<void> {
   console.log("  ✔ STDD を導入しました");
   console.log(`    .claude/           : ${ACTION_LABEL[result.claude]}`);
   console.log(`    .stdd.config.yml   : ${ACTION_LABEL[result.config]}`);
+  console.log(`    .mcp.json          : ${ACTION_LABEL[result.mcp]}  # Playwright MCP（ブラウザ動作確認）`);
   console.log(`    docs/              : ${ACTION_LABEL[result.docs]}`);
   console.log("");
   console.log("  次の手順:");
