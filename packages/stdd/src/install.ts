@@ -24,12 +24,15 @@ export interface InstallOptions {
 export interface InstallResult {
   claude: FileAction;
   config: FileAction;
+  mcp: FileAction;
   docs: FileAction;
 }
 
 const CLAUDE_DIR = ".claude";
 const CONFIG_FILE = ".stdd.config.yml";
 const CONFIG_TEMPLATE = "stdd.config.yml.tpl";
+const MCP_FILE = ".mcp.json";
+const MCP_TEMPLATE = "mcp.json";
 const DOCS_DIR = "docs";
 
 /**
@@ -47,9 +50,10 @@ export async function install(opts: InstallOptions): Promise<InstallResult> {
 
   const claude = await installClaude(assetsRoot, targetDir, overwriteClaude);
   const config = await installConfig(assetsRoot, targetDir, projectName);
+  const mcp = await installMcp(assetsRoot, targetDir);
   const docs = await ensureDocs(targetDir);
 
-  return { claude, config, docs };
+  return { claude, config, mcp, docs };
 }
 
 async function assertAssets(assetsRoot: string): Promise<void> {
@@ -62,6 +66,10 @@ async function assertAssets(assetsRoot: string): Promise<void> {
   }
   if (!(await isFile(tplSrc))) {
     throw new InstallError(`設定テンプレートが見つかりません: ${tplSrc}`);
+  }
+  const mcpSrc = path.join(assetsRoot, MCP_TEMPLATE);
+  if (!(await isFile(mcpSrc))) {
+    throw new InstallError(`MCP 設定テンプレートが見つかりません: ${mcpSrc}`);
   }
 }
 
@@ -92,6 +100,19 @@ async function installConfig(
   const raw = await fs.readFile(path.join(assetsRoot, CONFIG_TEMPLATE), "utf8");
   const rendered = renderTemplate(raw, { "project.name": projectName });
   await fs.writeFile(dst, rendered);
+  return "created";
+}
+
+/**
+ * Playwright MCP（ブラウザ動作確認用）を有効化する .mcp.json を配置する。
+ * テンプレートは静的（プレースホルダ無し）。既存があれば破壊しない（維持）。
+ */
+async function installMcp(assetsRoot: string, targetDir: string): Promise<FileAction> {
+  const dst = path.join(targetDir, MCP_FILE);
+  if (await pathExists(dst)) return "kept";
+
+  const raw = await fs.readFile(path.join(assetsRoot, MCP_TEMPLATE), "utf8");
+  await fs.writeFile(dst, raw);
   return "created";
 }
 
