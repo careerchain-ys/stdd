@@ -1,7 +1,7 @@
 ---
 name: reverse-engineering-common-spec
 description: |-
-  既存プロジェクトに STDD を導入する際、コードベース全体をリバースエンジニアリングして common ティアの Spec（docs/common/REQUIREMENTS.md + docs/common/ARCHITECTURE.md）を作成する。サービス概要・システム構成・リポジトリ構成・レイヤ規約・データモデルを俯瞰する正典を、導入時に一度だけ生成する。機能/ページ単位のリバースエンジニアリングには reverse-engineering-feature-spec を使用する。
+  既存プロジェクトに STDD を導入する際、コードベース全体をリバースエンジニアリングして common ティアの Spec（docs/common/REQUIREMENTS.md + ARCHITECTURE.md（システム概要）+ TABLE_DEFINITION.md（テーブル定義）+ API_SPEC.md（API がある場合））を作成する。サービス概要・システム構成・リポジトリ構成・レイヤ規約・データモデル・API 契約を俯瞰する正典を、導入時に一度だけ生成する。機能/ページ単位のリバースエンジニアリングには reverse-engineering-feature-spec を使用する。
 when_to_use: |-
   「STDD導入」「stdd導入」「共通spec生成」「commonティア」「プロジェクト全体のリバースエンジニアリング」「ARCHITECTURE.md作成」「アーキテクチャのドキュメント化」「既存プロジェクトにstdd」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
@@ -14,7 +14,9 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 | 出力 | 内容 |
 | ---- | ---- |
 | `docs/common/REQUIREMENTS.md` | サービス概要・登場アクター・アプリ構成（プロジェクト全体のビジネス要件） |
-| `docs/common/ARCHITECTURE.md` | システム構成・リポジトリ構成・レイヤ規約・データモデル（プロジェクト全体の技術設計） |
+| `docs/common/ARCHITECTURE.md` | システム概要（システム構成・リポジトリ構成・レイヤ規約・スタック・連携・セキュリティ・インフラ。データモデル/API は持たない） |
+| `docs/common/TABLE_DEFINITION.md` | 全テーブル定義の正典（カード形式・ER図なし） |
+| `docs/common/API_SPEC.md` | API 契約の正典（OpenAPI 風 Markdown。API がある場合） |
 
 テンプレートは `../documenting-specifications/templates/requirements-common.md` / `architecture-common.md` を参照する。
 
@@ -33,7 +35,7 @@ STDD 導入フロー（既存プロジェクト）
 3. auto-implement                    ← 以降の新機能は順行 STDD
 ```
 
-**順序の理由**: 先に common ティア（レイヤ規約・共有ドメインモデル・テーブル一覧）を固定しておくと、後続の機能単位リバース（`reverse-engineering-feature-spec`）の精度と速度が上がる。
+**順序の理由**: 先に common ティア（レイヤ規約・共有ドメインモデル・テーブル定義・API 契約）を固定しておくと、後続の機能単位リバース（`reverse-engineering-feature-spec`）の精度と速度が上がる。
 
 ---
 
@@ -48,14 +50,14 @@ feature ティアと違い、確認する一次情報は **UI 文言ではなく
 | パッケージ分割 | `package.json` の workspaces / 依存定義 | モジュール境界を推測で書く |
 | レイヤ規約・依存方向 | `domain/` 配下の実構成・lint ルール | 一般論の Clean Architecture を書く |
 | 外部サービス連携 | 環境変数・SDK の import 箇所 | 使っていないサービスを書く／使用中を漏らす |
-| テーブル一覧・ER | 生成された DB 型定義（`database.types.ts` 等） | テーブル名・カラム名を想像で書く |
+| テーブル一覧（TABLE_DEFINITION） | 生成された DB 型定義（`database.types.ts` 等） | テーブル名・カラム名を想像で書く |
 | デプロイ・環境 | CI/CD 設定（`.github/workflows` 等） | ブランチ→環境マッピングを推測で書く |
 
 ---
 
 ## 読む順序とチェックリスト
 
-`ARCHITECTURE.md` の目次がそのまま読む順序になる。
+`ARCHITECTURE.md`（システム概要）の目次がそのまま読む順序になる。データモデルは `TABLE_DEFINITION.md`、API 契約は `API_SPEC.md` に分離する。
 
 ### 1. システム構成（`REQUIREMENTS.md` のサービス概要・アクターもここで把握）
 
@@ -81,12 +83,19 @@ feature ティアと違い、確認する一次情報は **UI 文言ではなく
 □ 代表的なデータフロー 1 本 (Server Action / API → Service → Repository)
 ```
 
-### 4. データモデル・DB設計
+### 4. データモデル・DB設計（→ `TABLE_DEFINITION.md` に記述）
 
 ```
 □ 生成された DB 型定義 (database.types.ts 等) を正としてテーブルを列挙
-□ ドメイングループへの分類、中心テーブルごとの ER 図
+□ ドメイングループへの分類（カード形式・ER 図は持たない）
 □ 設計方針 (論理削除 / 主キー / 時系列カラム / マイグレーション規約)
+```
+
+### 5. API 契約（API がある場合 → `API_SPEC.md` に記述）
+
+```
+□ Server Actions / API Route / RPC のエンドポイントを列挙
+□ 入出力（リクエスト / レスポンス）の型・契約を OpenAPI 風 Markdown で記述
 ```
 
 ---
@@ -106,7 +115,9 @@ feature ティアと違い、確認する一次情報は **UI 文言ではなく
 
 ```
 □ docs/common/REQUIREMENTS.md を作成（サービス概要 / アクター / アプリ構成）
-□ docs/common/ARCHITECTURE.md を作成（システム構成 / リポジトリ / レイヤ / データモデル）
+□ docs/common/ARCHITECTURE.md を作成（システム概要：システム構成 / リポジトリ / レイヤ。データモデル/API は持たない）
+□ docs/common/TABLE_DEFINITION.md を作成（全テーブル定義・カード形式・ER 図なし）
+□ docs/common/API_SPEC.md を作成（API がある場合・API 契約の正典）
 □ テーブル一覧は生成された型定義ファイルと一致している
 □ 固有名詞・社外秘の値を不要に含めていない（公開を想定する場合）
 □ 要確認マーカーは「人間に確認すべき項目」としてレビュー依頼にまとめた

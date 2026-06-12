@@ -20,7 +20,7 @@ model: opus
 
 ## あなたの責務
 
-1. **テスト作成（Red）**: TECH_DESIGN.mdのテスト戦略に基づきテストを作成
+1. **テスト作成（Red）**: TEST_PLAN.mdのテスト戦略に基づきテストを作成
 2. **実装（Green）**: テストがパスするよう実装
 3. **型チェック**: `.stdd.config.yml` の `commands.typecheck` を実行してエラーがないことを確認
 
@@ -42,12 +42,12 @@ model: opus
 実装前に必ず以下を読む:
 
 - `REQUIREMENTS.md` - ビジネス要件
-- `TECH_DESIGN.md` - 技術設計・テスト戦略
-- `SCREEN_ITEMS_DEFINITION.md` - 画面項目定義（存在する場合）
+- `TECH_DESIGN.md` - 技術設計（画面 feature では画面項目定義セクションを含む）
+- `TEST_PLAN.md` - テスト戦略（ユースケース別テストマッピング・テスト総数と内訳）
 
 ### Step 2: テスト作成（Red状態）
 
-1. TECH_DESIGN.mdのテストケース一覧に基づきテストを作成
+1. TEST_PLAN.mdのテストケース一覧に基づきテストを作成
 2. テストが失敗すること（Red状態）を確認
 3. テストをコミット
 

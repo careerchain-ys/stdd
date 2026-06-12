@@ -40,7 +40,7 @@ docs/<app>/<feature_path>/wireframes/
 ### 1. 入力を読む
 
 - 対象の `REQUIREMENTS.md`（ユースケース：振る舞い＋受入基準・表示要素・空 / エラー状態）
-- `SCREEN_ITEMS_DEFINITION.md`（存在する場合 — フォーム項目名・選択肢・必須/任意の出所はこれ）
+- `TECH_DESIGN.md` の画面項目定義セクション（画面 feature にあれば — フォーム項目名・選択肢・必須/任意の出所はこれ）
 - 既存の類似画面の WF（`docs/**/wireframes/` を Glob して文言・構造を踏襲）
 
 ### 2. 画面を洗い出す

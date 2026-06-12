@@ -1,7 +1,7 @@
 ---
 name: reverse-engineering-feature-spec
 description: |-
-  既存の機能/ページの実装から feature ティアの Spec ドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）とテスト（E2E / Unit / Integration）をリバースエンジニアリングで作成するためのガイドライン。新規機能の仕様策定ではなく、既に動いている機能を正確にドキュメント化・テスト化する場合に使う。プロジェクト全体（common ティア）のリバースには reverse-engineering-common-spec を使用する。
+  既存の機能/ページの実装から feature ティアの Spec ドキュメント（REQUIREMENTS.md + TECH_DESIGN.md + TEST_PLAN.md）とテスト（E2E / Unit / Integration）をリバースエンジニアリングで作成するためのガイドライン。新規機能の仕様策定ではなく、既に動いている機能を正確にドキュメント化・テスト化する場合に使う。プロジェクト全体（common ティア）のリバースには reverse-engineering-common-spec を使用する。
 when_to_use: |-
   「リバースエンジニアリング」「既存コードからspec」「既存機能のドキュメント化」「機能のドキュメント化」「実装からテスト作成」「specカバー率向上」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
@@ -9,9 +9,9 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 # feature spec のリバースエンジニアリング
 
-既に動いている **機能 / ページ単位**の実装コードを精読し、その挙動を正確に反映した feature ティアの Spec ドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）とテスト（E2E / Unit / Integration）を作成する。
+既に動いている **機能 / ページ単位**の実装コードを精読し、その挙動を正確に反映した feature ティアの Spec ドキュメント（REQUIREMENTS.md + TECH_DESIGN.md + TEST_PLAN.md）とテスト（E2E / Unit / Integration）を作成する。
 
-> **前提（推奨）**: プロジェクト全体の **common ティア**（`docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md`）が未作成なら、先に `reverse-engineering-common-spec` スキルで作成しておくと、レイヤ規約・共有ドメインモデル・テーブル一覧を踏まえられて精度が上がる。既にある場合は本スキルから始める。
+> **前提（推奨）**: プロジェクト全体の **common ティア**（`docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md` + `TABLE_DEFINITION.md` + `API_SPEC.md`）が未作成なら、先に `reverse-engineering-common-spec` スキルで作成しておくと、レイヤ規約・共有ドメインモデル・テーブル定義・API 契約を踏まえられて精度が上がる。既にある場合は本スキルから始める。データモデル・API は common ティアが正典のため、feature 側では common の `TABLE_DEFINITION.md` / `API_SPEC.md` を参照する。
 
 ## 最重要原則
 
@@ -51,7 +51,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ### 前提条件
 
 - 対象機能が既に動いている実装コードがある
-- 対応するSpecドキュメント（REQUIREMENTS.md / TECH_DESIGN.md）が存在しない、または不十分
+- 対応するSpecドキュメント（REQUIREMENTS.md / TECH_DESIGN.md / TEST_PLAN.md）が存在しない、または不十分
 
 ### 作業フロー
 
@@ -62,7 +62,9 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
    ↓
 3. Playwright MCPでUIキャプチャ → Figmaファイル作成
    ↓
-4. TECH_DESIGN.md作成（技術設計 + テスト戦略）
+4. TECH_DESIGN.md作成（処理ロジック中心の技術設計。データモデル/APIは common 参照）
+   ↓
+4.5 TEST_PLAN.md作成（テスト戦略）
    ↓
 5. E2Eテスト作成
    ↓
@@ -247,13 +249,15 @@ REQUIREMENTS.md作成後、Playwright MCPを使って実装済みUIのスクリ�
 
 ## Phase 4: TECH_DESIGN.md作成
 
-`documenting-specifications` skillのテンプレートに従って作成する。
+`documenting-specifications` skillのテンプレートに従って作成する。章構成は **1.概要 / 2.主要な設計判断(任意) / 3.画面項目定義(画面 feature のみ必須) / 4.処理ロジック(コア) / 5.エラーハンドリング戦略 / 6.非機能要件(任意)**。
+
+> **データモデル / API は common ティアが正典**。TECH_DESIGN にはデータモデルや ER 図、API 設計を持たず、common の `TABLE_DEFINITION.md` / `API_SPEC.md` を**参照**する。TECH_DESIGN のコアは処理ロジック。テスト戦略は別ファイル `TEST_PLAN.md`（Phase 4.5）。
 
 ### リバースエンジニアリング固有のルール
 
 **1. 型定義は実装から正確にコピーする**
 
-domain/models配下のEntity型、スキーマの型をそのまま記載する。推測で型を書かない。
+domain/models配下のEntity型、スキーマの型をそのまま記載する。推測で型を書かない。テーブル定義そのものは common の `TABLE_DEFINITION.md` を参照する。
 
 ```typescript
 // ❌ 想像で書いた型
@@ -284,9 +288,26 @@ const phoneSchema = z.string()
 //   - エラー: 「電話番号は10文字以上で入力してください」「数字とハイフンのみ入力可能です」
 ```
 
-**3. テスト総数は作成後に正確にカウントする**
+**3. 処理ロジックは実装のフローを正確に反映する**
 
-TECH_DESIGN.mdにはテスト総数を記載するが、テストを実際に書いた後にitブロック数を正確にカウントして更新する。
+入力 → バリデーション → ビジネスロジック → 永続化 → 出力 の流れを、実装の Server Actions / service 層から正確に書き起こす。データモデル（テーブル・ER）は common の `TABLE_DEFINITION.md`、API 契約は common の `API_SPEC.md` を参照し、TECH_DESIGN では重複して持たない。
+
+**4. データモデル / API への言及は common を参照する**
+
+```
+❌ TECH_DESIGN にテーブル定義・ER 図・API 設計を書く（common と二重管理になる）
+✅ common の TABLE_DEFINITION.md / API_SPEC.md を参照し、supabase/generated/database.types.ts の定義と一致させる
+```
+
+---
+
+## Phase 4.5: TEST_PLAN.md作成
+
+テスト戦略は feature 単位の `TEST_PLAN.md` に記述する（TECH_DESIGN には書かない）。`documenting-specifications` skillのテンプレートに従う。
+
+**テスト総数は作成後に正確にカウントする**
+
+TEST_PLAN.mdにはテスト総数を記載するが、テストを実際に書いた後にitブロック数を正確にカウントして更新する。
 
 ```
 # カウント方法（Jest）
@@ -296,20 +317,13 @@ grep -c "it(" path/to/test.test.tsx
 grep -c "test(" e2e/tests/user-app/feature.spec.ts
 ```
 
-**4. ER図はdatabase.types.tsを正確に反映する**
-
-```
-❌ テーブル名やカラム名を想像で書く
-✅ supabase/generated/database.types.ts の定義を参照して書く
-```
-
 ---
 
 ## Phase 5: テスト作成
 
 ### E2Eテスト
 
-`e2e-testing` skillに従い、TECH_DESIGN.mdのテスト戦略に基づいて作成する。
+`e2e-testing` skillに従い、TEST_PLAN.mdのテスト戦略に基づいて作成する。
 
 **リバースエンジニアリング固有のポイント**:
 
@@ -333,7 +347,7 @@ grep -c "test(" e2e/tests/user-app/feature.spec.ts
 
 ### Unit / Integrationテスト
 
-TECH_DESIGN.mdのテスト戦略で定めたテストレベルに従って作成する。
+TEST_PLAN.mdのテスト戦略で定めたテストレベルに従って作成する。
 
 ---
 
@@ -413,10 +427,17 @@ TECH_DESIGN.mdのテスト戦略で定めたテストレベルに従って作成
 ```
 □ 型定義はdomain/models配下から正確にコピーした
 □ バリデーションルールはschema.tsから正確に転記した
-□ ER図はdatabase.types.tsを参照して作成した
+□ 処理ロジック（入力→検証→ロジック→永続化→出力）を実装から書き起こした
+□ データモデル/ER/API は common の TABLE_DEFINITION.md / API_SPEC.md を参照（TECH_DESIGN に重複して持っていない）
+□ 画面 feature の場合、画面項目定義セクションを記載した
+□ 実装例・コード例が含まれていないことを確認した（型定義・I/Fは除く）
+```
+
+### TEST_PLAN.md作成時
+
+```
 □ テスト戦略を記載した（ユースケース別テストマッピング）
 □ テスト総数と内訳を記載した
-□ 実装例・コード例が含まれていないことを確認した（型定義・I/Fは除く）
 ```
 
 ### テスト作成時
@@ -424,9 +445,9 @@ TECH_DESIGN.mdのテスト戦略で定めたテストレベルに従って作成
 ```
 □ E2EテストのLocatorは実装のJSXテキストから取得した
 □ テストデータはseedファイルの内容を確認した
-□ TECH_DESIGN.mdのテスト戦略に記載されたテストケースを網羅した
+□ TEST_PLAN.mdのテスト戦略に記載されたテストケースを網羅した
 □ テスト実行して全件パスした
-□ TECH_DESIGN.mdのテスト総数を実際のitブロック数で更新した
+□ TEST_PLAN.mdのテスト総数を実際のitブロック数で更新した
 ```
 
 ### 最終確認

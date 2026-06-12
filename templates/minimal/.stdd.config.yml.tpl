@@ -24,6 +24,7 @@ docs:
   layout:
     requirements: "docs/{{feature_path}}/REQUIREMENTS.md"
     tech_design: "docs/{{feature_path}}/TECH_DESIGN.md"
+    test_plan: "docs/{{feature_path}}/TEST_PLAN.md"
     plan: "docs/{{feature_path}}/plans/{{date}}.md"
 
 workflow:

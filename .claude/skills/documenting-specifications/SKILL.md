@@ -1,15 +1,15 @@
 ---
 name: documenting-specifications
 description: |-
-  REQUIREMENTS.md（業務要件・機能要件・非機能要件）と TECH_DESIGN.md（技術設計・テスト戦略）のテンプレートとガイドラインを提供する。STDD 方法論に従った仕様ドキュメントの作成・更新を支援する。
+  REQUIREMENTS.md（業務要件・機能要件・非機能要件）・TECH_DESIGN.md（技術設計）・TEST_PLAN.md（テスト戦略）と、common ティアの ARCHITECTURE / TABLE_DEFINITION / API_SPEC / DESIGN のテンプレートとガイドラインを提供する。STDD 方法論に従った仕様ドキュメントの作成・更新を支援する。
 when_to_use: |-
-  「spec」「仕様書」「設計書」「要件定義」「REQUIREMENTS.md」「TECH_DESIGN.md」「Spec and Test Driven Development」「STDD」「仕様駆動」に関する作業のとき。
+  「spec」「仕様書」「設計書」「要件定義」「REQUIREMENTS.md」「TECH_DESIGN.md」「TEST_PLAN.md」「テーブル定義」「API仕様」「Spec and Test Driven Development」「STDD」「仕様駆動」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
-# 仕様ドキュメント（REQUIREMENTS / TECH_DESIGN）の作成
+# 仕様ドキュメント（REQUIREMENTS / TECH_DESIGN / TEST_PLAN）の作成
 
-STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.md と TECH_DESIGN.md を作成・更新します。
+STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.md・TECH_DESIGN.md・TEST_PLAN.md（および common ティアの spec）を作成・更新します。
 
 ## Quick Start
 
@@ -43,52 +43,55 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
    docs/<app>/<path>/TECH_DESIGN.md
    ```
 
-   - 技術設計、テスト戦略（ユースケースを E2E/Integration/Unit にマッピング）を記述
+   - 章構成: 概要 / 主要な設計判断（任意）/ 画面項目定義（画面 feature は必須）/ 処理ロジック（コア）/ エラーハンドリング戦略 / 非機能要件（任意）
+   - データ構造は common の `TABLE_DEFINITION.md`、API は common の `API_SPEC.md` を**参照**（再定義しない）
    - [テンプレート](templates/tech-design.md) を参照
 
-4. **SCREEN_ITEMS_DEFINITION.md を作成（オプション）**
+4. **TEST_PLAN.md を作成**
 
    ```
-   docs/<app>/<path>/SCREEN_ITEMS_DEFINITION.md
+   docs/<app>/<path>/TEST_PLAN.md
    ```
 
-   - 画面項目定義（フォーム項目、バリデーション、表示形式）を記述
-   - REQUIREMENTS.md の派生ドキュメントとして、UI詳細が必要な場合に作成
+   - テスト戦略（ユースケースを E2E/Integration/Unit にマッピング）・テストファイル構成を記述
+   - [テンプレート](templates/test-plan.md) を参照
+
+> 横断要素（テーブル定義・API 仕様）は common ティアに集約する。新規テーブル / API が生じたら common の
+> [`TABLE_DEFINITION.md`](templates/table-definition-common.md) / [`API_SPEC.md`](templates/api-spec-common.md) を更新し、feature からは参照する。
 
 ### 既存機能の仕様書を更新する場合
 
-1. 対応する REQUIREMENTS.md と TECH_DESIGN.md を確認
-2. 変更内容に応じて両方を更新
-3. テスト戦略（テスト総数・内訳）を更新
+1. 対応する REQUIREMENTS.md / TECH_DESIGN.md / TEST_PLAN.md を確認
+2. 変更内容に応じて更新（テーブル・API の変更は common の TABLE_DEFINITION / API_SPEC に反映）
+3. テスト戦略（テスト総数・内訳）は TEST_PLAN.md を更新
 
 ## Spec の 2 ティア構造（common / feature）
 
-本スキルが扱う REQUIREMENTS.md / TECH_DESIGN.md は **feature ティア**（機能単位）の spec である。
-その上位に、プロジェクト全体を俯瞰する **common ティア** が存在する。
+本スキルが扱う feature ティア（機能単位）の spec は、上位の **common ティア**（プロジェクト全体）を前提とする。
 
-| ティア      | What / Why                | How                       | 配置例                                |
-| ----------- | ------------------------- | ------------------------- | ------------------------------------- |
-| **common**  | `REQUIREMENTS.md` (全体版) | `ARCHITECTURE.md` (全体版) | `docs/common/`                        |
-| **feature** | `REQUIREMENTS.md`         | `TECH_DESIGN.md`          | `docs/<app>/<feature>/`               |
+| ティア      | ドキュメント | 配置例 |
+| ----------- | --- | --- |
+| **common**  | `REQUIREMENTS.md`（業務要件）/ `ARCHITECTURE.md`（システム概要）/ `TABLE_DEFINITION.md`（テーブル定義）/ `API_SPEC.md`（API 仕様）/ `DESIGN.md`（任意） | `docs/common/` |
+| **feature** | `REQUIREMENTS.md` / `TECH_DESIGN.md` / `TEST_PLAN.md` | `docs/<app>/<feature>/` |
 
-- feature spec は common ティア（サービス目的・アクター・システム構成・レイヤ規約・データモデル）を**前提とする**。common と矛盾しないこと。
-- common ティアのテンプレートは [`templates/requirements-common.md`](templates/requirements-common.md) を参照。既存実装からの common spec 作成は `reverse-engineering-common-spec` スキルを参照。
-- common / feature とも章立ては **業務要件 → 機能要件 → 非機能要件** の3層で揃える。非機能要件・横断業務ルール・用語は common に集約し、feature は「common 準拠」で参照する。
+- feature spec は common ティア（サービス目的・アクター・システム構成・テーブル定義・API 仕様）を**前提とし、参照する**。common と矛盾しないこと。**テーブル・API は feature で再定義しない**。
+- common ティアのテンプレート: [`requirements-common.md`](templates/requirements-common.md) / [`architecture-common.md`](templates/architecture-common.md) / [`table-definition-common.md`](templates/table-definition-common.md) / [`api-spec-common.md`](templates/api-spec-common.md) / [`design-common.md`](templates/design-common.md)。既存実装からの common spec 作成は `reverse-engineering-common-spec` スキルを参照。
+- REQUIREMENTS は common / feature とも **業務要件 → 機能要件 → 非機能要件** の3層で揃える。非機能要件・横断業務ルール・用語は common に集約し、feature は「common 準拠」で参照する。
 
 ## ドキュメント配置ルール
 
-| 実装ファイル                  | ドキュメント配置先                                                                                                                                                   |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `<app>/app/<path>/page.tsx`   | `docs/<app>/<path>/REQUIREMENTS.md`<br>`docs/<app>/<path>/TECH_DESIGN.md`<br>`docs/<app>/<path>/SCREEN_ITEMS_DEFINITION.md`（任意）                                  |
-| `<app>/components/<name>.tsx` | `docs/<app>/components/<name>/REQUIREMENTS.md`<br>`docs/<app>/components/<name>/TECH_DESIGN.md`<br>`docs/<app>/components/<name>/SCREEN_ITEMS_DEFINITION.md`（任意） |
+| 実装ファイル                  | ドキュメント配置先 |
+| ----------------------------- | --- |
+| `<app>/app/<path>/page.tsx`   | `docs/<app>/<path>/REQUIREMENTS.md`<br>`docs/<app>/<path>/TECH_DESIGN.md`<br>`docs/<app>/<path>/TEST_PLAN.md` |
+| `<app>/components/<name>.tsx` | `docs/<app>/components/<name>/REQUIREMENTS.md`<br>`docs/<app>/components/<name>/TECH_DESIGN.md`<br>`docs/<app>/components/<name>/TEST_PLAN.md` |
 
 **例**:
 
 - 実装: `<app.path>/app/login/page.tsx`（`app.path` は `.stdd.config.yml` の `apps[].path`）
 - ドキュメント（`docs.layout.*` テンプレートに従う。`<app.id>` は `apps[].id`）:
   - `docs/<app.id>/login/REQUIREMENTS.md`（必須）
-  - `docs/<app.id>/login/TECH_DESIGN.md`（必須）
-  - `docs/<app.id>/login/SCREEN_ITEMS_DEFINITION.md`（任意）
+  - `docs/<app.id>/login/TECH_DESIGN.md`（必須。画面項目定義は画面 feature のみ）
+  - `docs/<app.id>/login/TEST_PLAN.md`（必須）
 
 ## 絶対ルール: SSOT原則（最優先）
 
@@ -96,7 +99,7 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
 
 ### 禁止事項
 
-以下は **REQUIREMENTS.md / TECH_DESIGN.md / SCREEN_ITEMS_DEFINITION.md のいずれでも禁止**:
+以下は **すべての spec ドキュメント（REQUIREMENTS / TECH_DESIGN / TEST_PLAN / common 各種）で禁止**:
 
 1. **issueへの言及**: `issue #123 で対応`, `#456 にて追加`, `本issueでは`, `Closes #...` 等
 2. **経緯・履歴の記載**: `変更前` / `変更後` / `更新前` / `更新後` / `変更理由` / `削除理由` / `旧仕様` / `〜だったが〜に変更` 等
@@ -188,47 +191,43 @@ HTMLテンプレートは `lib/email/templates/` で管理。
 
 **記述しない内容**:
 
-- データモデル・集計実装・API → TECH_DESIGN.md ／ 画面項目 × バリデーション × DB マッピング → SCREEN_ITEMS_DEFINITION.md
+- データモデル・集計実装・API・画面項目 → TECH_DESIGN.md（データ構造・API は common の TABLE_DEFINITION / API_SPEC）
 - 実装ファイルへの参照・関数名・クラス名、テスト実装の詳細
 
 ### TECH_DESIGN.md（設計書）
 
-**目的**: 機能実装のための技術設計とテスト戦略
+**目的**: 機能（画面単位）の技術設計。実装者が**ロジックを起こせる粒度**で記述する。
+
+**章構成**: 概要 / 主要な設計判断（任意）/ 画面項目定義（画面 feature は必須）/ 処理ロジック（コア）/ エラーハンドリング戦略 / 非機能要件（任意）
 
 **記述する内容**:
 
-- 技術視点（How）
-- テスト戦略: 各ユースケースをテストレベルにマッピング
-- アーキテクチャ、API 設計、エラーハンドリング
+- **処理ロジック**: 集計式・変換・ドメインルール・トランザクション境界・副作用・複数テーブル横断の流れ（手順 / 擬似コード / 計算式）
+- **画面項目定義**: UI × バリデーション × DB マッピング（画面 feature のみ。DB カラムは TABLE_DEFINITION を参照）
+- **エラーハンドリング戦略**: API / 処理の失敗を本機能がどう捌くか
+- データ構造・API は common の `TABLE_DEFINITION.md` / `API_SPEC.md` を**参照**（再定義しない）
+
+**記述しない内容**:
+
+- 実装例・コード例（関数・メソッドの実装、Server Actions の実装）。擬似コード・型 I/F・計算式は可
+- テーブル・カラム定義（→ common `TABLE_DEFINITION.md`）/ API 契約（→ common `API_SPEC.md`）
+- テスト戦略（→ `TEST_PLAN.md`）
+
+### TEST_PLAN.md（テスト計画書）
+
+**目的**: 機能のテスト戦略。ユースケースをテストレベル（E2E / Integration / Unit）にマッピングし、テストファイル構成を定義する。
+
+**記述する内容**:
+
+- ユースケース別テスト戦略（テストレベル × 根拠）
 - **テスト総数と内訳**（例: 合計 33 件 - Unit 18 件, Integration 9 件, E2E 6 件）
 
-**記述しない内容**:
+### common ティアの技術ドキュメント
 
-- 実装例・コード例（関数・メソッドの実装、Server Actions の実装、処理フローのコード）
-- ただし、**型定義・インターフェース**（Entity型、UI型、Request/Response型）や **データモデル**（ER図）はコードブロックで記述可
-
-### SCREEN_ITEMS_DEFINITION.md（画面項目定義書）- オプション
-
-**目的**: 画面の入力項目・表示項目の詳細定義
-
-**作成タイミング**: 以下の場合に作成を検討
-
-- フォーム項目が多い画面
-- 複雑なバリデーションルールがある
-- 表示形式（フォーマット、単位など）の定義が必要
-
-**記述する内容**:
-
-- 項目ID、項目名、データ型
-- 入力/表示の区分
-- バリデーションルール（必須、桁数、形式など）
-- 表示形式（日付フォーマット、通貨フォーマットなど）
-- 初期値、選択肢
-
-**記述しない内容**:
-
-- ユースケース（REQUIREMENTS.md に記載）
-- 技術設計・実装詳細（TECH_DESIGN.md に記載）
+- **ARCHITECTURE.md**: システム概要（構成 / スタック / 連携 / セキュリティ / インフラ）。データモデル・API は持たない。
+- **TABLE_DEFINITION.md**: 全テーブル定義の正典（カード形式・ER 図なし）。feature が参照する。
+- **API_SPEC.md**: API 契約の正典（OpenAPI 風 Markdown）。feature が参照する。
+- **DESIGN.md**（任意）: デザイン標準。
 
 ### Priority（優先度）ガイドライン
 
@@ -249,11 +248,16 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）の作成・レビ�
 
 詳細なテンプレートとガイドは以下を参照:
 
-- **テンプレート**
-  - [REQUIREMENTS.md テンプレート（feature）](templates/requirements.md)
-  - [REQUIREMENTS.md テンプレート（common）](templates/requirements-common.md)
-  - [TECH_DESIGN.md テンプレート](templates/tech-design.md)
-  - [SCREEN_ITEMS_DEFINITION.md テンプレート](templates/screen-items-definition.md) ← 画面項目定義（オプション）
+- **テンプレート（feature）**
+  - [REQUIREMENTS.md](templates/requirements.md)
+  - [TECH_DESIGN.md](templates/tech-design.md) ← 概要 / 設計判断 / 画面項目定義 / 処理ロジック / エラーハンドリング / 非機能要件
+  - [TEST_PLAN.md](templates/test-plan.md) ← テスト戦略
+- **テンプレート（common）**
+  - [REQUIREMENTS.md](templates/requirements-common.md)
+  - [ARCHITECTURE.md](templates/architecture-common.md) ← システム概要
+  - [TABLE_DEFINITION.md](templates/table-definition-common.md) ← テーブル定義
+  - [API_SPEC.md](templates/api-spec-common.md) ← API 仕様
+  - [DESIGN.md](templates/design-common.md) ← デザイン標準（任意）
 - **関連スキル**
   - [generating-wireframes Skill](../generating-wireframes/SKILL.md) ← UI を持つ機能の WF 生成
 - **ガイド**
@@ -286,31 +290,34 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）の作成・レビ�
 □ UI/UX デザイン（HTML ワイヤーフレームを生成し「2.5 UI/UX デザイン」からリンク）→ generating-wireframes Skill
 □ 受入基準に曖昧語（適切に/正しく）が無い／How（テーブル名・関数・API）が混入していない
 □ スコープ外
-□ SCREEN_ITEMS_DEFINITION.md が必要か検討（フォーム項目が多い場合）
 ```
 
 ### TECH_DESIGN.md 作成時
 
 ```
-□ アーキテクチャ図（Mermaid）
-□ 主要な設計判断（Decision）- 選択と理由を明記
-□ データモデル（ER 図、TypeScript 型定義）
-□ API 設計（エンドポイント、型定義）
-□ エラーハンドリング戦略
-□ テスト戦略（ユースケース別テストマッピング）
-□ テスト総数と内訳（Unit/Integration/E2E）
-□ 実装例・コード例が含まれていないことを確認（型定義・I/F は除く）
-□ SCREEN_ITEMS_DEFINITION.md が存在する場合、整合性を確認
+□ 1. 概要（目的・スコープ・参照する common テーブル/API）
+□ 2. 主要な設計判断 - この機能特有の判断のみ（無ければ章ごと省略）
+□ 3. 画面項目定義 - 画面 feature は必須（UI × バリデーション × DB マッピング）。非画面は省略
+□ 4. 処理ロジック - 集計式・変換・ドメインルール・トランザクション境界（手順/擬似コード）
+□ 5. エラーハンドリング戦略 - API/処理の失敗を本機能がどう捌くか
+□ 6. 非機能要件 - REQUIREMENTS に記載がある場合のみ実現方法（無ければ章ごと省略）
+□ テーブル・API を再定義していない（common の TABLE_DEFINITION / API_SPEC を参照）
+□ 実装例・コード例が含まれていないことを確認（擬似コード・型 I/F・計算式は除く）
 ```
 
-### SCREEN_ITEMS_DEFINITION.md 作成時（任意）
+### TEST_PLAN.md 作成時
 
 ```
-□ 画面単位で項目を整理
-□ 各項目に一意のIDを付与
-□ データ型を明記（string, number, date, select など）
-□ バリデーションルール（必須、桁数、形式、範囲）
-□ 表示形式（日付フォーマット、通貨、単位など）
-□ 選択肢がある場合はすべての選択肢を列挙
-□ REQUIREMENTS.md の UI/UX デザインと整合性を確認
+□ ユースケース別テスト戦略（E2E/Integration/Unit × 根拠）
+□ 各テストレベルの選択に根拠（Rationale）がある
+□ テストファイル構成（E2E/Integration/Unit の配置）
+□ REQUIREMENTS の Priority（P0/P1/P2）と対応している
+```
+
+### common ティア（テーブル定義 / API 仕様）更新時
+
+```
+□ TABLE_DEFINITION.md: 新規/変更テーブルをカード形式で記載（型は論理型・FK は説明欄）
+□ API_SPEC.md: 新規/変更エンドポイントを記載（レスポンス実体は TABLE_DEFINITION へリンク）
+□ 参照する feature TECH_DESIGN との整合を確認
 ```

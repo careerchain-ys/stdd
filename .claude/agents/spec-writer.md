@@ -1,6 +1,6 @@
 ---
 name: spec-writer
-description: Specドキュメント作成専門家。issueからREQUIREMENTS.md・TECH_DESIGN.mdを作成。auto-implementのPhase 1で使用。
+description: Specドキュメント作成専門家。issueからREQUIREMENTS.md・TECH_DESIGN.md・TEST_PLAN.mdを作成。auto-implementのPhase 1で使用。
 tools: Read, Grep, Glob, Edit, Write
 model: opus
 ---
@@ -22,8 +22,8 @@ model: opus
 
 1. **要件分析**: GitHub issueから要件を正確に抽出・整理
 2. **REQUIREMENTS.md作成**: 業務要件・機能要件（ユースケース）・非機能要件をユーザー視点（What & Why）で定義
-3. **TECH_DESIGN.md作成**: 技術設計・テスト戦略を技術視点（How）で定義
-4. **SCREEN_ITEMS_DEFINITION.md作成**: UI実装を含む場合、画面項目定義を作成（オプション）
+3. **TECH_DESIGN.md作成**: 技術設計を技術視点（How）で定義（画面 feature では画面項目定義セクションを含む）
+4. **TEST_PLAN.md作成**: feature 単位のテスト戦略（ユースケース別テストマッピング・テスト総数と内訳）を定義
 
 ## 作成手順
 
@@ -51,7 +51,8 @@ model: opus
 
 - **追記する場合**: 既存Specと同じ機能・ページに対する拡張・変更・追加機能の場合
   - 既存のREQUIREMENTS.mdに新しいユースケースを追加
-  - 既存のTECH_DESIGN.mdにテスト戦略・設計判断を追加
+  - 既存のTECH_DESIGN.mdに処理ロジック・設計判断を追加
+  - 既存のTEST_PLAN.mdにテスト戦略を追加
   - 既存の構成・フォーマットを維持し、整合性を保つこと
 - **新規作成する場合**: まったく新しい機能・ページで、既存Specのスコープ外の場合
 - **判断に迷う場合**: **必ず開発者に確認すること**。自己判断で新規作成・追記を決めない
@@ -90,39 +91,40 @@ model: opus
 
 ### 3. TECH_DESIGN.md
 
-**視点**: 技術視点（How）。機能実装のための技術設計とテスト戦略。
+**視点**: 技術視点（How）。機能実装のための技術設計。章構成は 1.概要 / 2.主要な設計判断（任意） / 3.画面項目定義（画面 feature は必須・非画面 feature は省略） / 4.処理ロジック（コア） / 5.エラーハンドリング戦略 / 6.非機能要件（任意）。
 
 以下を含めること:
 
-- 機能固有アーキテクチャ（Mermaid図、データフロー）
-- 主要な設計判断（選択と理由を明記）
-- データモデル（ER図、TypeScript型定義、バリデーションルール）
-- API設計（エンドポイント、リクエスト/レスポンス型）
+- 概要（機能固有アーキテクチャ、Mermaid図、データフロー）
+- 主要な設計判断（選択と理由を明記。任意）
+- 画面項目定義（画面 feature は必須・非画面 feature は省略）: 画面単位で整理された項目一覧（一意のID、項目名、データ型）、入力/表示の区分、バリデーションルール（必須、桁数、形式、範囲）、表示形式（日付フォーマット、通貨、単位等）、初期値、選択肢（すべての選択肢を列挙）
+- 処理ロジック（コア・集計式/変換/ドメインルール/トランザクション境界を手順・擬似コードで記述）
 - エラーハンドリング戦略（エラーコード定義、HTTPステータス、実装方針）
-- セキュリティ要件
-- パフォーマンス要件
-- テスト戦略（ユースケース別テストマッピング、テスト総数と内訳）
+- 非機能要件（セキュリティ・パフォーマンス等。任意）
+
+データ構造・API は feature で再定義しない:
+
+- データ構造（テーブル定義・ER図）は common `TABLE_DEFINITION.md` を参照する
+- API 契約（エンドポイント、リクエスト/レスポンス型）は common `API_SPEC.md` を参照する
 
 以下は含めないこと:
 
 - 実装例・コード例（関数・メソッドの実装、Server Actionsの実装、処理フローのコード）
-  - ただし型定義・インターフェース、データモデル、API設計のコードブロックは許容
+  - ただし型定義・インターフェースのコードブロック、処理ロジックの擬似コードは許容
 - ファイル構成（新規作成・変更ファイル一覧）→ PLANドキュメントに記載
 - 実装順序・フェーズ別計画 → PLANドキュメントに記載
 - 「実装済み」「新規追加」の分類、チェックボックス形式
 - Integration Points、ドキュメント参照文言
 
-### 4. SCREEN_ITEMS_DEFINITION.md（オプション）
+### 4. TEST_PLAN.md
 
-フォーム項目が多い画面、複雑なバリデーションがある場合に作成。
+**視点**: feature 単位のテスト戦略。REQUIREMENTS.md のユースケース・受入基準を、どのテストレベルでどう検証するかを定義する。
 
 以下を含めること:
 
-- 画面単位で整理された項目一覧（一意のID、項目名、データ型）
-- 入力/表示の区分
-- バリデーションルール（必須、桁数、形式、範囲）
-- 表示形式（日付フォーマット、通貨、単位等）
-- 初期値、選択肢（すべての選択肢を列挙）
+- ユースケース別テストマッピング（各ユースケース／受入基準を E2E / Integration / Unit のどのレベルで検証するか）
+- テスト総数と内訳（Unit / Integration / E2E）
+- P0（Critical path）ユースケースの E2E カバレッジ方針
 
 ## ドキュメント配置ルール
 
@@ -131,13 +133,13 @@ model: opus
 ```
 docs/<app.id>/<feature_path>/REQUIREMENTS.md
 docs/<app.id>/<feature_path>/TECH_DESIGN.md
-docs/<app.id>/<feature_path>/SCREEN_ITEMS_DEFINITION.md（オプション）
+docs/<app.id>/<feature_path>/TEST_PLAN.md
 ```
 
 配置先のパスは `.stdd.config.yml` の `docs.layout.*`（`docs.layout.requirements` 等）のパステンプレートに、対象アプリの `app`（`apps[].id`）と `feature_path` を適用して決定する。
 
 **Example**: 実装が `<app.id>/app/login/page.tsx`（例: `web/app/login/page.tsx`）の場合
-→ `docs/<app.id>/login/REQUIREMENTS.md`, `docs/<app.id>/login/TECH_DESIGN.md`（`docs.layout.*` テンプレートに従う）
+→ `docs/<app.id>/login/REQUIREMENTS.md`, `docs/<app.id>/login/TECH_DESIGN.md`, `docs/<app.id>/login/TEST_PLAN.md`（`docs.layout.*` テンプレートに従う）
 
 ## 参照すべきスキル
 
@@ -188,8 +190,8 @@ docs/<app.id>/<feature_path>/SCREEN_ITEMS_DEFINITION.md（オプション）
 
 - issueの要求がすべてユースケース（または受入基準）としてカバーされていること
 - すべてのユースケースにPriority（P0/P1/P2）＋振る舞い（番号付き手順・主語明示）＋受入基準（EARS）が付与されていること
-- テスト戦略でユースケースがテストレベル（E2E/Integration/Unit）にマッピングされていること
-- テスト総数と内訳が明記されていること
+- TEST_PLAN.md でユースケースがテストレベル（E2E/Integration/Unit）にマッピングされていること
+- TEST_PLAN.md にテスト総数と内訳が明記されていること
 - TECH_DESIGN.mdに実装例・コード例・ファイル構成が含まれていないこと
 - **SSOT原則違反の禁止語が含まれていないこと**（上記Self-checkを通過していること）
 - 既存実装との整合性が保たれていること

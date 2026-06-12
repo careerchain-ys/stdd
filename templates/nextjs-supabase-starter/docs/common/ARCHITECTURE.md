@@ -1,223 +1,145 @@
 <!--
-共通 ARCHITECTURE.md — STDD 技術設計ドキュメント (プロジェクト全体 / 技術視点)
+共通 ARCHITECTURE.md — STDD システム概要ドキュメント (プロジェクト全体 / 技術視点)
 
 位置づけ:
-  - 本ファイルは STDD の TECH_DESIGN.md の「全体版」。プロジェクト全体の技術設計を
-    俯瞰する正典 (SSoT) であり、feature 単位の TECH_DESIGN.md の上位ティアにあたる。
-  - feature ティアと名前を分けるため、全体版は ARCHITECTURE.md と呼ぶ
-    (システム全体 = ARCHITECTURE / 機能単位 = TECH_DESIGN)。
+  - 本ファイルは common ティアの技術設計（システム概要）。複数 feature が前提とする横断的な
+    技術文脈（構成・スタック・連携・セキュリティ・インフラ）を俯瞰する正典 (SSoT)。
+  - データモデルは ./TABLE_DEFINITION.md、API 仕様は ./API_SPEC.md に分離する（本書には持たない）。
   - サービスの目的・アクター・アプリの責務分担は ./REQUIREMENTS.md を参照する。
   - 機能・ページ単位の技術設計は docs/<app>/<feature>/TECH_DESIGN.md を参照する。
 
-目的:
-  - システム構成・リポジトリ構成・レイヤ規約・データモデルなど、複数 feature が前提とする
-    横断的な技術文脈を一箇所に固定する
-  - 各 feature の TECH_DESIGN.md が「全体のどこに位置するか」を判断する基準を提供する
-
-配置:
-  .stdd.config.yml の docs.layout.common_architecture に従う。
-  デフォルト例: docs/common/ARCHITECTURE.md
-
-含めない:
-  - 機能単位のアーキテクチャ・API・テスト戦略 (→ 各 feature の TECH_DESIGN.md)
-  - 実装の進捗・履歴・変更経緯・リネーム履歴 (SSoT として常に最新の構成のみ保持する)
-  - 関数 / メソッドの具体実装コード (型定義 / I/F / スキーマ定義は可)
-
-要確認マーカーについて:
-  リバースエンジニアリングで作成した直後など、実装からの読み取りに確信が持てない箇所は
-  `<!-- 要確認: ... -->` のインラインコメントで明示してよい。これは一時的な注記であり、
-  人間レビューで確定したら必ず除去する (恒久的に残さない)。
-
 書き換え方:
-  プレースホルダを実値に置換し、不要セクション・不要な図は削除する。
-  単一アプリ構成の場合は複数アプリ前提の記述 (workspaces / 共有パッケージ / 依存逆転 等) を畳む。
+  プレースホルダを実値に置換し、不要な節・図は削除する。
+  単一アプリ構成では複数アプリ前提の記述（workspaces / 共有パッケージ 等）を畳む。
 -->
 
 # [サービス名] アーキテクチャ設計書
 
-> **位置づけ**: 本ドキュメントは [サービス名] 全体の技術設計を俯瞰する正典である。STDD における `TECH_DESIGN.md` の全体版にあたる。
+> **位置づけ**: 本書は [サービス名] 全体のシステム概要を俯瞰する正典（common ティアの技術設計）。
 > サービスの目的・アクターなどのビジネス要件は [`REQUIREMENTS.md`](./REQUIREMENTS.md) を参照。
-> 機能・ページ単位の技術設計は `docs/<app>/<feature>/TECH_DESIGN.md` を参照。
+> データモデルは [`TABLE_DEFINITION.md`](./TABLE_DEFINITION.md)、API 仕様は [`API_SPEC.md`](./API_SPEC.md) を参照。
+> 機能・画面単位の技術設計は `docs/<app>/<feature>/TECH_DESIGN.md` を参照。
 >
 > **最終更新**: [yyyy-mm-dd] / **基準ブランチ**: [main / develop 等]
 
 ---
 
-## 目次
+## 1. システム概要
 
-1. [システム構成](#1-システム構成)
-2. [リポジトリ構成](#2-リポジトリ構成)
-3. [レイヤードアーキテクチャ](#3-レイヤードアーキテクチャ)
-4. [データモデル・DB設計](#4-データモデルdb設計)
-5. [付録・関連ドキュメント](#付録関連ドキュメント)
+### 1.1 システム構成概要
 
----
+（本システムが何であるか・全体構成・特徴を端的に。1 枚の構成図を添える）
 
-## 1. システム構成
+**全体構成**
 
-### 1.1 コンテキスト図
-
-(フロントエンド / バックエンド / 外部サービスの関係を 1 枚で示す)
+- フロントエンド層: Next.js（App Router）。CSR / SSR の方針を明記
+- バックエンド層: Supabase（PostgreSQL / Auth / Storage）を利用
+- データソース: Supabase Database（主要テーブル群）
 
 ```mermaid
 flowchart TB
-    subgraph Frontend["フロントエンド"]
-        APPA["[app_a]"]
-        APPB["[app_b]"]
+    subgraph Frontend["フロントエンド (Next.js)"]
+        WEB["web"]
     end
-    subgraph Backend["バックエンド / インフラ"]
-        AUTH["[認証]"]
-        DB[("[DB]")]
-        ST["[ストレージ]"]
+    subgraph Backend["Supabase"]
+        AUTH["Auth"]
+        DB[("PostgreSQL")]
+        ST["Storage"]
     end
-    EXT["[外部サービス]"]
 
-    APPA --> AUTH & DB & ST
-    APPB --> AUTH & DB & ST
-    Backend --> EXT
+    WEB --> AUTH & DB & ST
 ```
 
-### 1.2 構成要素一覧
+**特徴**
 
-| コンポーネント | 種別     | 役割                          |
-| -------------- | -------- | ----------------------------- |
-| [app_a]        | アプリ   | (対象ユーザーと責務)          |
-| [app_b]        | アプリ   | (対象ユーザーと責務)          |
-| [DB]           | DB       | (永続化層・アクセス制御方針)  |
-| [認証]         | 認証     | (認証方式・プロバイダ)        |
-| [ホスティング] | インフラ | (デプロイ先)                  |
+- [参照専用 / 書き込みあり 等の基本性質]
+- [RLS によるアクセス制御方針]
 
-### 1.3 外部サービス連携
-
-- **[サービス名]**: (用途・呼び出し元)
-- **[サービス名]**: (用途・呼び出し元)
-
-### 1.4 デプロイ・環境
-
-| 環境  | 用途 | フロントエンド | バックエンド / DB     |
-| ----- | ---- | -------------- | --------------------- |
-| local | 開発 | ...            | ...                   |
-| STG   | 検証 | ...            | ([ブランチ] で自動)   |
-| PROD  | 本番 | ...            | ([ブランチ] で自動)   |
-
-- **ブランチ戦略**: メインは `[main / develop]`、作業ブランチは `[命名規則]` とする。
-
----
-
-## 2. リポジトリ構成
-
-### 2.1 トップレベル構成
+**リポジトリ構成 / レイヤ規約**
 
 ```
 [repo]/
-├── [app_a]/           # (役割)
-├── [app_b]/           # (役割)
-├── packages/          # (共有パッケージ。単一アプリなら不要)
+├── app/               # Next.js App Router
+├── components/        # UI コンポーネント
+├── lib/               # ドメイン / データアクセス
 ├── docs/              # 機能別 Spec + 全体ドキュメント (本書を含む)
-├── scripts/           # (補助スクリプト)
 └── .github/workflows/ # CI/CD
 ```
 
-### 2.2 パッケージ / モジュール分割
+| レイヤー | 責務 | 依存方向 |
+| --- | --- | --- |
+| app / components | 表示・入力・認証ガード | 下位へのみ依存 |
+| lib（service） | ビジネスロジック | repository の I/F に依存 |
+| lib（repository） | データアクセス（Supabase client） | DB |
 
-(monorepo の場合は workspace 一覧、単一アプリの場合は主要モジュールの責務を記す)
+（依存は一方向。下位レイヤーは上位を知らない）
 
-| 単位       | 役割                                |
-| ---------- | ----------------------------------- |
-| [app_a]    | (アプリ本体)                        |
-| [shared]   | (複数アプリ共有ロジック。任意)      |
+### 1.2 使用技術スタック
 
-### 2.3 依存管理ルール
+**フロントエンド**
 
-(依存をどこに置くか・アプリ間 import の禁止有無などの横断ルール)
+- Next.js / React / TypeScript
 
----
+**バックエンド / データ基盤**
 
-## 3. レイヤードアーキテクチャ
+- Supabase（PostgreSQL / Auth / Storage）。データアクセスは Supabase クライアント経由
 
-### 3.1 レイヤー構成
+**テスト**
 
-各アプリ / 共有モジュールのレイヤー責務:
+- E2E: Playwright ／ Unit / Integration: [採用ツール]
 
-| ディレクトリ  | 責務                                  | DI                          |
-| ------------- | ------------------------------------- | --------------------------- |
-| `models/`     | Entity / ドメインモデル               | —                           |
-| `repository/` | データアクセス (CRUD)                 | constructor で受け取る      |
-| `service/`    | ビジネスロジック                      | constructor で受け取る      |
+**CI/CD・ホスティング**
 
-### 3.2 依存方向ルール
+- [ビルド・デプロイ自動化 / ホスティング先（例: Vercel）]
 
-依存は一方向。下位レイヤーは上位を知らない。
+### 1.3 システム間連携
 
-```mermaid
-flowchart TB
-    UI["UI"] --> APP["アプリケーション層"] --> SVC["Service"] --> REPO["Repository"] --> DB[("DB")]
-```
+**主要連携**
 
-**禁止される依存方向**
+1. web ⇔ Supabase Auth: ログイン認証・セッション管理
+2. web ⇔ Supabase Database: 各種テーブルの参照 / 更新（RLS 適用）
 
-- Repository → Service: 逆向きのため禁止。Service が Repository の interface に依存する。
-- (プロジェクト固有の禁止ルールを追記)
+**連携方針**
 
-### 3.3 データフロー
+- [専用バックエンドを設けるか / フロントから Supabase 直接連携か]
 
-(代表的なリクエストの流れを 1 本、シーケンス図で示す)
+**外部連携**
 
-```mermaid
-sequenceDiagram
-    participant UI as UI
-    participant App as アプリケーション層
-    participant Svc as Service
-    participant Repo as Repository
-    participant DB as DB
+- [外部システム連携。なければ「現時点で未定義」]
 
-    UI->>App: 呼び出し
-    App->>App: 認証 / 入力チェック
-    App->>Svc: 実行
-    Svc->>Repo: ビジネスロジック
-    Repo->>DB: CRUD
-    DB-->>Repo: rows
-    Repo-->>Svc: Entity / Model
-    Svc-->>App: 結果
-    App-->>UI: レスポンス
-```
+### 1.4 データフロー概要
 
----
+**[認証フロー]**
 
-## 4. データモデル・DB設計
+1. ユーザーが認証情報を入力 → Supabase Auth へ認証要求
+2. 成功 → セッショントークンを保持しアプリへ遷移 / 失敗 → エラー表示
+3. 認証ガードが各遷移でトークンを検証し、未認証はログインへリダイレクト
 
-### 4.1 設計方針
+**[データ参照 / 更新フロー]**
 
-- **削除方針**: (論理削除 / 物理削除のいずれか、判定カラム)
-- **主キー**: (UUID / 連番 等)
-- **時系列**: (`created_at` / `updated_at` などの方針)
-- **マイグレーション**: (命名規則・冪等性方針)
+1. 認証済みユーザーの操作で Supabase へクエリ発行（`deleted_at IS NULL` 等で絞り込み）
+2. 結果をクライアントで加工・表示
 
-### 4.2 ドメイン分類とテーブル一覧
+### 1.5 セキュリティ概要
 
-(テーブルをドメイングループに整理する。生成された型定義ファイルを正とする)
+- **認証・アクセス制御**: Supabase Auth + 認証ガード。未認証アクセスを遮断
+- **セッション / トークン管理**: トークンの保持・検証・失効時の再ログイン
+- **通信**: TLS（HTTPS）
+- **データ保護**: Row Level Security（RLS）。機密鍵をフロントに含めない（anon key のみ）
 
-| #   | グループ     | テーブル                        |
-| --- | ------------ | ------------------------------- |
-| ①   | [グループ名] | `table_a`, `table_b`            |
-| ②   | [グループ名] | `table_c`, `table_d`            |
+### 1.6 インフラ構成概要
 
-### 4.3 ER 図
-
-(中心テーブルごとに分割して示す。1 枚に詰め込まない)
-
-```mermaid
-erDiagram
-    table_a ||--o{ table_b : has
-    table_a ||--o{ table_c : has
-```
-
-> 上記はカーディナリティの概観であり、実際の外部キー・NULL 許容はマイグレーション / 型定義を正とする。
+- **ホスティング**: [フロントの配置先]
+- **データ・認証基盤**: Supabase（Database / Auth / Storage）
+- **可用性**: [稼働率目標・メンテナンス方針]
+- **CI/CD・運用・監視**: [自動化・監視・通知]
+- **性能・拡張性**: [同時接続・対象ブラウザ・最適化方針]
 
 ---
 
 ## 付録・関連ドキュメント
 
 - 共通要件定義: [`./REQUIREMENTS.md`](./REQUIREMENTS.md)
-- STDD 方法論: `packages/core/docs/stdd-methodology.md`
-- 機能別 Spec: `docs/<app>/<feature>/REQUIREMENTS.md`, `TECH_DESIGN.md`
+- テーブル定義: [`./TABLE_DEFINITION.md`](./TABLE_DEFINITION.md)
+- API 仕様: [`./API_SPEC.md`](./API_SPEC.md)
+- 機能別 Spec: `docs/<app>/<feature>/TECH_DESIGN.md`

@@ -117,8 +117,11 @@ docs:
   layout:
     common_requirements: docs/common/REQUIREMENTS.md    # common ティアを使う場合のみ
     common_architecture: docs/common/ARCHITECTURE.md
+    common_table_definition: docs/common/TABLE_DEFINITION.md
+    common_api_spec: docs/common/API_SPEC.md             # API がある場合
     requirements: docs/{{app.id}}/{{feature_path}}/REQUIREMENTS.md
     tech_design: docs/{{app.id}}/{{feature_path}}/TECH_DESIGN.md
+    test_plan: docs/{{app.id}}/{{feature_path}}/TEST_PLAN.md
     plan: docs/{{app.id}}/{{feature_path}}/plans/{{date}}.md
 ```
 

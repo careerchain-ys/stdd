@@ -25,10 +25,10 @@
    - REQUIREMENTS.md「2.4 UI/UX・画面」から `./wireframes/index.html` にリンク
    - UI を持たない機能（バッチ・API のみ等）はスキップ
 4. `TECH_DESIGN.md` を作成:
-   - 技術設計方針
-   - ファイル構成
-   - テスト戦略（テストケース一覧）
-5. 必要に応じて `SCREEN_ITEMS_DEFINITION.md` を作成
+   - 技術設計方針（概要 / 主要な設計判断 / 処理ロジック / エラーハンドリング戦略）
+   - 画面 feature では「画面項目定義」セクションを含める（非画面 feature は省略）
+   - データ構造は common `TABLE_DEFINITION.md`、API は common `API_SPEC.md` を参照
+5. `TEST_PLAN.md` を作成（テスト戦略・テストケース一覧。feature 単位の独立ドキュメント）
 
 作成したSpecをコミット。
 
@@ -56,7 +56,7 @@ HIGH/MEDIUM の指摘がある場合は Hard Threshold とは別に判断する�
 **Plan Writerに依頼**して、Specドキュメントに基づきPLANドキュメントを作成する。
 
 1. REQUIREMENTS.mdのユースケース（振る舞い＋受入基準）とPriorityを確認
-2. TECH_DESIGN.mdのTest Strategyに基づきタスクを分解
+2. TEST_PLAN.mdのテスト戦略に基づきタスクを分解
 3. テスト→実装の順序でタスクリストを作成
 4. ファイル構成（新規/既存修正/既存維持）を明記
 5. PLANドキュメントをコミット
@@ -107,14 +107,14 @@ HIGH/MEDIUM の指摘がある場合は Hard Threshold とは別に判断する�
 
 レビュー観点:
 
-1. **Spec準拠**: TECH_DESIGN.mdのテスト戦略（ユースケース別テストレベル分類・テスト総数・内訳）に作成テストが則っているか
+1. **Spec準拠**: TEST_PLAN.mdのテスト戦略（ユースケース別テストレベル分類・テスト総数・内訳）に作成テストが則っているか
 2. **形骸的テストの検出**: トートロジー、モック戻り値のassert、内容を検証しないアサーション等、意味のないテストがないか
    - ただしE2EテストでUI要素（role, aria-label, data-testid, 可視テキスト等）に依拠した検証は許容
 3. **一般的なテスト品質**: AAA構造、独立性、命名、Flaky耐性、アサーションの具体性
 
 ### 判定結果の扱い
 
-Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テスト 0件 / TECH_DESIGN.md整合 / P0 E2E完全カバー / 受入基準テスト網羅）を1項目でも下回った場合は必ず NEEDS CHANGES 以下となる。
+Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テスト 0件 / TEST_PLAN.md整合 / P0 E2E完全カバー / 受入基準テスト網羅）を1項目でも下回った場合は必ず NEEDS CHANGES 以下となる。
 
 - **PASS**: Phase 2のステップ2（実装）に戻って作業を継続。
 - **NEEDS CHANGES**: Test Reviewer 出力末尾の「Generator への差し戻し指示」をそのまま implementer に渡してテストを修正させる → テストを再コミット → Test Reviewer に再レビュー依頼。**最大3回**ループ。

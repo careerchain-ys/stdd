@@ -29,9 +29,13 @@ docs:
     # common ティア（プロジェクト全体の俯瞰 spec）
     common_requirements: "docs/common/REQUIREMENTS.md"
     common_architecture: "docs/common/ARCHITECTURE.md"
+    common_table_definition: "docs/common/TABLE_DEFINITION.md"
+    common_api_spec: "docs/common/API_SPEC.md"
+    common_design: "docs/common/DESIGN.md"
     # feature ティア（機能単位の spec）
     requirements: "docs/{{feature_path}}/REQUIREMENTS.md"
     tech_design: "docs/{{feature_path}}/TECH_DESIGN.md"
+    test_plan: "docs/{{feature_path}}/TEST_PLAN.md"
     plan: "docs/{{feature_path}}/plans/{{date}}.md"
 
 workflow:
