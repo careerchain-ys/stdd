@@ -1,7 +1,7 @@
 ---
 name: documenting-specifications
 description: |-
-  REQUIREMENTS.md（ビジネス要件・ユーザージャーニー）と TECH_DESIGN.md（技術設計・テスト戦略）のテンプレートとガイドラインを提供する。STDD 方法論に従った仕様ドキュメントの作成・更新を支援する。
+  REQUIREMENTS.md（業務要件・機能要件・非機能要件）と TECH_DESIGN.md（技術設計・テスト戦略）のテンプレートとガイドラインを提供する。STDD 方法論に従った仕様ドキュメントの作成・更新を支援する。
 when_to_use: |-
   「spec」「仕様書」「設計書」「要件定義」「REQUIREMENTS.md」「TECH_DESIGN.md」「Spec and Test Driven Development」「STDD」「仕様駆動」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep
@@ -21,8 +21,11 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
    docs/<app>/<path>/REQUIREMENTS.md
    ```
 
-   - ビジネス要件、ユーザージャーニー（P0/P1/P2 の優先度付き）を記述
-   - [テンプレート](templates/requirements.md) を参照
+   - **業務要件 → 機能要件 → 非機能要件** の3層で記述
+   - 機能要件は **コア**（2.1 ユースケース＋2.2 業務ルール）＋ **拡張**（2.3 指標定義・2.4 UI/UX・2.5 外部IF、該当機能のみ。無ければ章ごと省略）
+   - 各ユースケースに 振る舞い（番号付き手順・主語明示）＋ 受入基準（EARS）を併記し、Priority を付与
+   - 指標を持つ機能は §2.3 指標定義表を埋める（算出ロジック・データソース・代理注記）
+   - [テンプレート（feature）](templates/requirements.md) を参照
 
 2. **ワイヤーフレーム（WF）を生成**（UI を持つ機能の場合）
 
@@ -30,9 +33,9 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
    docs/<app>/<path>/wireframes/
    ```
 
-   - REQUIREMENTS.md のジャーニーから HTML ワイヤーフレームを生成（低忠実度・主要文言は実値）
+   - REQUIREMENTS.md のユースケースから HTML ワイヤーフレームを生成（低忠実度・主要文言は実値）
    - [generating-wireframes Skill](../generating-wireframes/SKILL.md) を参照
-   - 生成後、REQUIREMENTS.md「3. UI/UX デザイン」から `./wireframes/index.html` にリンクする
+   - 生成後、REQUIREMENTS.md「2.4 UI/UX・画面」から `./wireframes/index.html` にリンクする
 
 3. **TECH_DESIGN.md を作成**
 
@@ -40,7 +43,7 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
    docs/<app>/<path>/TECH_DESIGN.md
    ```
 
-   - 技術設計、テスト戦略（ジャーニーを E2E/Integration/Unit にマッピング）を記述
+   - 技術設計、テスト戦略（ユースケースを E2E/Integration/Unit にマッピング）を記述
    - [テンプレート](templates/tech-design.md) を参照
 
 4. **SCREEN_ITEMS_DEFINITION.md を作成（オプション）**
@@ -69,8 +72,8 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
 | **feature** | `REQUIREMENTS.md`         | `TECH_DESIGN.md`          | `docs/<app>/<feature>/`               |
 
 - feature spec は common ティア（サービス目的・アクター・システム構成・レイヤ規約・データモデル）を**前提とする**。common と矛盾しないこと。
-- 全体版テンプレートは `packages/core/templates/common/` を参照。既存実装からの common spec 作成は `reverse-engineering-common-spec` スキルを参照。
-- 詳細は `packages/core/docs/stdd-methodology.md` §2.0 を参照。
+- common ティアのテンプレートは [`templates/requirements-common.md`](templates/requirements-common.md) を参照。既存実装からの common spec 作成は `reverse-engineering-common-spec` スキルを参照。
+- common / feature とも章立ては **業務要件 → 機能要件 → 非機能要件** の3層で揃える。非機能要件・横断業務ルール・用語は common に集約し、feature は「common 準拠」で参照する。
 
 ## ドキュメント配置ルール
 
@@ -125,9 +128,9 @@ HTMLテンプレートは `lib/email/templates/` で管理。
 ❌ **悪い例（issue・今回への言及）**:
 
 ```markdown
-## ユーザージャーニー
+## 機能要件
 
-### 新規ユーザー登録（issue #1234 で追加）
+#### 新規ユーザー登録（issue #1234 で追加）
 
 今回のリリースで対応する新規登録フロー。
 ```
@@ -135,9 +138,9 @@ HTMLテンプレートは `lib/email/templates/` で管理。
 ✅ **良い例**:
 
 ```markdown
-## ユーザージャーニー
+## 機能要件
 
-### 新規ユーザー登録
+#### 新規ユーザー登録
 
 **Priority**: P0
 ```
@@ -152,12 +155,12 @@ HTMLテンプレートは `lib/email/templates/` で管理。
 変更理由 | 削除理由 | 旧仕様 | issue # | Closes # | リバースエンジニアリング
 本対応 | 本issue | 今回のスコープ | 今回の変更
 
-# テスト/ジャーニー再構成の履歴を暗示するフレーミング
+# テスト/ユースケース再構成の履歴を暗示するフレーミング
 に統合 | を統合 | に集約 | を集約 | にまとめ | をまとめ | にマージ | をマージ
 別テストに分割 | テストを分けた | 元々は | 当初は | 以前は
 ```
 
-「ジャーニー名」や「アーキテクチャ判断の理由」など現在仕様の説明として正当な「理由」は問題ない。禁止しているのは**変更そのものの理由**（なぜ仕様を変えたか）と、**過去構成からの再編を暗示するフレーミング**。
+「ユースケース名」や「アーキテクチャ判断の理由」など現在仕様の説明として正当な「理由」は問題ない。禁止しているのは**変更そのものの理由**（なぜ仕様を変えたか）と、**過去構成からの再編を暗示するフレーミング**。
 
 > 特に注意: テスト戦略表で `✅ (更新に統合)` `2 ケースに集約` `1 テストにまとめる方針` のように「以前は別だったが今はまとめてある」ことを匂わせる表現は SSOT 違反。常に**現在の構成事実のみ**を記述し（例: `プロフィール情報を更新する テスト内のステップとして検証`）、設計判断の理由は注記/設計判断セクションで「**この構成を採る**理由」として書く。
 
@@ -167,19 +170,26 @@ HTMLテンプレートは `lib/email/templates/` で管理。
 
 ### REQUIREMENTS.md（要件定義書）
 
-**目的**: ビジネス要件とユーザージャーニーをステークホルダー視点で定義
+**目的**: 機能の要件を「業務要件 → 機能要件 → 非機能要件」の3層で定義し、後続（TECH_DESIGN / テスト / コード）の一次インプットにする
 
-**記述する内容**:
+**章立ての3層**:
 
-- ユーザー視点（What & Why）
-- **ユーザーから見える挙動のみ**
-- すべてのユーザージャーニーに Priority（P0/P1/P2）を付与
-- UI/UX デザイン（HTML ワイヤーフレームへのリンク） … `generating-wireframes` スキルで生成
+| 層 | 答える問い | 書くもの |
+| --- | --- | --- |
+| **業務要件** | なぜ作るか（Why） | ビジネス課題・目標・KPI・対象ユーザー・利用シーン |
+| **機能要件** | 何が見える/できるか（What） | **コア**: ユースケース（振る舞い〔手順〕＋受入基準〔EARS〕）・業務ルール ／ **拡張（該当機能のみ）**: 指標定義・UI/UX・外部IF |
+| **非機能要件** | どれだけうまく（How well） | 性能・可用性・セキュリティ・アクセシビリティ（機能固有のみ。共通は common §6 を参照） |
+
+**記法**:
+
+- 各ユースケースは **振る舞い（番号付き手順）＋ 受入基準（EARS）** の2部構成で記述する
+- **振る舞い → 番号付き手順**（1. 2. 3. …）。各ステップの主語を明示（「ユーザーは〜」「システムは〜」）し、ユーザー操作とシステム応答の主要フロー（ハッピーパス＋主要分岐）を表す。E2E テストの骨格になる。抽象（ビジネス言語）に保ち、テストデータ・セレクタはテストコード側に置く
+- **受入基準・業務ルール → EARS**（常時 / WHEN / WHILE / IF / WHERE）。フローが満たすべき詳細条件・例外・データ制約を網羅。手順と重複させず、エッジケースは IF / WHERE で統合
 
 **記述しない内容**:
 
-- 技術的な詳細（テーブル名、セッション管理、実装ファイルへの参照等）
-- テスト実装の詳細（TECH_DESIGN.md に記載）
+- データモデル・集計実装・API → TECH_DESIGN.md ／ 画面項目 × バリデーション × DB マッピング → SCREEN_ITEMS_DEFINITION.md
+- 実装ファイルへの参照・関数名・クラス名、テスト実装の詳細
 
 ### TECH_DESIGN.md（設計書）
 
@@ -188,7 +198,7 @@ HTMLテンプレートは `lib/email/templates/` で管理。
 **記述する内容**:
 
 - 技術視点（How）
-- テスト戦略: 各ジャーニーをテストレベルにマッピング
+- テスト戦略: 各ユースケースをテストレベルにマッピング
 - アーキテクチャ、API 設計、エラーハンドリング
 - **テスト総数と内訳**（例: 合計 33 件 - Unit 18 件, Integration 9 件, E2E 6 件）
 
@@ -217,7 +227,7 @@ HTMLテンプレートは `lib/email/templates/` で管理。
 
 **記述しない内容**:
 
-- ユーザージャーニー（REQUIREMENTS.md に記載）
+- ユースケース（REQUIREMENTS.md に記載）
 - 技術設計・実装詳細（TECH_DESIGN.md に記載）
 
 ### Priority（優先度）ガイドライン
@@ -240,7 +250,8 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）の作成・レビ�
 詳細なテンプレートとガイドは以下を参照:
 
 - **テンプレート**
-  - [REQUIREMENTS.md テンプレート](templates/requirements.md)
+  - [REQUIREMENTS.md テンプレート（feature）](templates/requirements.md)
+  - [REQUIREMENTS.md テンプレート（common）](templates/requirements-common.md)
   - [TECH_DESIGN.md テンプレート](templates/tech-design.md)
   - [SCREEN_ITEMS_DEFINITION.md テンプレート](templates/screen-items-definition.md) ← 画面項目定義（オプション）
 - **関連スキル**
@@ -265,10 +276,15 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）の作成・レビ�
 ### REQUIREMENTS.md 作成時
 
 ```
-□ 概要（解決する問題、対象ユーザー、ビジネス目標）
-□ すべてのユーザージャーニーに Priority（P0/P1/P2）を付与
-□ UI/UX デザイン（HTML ワイヤーフレームを生成し「3. UI/UX デザイン」からリンク）→ generating-wireframes Skill
-□ エッジケース
+□ 業務要件・機能要件・非機能要件の3層が揃っている（非機能が「common 準拠」でも明記）
+□ 各記述が3層のいずれかに分類されている（フラットな未分類項目が無い）
+□ 全ユースケースに Priority＋振る舞い（番号付き手順）＋受入基準（EARS）がある
+□ 振る舞い手順は主要フロー（抽象）に保たれ、テストデータ・セレクタが混入していない
+□ 受入基準（EARS）が詳細条件・例外・データ制約を網羅している（エッジケースは IF/WHERE）
+□ 指標を持つ機能は §2.1 指標定義表が埋まっている（算出/データソース/代理注記）
+□ 近似・代理指標は「注記表示=必須」が明記されている
+□ UI/UX デザイン（HTML ワイヤーフレームを生成し「2.5 UI/UX デザイン」からリンク）→ generating-wireframes Skill
+□ 受入基準に曖昧語（適切に/正しく）が無い／How（テーブル名・関数・API）が混入していない
 □ スコープ外
 □ SCREEN_ITEMS_DEFINITION.md が必要か検討（フォーム項目が多い場合）
 ```
@@ -281,7 +297,7 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）の作成・レビ�
 □ データモデル（ER 図、TypeScript 型定義）
 □ API 設計（エンドポイント、型定義）
 □ エラーハンドリング戦略
-□ テスト戦略（ジャーニー別テストマッピング）
+□ テスト戦略（ユースケース別テストマッピング）
 □ テスト総数と内訳（Unit/Integration/E2E）
 □ 実装例・コード例が含まれていないことを確認（型定義・I/F は除く）
 □ SCREEN_ITEMS_DEFINITION.md が存在する場合、整合性を確認

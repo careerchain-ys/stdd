@@ -146,9 +146,9 @@ interface CreateUserResponse {
 
 ## 8. テスト戦略
 
-### ジャーニー別テスト戦略
+### ユースケース別テスト戦略
 
-| ジャーニー | E2E | Integration | Unit | 根拠 |
+| ユースケース | E2E | Integration | Unit | 根拠 |
 |---------|-----|-------------|------|-----------|
 | P0: メインフロー | ✅ | ✅ | ✅ | Critical path、ビジネスに直結、複数システム統合 |
 | P1: 重要なエラーケース | ⚠️ 検討 | ✅ | ✅ | 頻度高い、Integration必須、E2Eは複雑さ・コストで判断 |
@@ -163,7 +163,7 @@ interface CreateUserResponse {
 
 ## 重要なポイント
 
-- REQUIREMENTS.mdのジャーニーをテストレベル（E2E/Integration/Unit）にマッピング
+- REQUIREMENTS.mdのユースケースをテストレベル（E2E/Integration/Unit）にマッピング
 - テストレベル決定の根拠（Rationale）を含める
 - 設計判断は「選択」と「理由」を明記
 - アーキテクチャ、API設計、エラーハンドリング戦略
