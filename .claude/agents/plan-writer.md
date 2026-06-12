@@ -32,7 +32,7 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）を読み取り、�
 
 以下を必ず読み込む:
 
-- `REQUIREMENTS.md` - ビジネス要件・User Journey・Priority
+- `REQUIREMENTS.md` - 業務要件・機能要件（ユースケース：振る舞い＋受入基準）・Priority
 - `TECH_DESIGN.md` - 技術設計・Test Strategy
 - `SCREEN_ITEMS_DEFINITION.md` - 画面項目定義（存在する場合）
 

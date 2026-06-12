@@ -17,12 +17,12 @@
 
 1. `docs/` 配下に該当機能のディレクトリを作成（存在しない場合）
 2. `REQUIREMENTS.md` を作成:
-   - ビジネス要件の整理
-   - ユーザージャーニーの定義
-   - 受入基準の明確化
+   - 業務要件（解決する問題・対象ユーザー・ビジネス目標）の整理
+   - 機能要件：ユースケースごとに 振る舞い（番号付き手順・主語明示）＋ 受入基準（EARS）＋ Priority を定義
+   - 非機能要件（機能固有のもの。共通は common 準拠）の明確化
 3. ワイヤーフレーム（WF）を生成（UI を持つ機能の場合）:
    - `generating-wireframes` スキルに従い `docs/<app>/<feature-path>/wireframes/` に HTML WF を生成
-   - REQUIREMENTS.md「3. UI/UX デザイン」から `./wireframes/index.html` にリンク
+   - REQUIREMENTS.md「2.4 UI/UX・画面」から `./wireframes/index.html` にリンク
    - UI を持たない機能（バッチ・API のみ等）はスキップ
 4. `TECH_DESIGN.md` を作成:
    - 技術設計方針
@@ -55,7 +55,7 @@ HIGH/MEDIUM の指摘がある場合は Hard Threshold とは別に判断する�
 
 **Plan Writerに依頼**して、Specドキュメントに基づきPLANドキュメントを作成する。
 
-1. REQUIREMENTS.mdのUser JourneyとPriorityを確認
+1. REQUIREMENTS.mdのユースケース（振る舞い＋受入基準）とPriorityを確認
 2. TECH_DESIGN.mdのTest Strategyに基づきタスクを分解
 3. テスト→実装の順序でタスクリストを作成
 4. ファイル構成（新規/既存修正/既存維持）を明記
@@ -107,7 +107,7 @@ HIGH/MEDIUM の指摘がある場合は Hard Threshold とは別に判断する�
 
 レビュー観点:
 
-1. **Spec準拠**: TECH_DESIGN.mdのテスト戦略（ジャーニー別テストレベル分類・テスト総数・内訳）に作成テストが則っているか
+1. **Spec準拠**: TECH_DESIGN.mdのテスト戦略（ユースケース別テストレベル分類・テスト総数・内訳）に作成テストが則っているか
 2. **形骸的テストの検出**: トートロジー、モック戻り値のassert、内容を検証しないアサーション等、意味のないテストがないか
    - ただしE2EテストでUI要素（role, aria-label, data-testid, 可視テキスト等）に依拠した検証は許容
 3. **一般的なテスト品質**: AAA構造、独立性、命名、Flaky耐性、アサーションの具体性
@@ -143,7 +143,7 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
 
 4. **コード品質チェック**: `simplify` skill と同等のレビューを実施
 
-5. **動作確認（Playwright MCP）**: `commands.dev` が定義され UI を持つ場合、dev サーバを起動し Playwright MCP（`mcp__playwright__*`）で主要ユーザージャーニーのハッピーパスをブラウザ操作で確認する（主要要素の存在・console エラーなし・画面遷移）。`commands.dev` 未定義 / UIなし / Playwright MCP 利用不可ならスキップする。詳細は QA Engineer の Phase 6 を参照。
+5. **動作確認（Playwright MCP）**: `commands.dev` が定義され UI を持つ場合、dev サーバを起動し Playwright MCP（`mcp__playwright__*`）で主要ユースケースのハッピーパスをブラウザ操作で確認する（主要要素の存在・console エラーなし・画面遷移）。`commands.dev` 未定義 / UIなし / Playwright MCP 利用不可ならスキップする。詳細は QA Engineer の Phase 6 を参照。
 
 問題がある場合:
 

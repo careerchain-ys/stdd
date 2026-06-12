@@ -34,7 +34,7 @@ git diff origin/<primary_branch>...HEAD --name-only
 
 ### A. REQUIREMENTS.md ⇔ 実装
 
-- [ ] REQUIREMENTS.md の User Journey が実装で網羅されているか
+- [ ] REQUIREMENTS.md のユースケース（振る舞い＋受入基準）が実装で網羅されているか
 - [ ] REQUIREMENTS.md の画面仕様（ボタン、フォーム、表示項目）が実装と一致しているか
 - [ ] REQUIREMENTS.md に記載された機能要件が全て実装されているか
 

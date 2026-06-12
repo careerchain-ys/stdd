@@ -186,18 +186,18 @@ Projects - 削除確認ダイアログ
 ### 記載フォーマット
 
 ```markdown
-## 3. UI/UXデザイン
+### 2.4 UI/UX・画面
 
-### Figmaデザイン
+#### Figmaデザイン
 
 **Figmaファイル**: [<ファイル名>](<FigmaファイルURL>)
 
-#### [画面名1]
+##### [画面名1]
 
 - [状態A](<FigmaファイルURL>?node-id=<node-id>)
 - [状態B](<FigmaファイルURL>?node-id=<node-id>)
 
-#### [画面名2]
+##### [画面名2]
 
 - [状態A](<FigmaファイルURL>?node-id=<node-id>)
 - [状態B](<FigmaファイルURL>?node-id=<node-id>)
@@ -206,22 +206,22 @@ Projects - 削除確認ダイアログ
 ### 記載例（ダッシュボードの場合）
 
 ```markdown
-## 3. UI/UXデザイン
+### 2.4 UI/UX・画面
 
-### Figmaデザイン
+#### Figmaデザイン
 
 **Figmaファイル**: [<app.id>-Dashboard-Common](https://www.figma.com/design/xxxxx/<app.id>-Dashboard-Common)
 
-#### OverviewTab
+##### OverviewTab
 
 - [実績サマリ表示](https://www.figma.com/design/xxxxx/<app.id>-Dashboard-Common?node-id=1-2)
 
-#### タブ切り替え
+##### タブ切り替え
 
 - [Overviewタブ（アクティブ）](https://www.figma.com/design/xxxxx/<app.id>-Dashboard-Common?node-id=2-2)
 - [Projectsタブ（アクティブ）](https://www.figma.com/design/xxxxx/<app.id>-Dashboard-Common?node-id=3-2)
 
-#### WelcomeSection
+##### WelcomeSection
 
 - [ウェルカムバナー表示](https://www.figma.com/design/xxxxx/<app.id>-Dashboard-Common?node-id=4-2)
 ```

@@ -1,7 +1,7 @@
 ---
 name: generating-wireframes
 description: |-
-  REQUIREMENTS.md のユーザージャーニーから、低忠実度（low-fidelity）の HTML ワイヤーフレームを生成する。技術スタック非依存の素の HTML（CSS は各 HTML に `<style>` で埋め込み・自己完結）で、画面レイアウト・情報設計・主要文言（タイトル / ボタン / 項目ラベル）を合意形成用に可視化する。
+  REQUIREMENTS.md のユースケース（振る舞い＋受入基準）から、低忠実度（low-fidelity）の HTML ワイヤーフレームを生成する。技術スタック非依存の素の HTML（CSS は各 HTML に `<style>` で埋め込み・自己完結）で、画面レイアウト・情報設計・主要文言（タイトル / ボタン / 項目ラベル）を合意形成用に可視化する。
 when_to_use: |-
   「ワイヤーフレーム」「WF」「wireframe」「画面設計」「画面イメージ」「モックの前段」「UI/UX デザインのHTML化」「REQUIREMENTS の画面を作る」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep
@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 
 # ワイヤーフレーム生成
 
-REQUIREMENTS.md の **ユーザージャーニー**と**画面要素**をもとに、低忠実度の HTML ワイヤーフレーム（WF）を生成する。WF は REQUIREMENTS.md の「3. UI/UX デザイン」セクションの実体となり、ステークホルダーが画面構成・遷移・主要文言を合意するために使う。
+REQUIREMENTS.md の **ユースケース**（振る舞い＋受入基準）と**画面要素**をもとに、低忠実度の HTML ワイヤーフレーム（WF）を生成する。WF は REQUIREMENTS.md の「2.4 UI/UX・画面」セクションの実体となり、ステークホルダーが画面構成・遷移・主要文言を合意するために使う。
 
 ## 何を作るか / 作らないか
 
@@ -39,13 +39,13 @@ docs/<app>/<feature_path>/wireframes/
 
 ### 1. 入力を読む
 
-- 対象の `REQUIREMENTS.md`（ユーザージャーニー・表示要素・空 / エラー状態）
+- 対象の `REQUIREMENTS.md`（ユースケース：振る舞い＋受入基準・表示要素・空 / エラー状態）
 - `SCREEN_ITEMS_DEFINITION.md`（存在する場合 — フォーム項目名・選択肢・必須/任意の出所はこれ）
 - 既存の類似画面の WF（`docs/**/wireframes/` を Glob して文言・構造を踏襲）
 
 ### 2. 画面を洗い出す
 
-ユーザージャーニーの各ステップが「どの画面で起きるか」を割り出し、画面のリストを作る。1 ジャーニー = 複数画面のことも、複数ジャーニーが 1 画面を共有することもある。各画面について必要な**状態**（通常 / 空 / エラー / ローディング）を決める。詳細は [guides/from-requirements.md](guides/from-requirements.md)。
+ユースケースの振る舞い（手順）の各ステップが「どの画面で起きるか」を割り出し、画面のリストを作る。1 ユースケース = 複数画面のことも、複数ユースケースが 1 画面を共有することもある。各画面について必要な**状態**（通常 / 空 / エラー / ローディング）を決める。詳細は [guides/from-requirements.md](guides/from-requirements.md)。
 
 ### 3. 雛形をコピーして組む
 
@@ -54,7 +54,7 @@ docs/<app>/<feature_path>/wireframes/
 3. 各画面の `<title>` と `.wf-screen-label` に「画面名 / 状態名」を実値で入れる。
 4. `<style>` ブロックは各画面で同一内容を保つ（デザインシステムを変えたい場合は全画面の `<style>` を揃えて更新する）。CSS 単体ファイルは作らない。
 
-### 4. REQUIREMENTS.md の「3. UI/UX デザイン」を更新
+### 4. REQUIREMENTS.md の「2.4 UI/UX・画面」を更新
 
 ASCII アートは置かない。代わりに以下を書く（テンプレートは `documenting-specifications` の REQUIREMENTS テンプレートに準拠）:
 
@@ -64,7 +64,7 @@ ASCII アートは置かない。代わりに以下を書く（テンプレー�
 
 ### 5. セルフチェック
 
-- [ ] すべての P0 / P1 ジャーニーに対応する画面が WF 化されている
+- [ ] すべての P0 / P1 ユースケースに対応する画面が WF 化されている
 - [ ] 各画面に**実文言**のタイトル・ボタン・ラベルが入っている（ダミー `[...]` が残っていない）
 - [ ] 空状態・主要エラー状態の WF がある
 - [ ] モバイル幅でも破綻しない（`wf-page--mobile` でプレビュー確認、または論理的に 1 列化される構造）
@@ -98,8 +98,8 @@ ASCII アートは置かない。代わりに以下を書く（テンプレー�
 ## STDD フローでの位置づけ
 
 ```
-REQUIREMENTS.md（ジャーニー）
-  └─ ワイヤーフレーム生成（本スキル）── 「3. UI/UX デザイン」の実体に
+REQUIREMENTS.md（ユースケース）
+  └─ ワイヤーフレーム生成（本スキル）── 「2.4 UI/UX・画面」の実体に
        └─ TECH_DESIGN.md → テスト → 実装
 ```
 
@@ -116,6 +116,6 @@ REQUIREMENTS.md（ジャーニー）
 
 - [templates/screen.html](templates/screen.html) — 画面ひな型（`<head>` に汎用デザインシステムの `<style>` を埋め込み済み＝デザインシステム本体）
 - [templates/index.html](templates/index.html) — 画面一覧ひな型
-- [guides/from-requirements.md](guides/from-requirements.md) — ジャーニー → 画面の起こし方
+- [guides/from-requirements.md](guides/from-requirements.md) — ユースケース → 画面の起こし方
 - [examples/](examples/) — toC / toB のサンプル WF
 - 関連: [documenting-specifications](../documenting-specifications/SKILL.md)（REQUIREMENTS テンプレート）
