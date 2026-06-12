@@ -59,7 +59,7 @@ Spec は **プロジェクト全体 (common ティア)** と **機能単位 (fea
 - 解決する問題、対象ユーザー、ビジネス目標
 - すべての User Journey (正常系、エラーケース、エッジケース)
 - 各 Journey に Priority (P0 / P1 / P2) を付与
-- UI / UX デザイン (HTML ワイヤーフレームへのリンク、表示要素、空状態 / エラー状態。WF は `generating-wireframes` スキルで生成)
+- UI / UX デザイン (HTML ワイヤーフレームへのリンク、表示要素。画面状態〔通常 / 空 / ローディング / エラー〕の設計は TECH_DESIGN.md。WF は `generating-wireframes` スキルで生成)
 - 成功基準、スコープ外
 
 **読者**: ステークホルダー、PM、デザイナー、エンジニア
