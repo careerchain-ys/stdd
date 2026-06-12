@@ -16,7 +16,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 | `docs/common/REQUIREMENTS.md` | サービス概要・登場アクター・アプリ構成（プロジェクト全体のビジネス要件） |
 | `docs/common/ARCHITECTURE.md` | システム構成・リポジトリ構成・レイヤ規約・データモデル（プロジェクト全体の技術設計） |
 
-テンプレートは `packages/core/templates/common/REQUIREMENTS.md` / `ARCHITECTURE.md` を参照する。
+テンプレートは `../documenting-specifications/templates/requirements-common.md` / `architecture-common.md` を参照する。
 
 ## 位置づけ — 導入時に一度だけ
 
@@ -131,7 +131,7 @@ feature ティアと違い、確認する一次情報は **UI 文言ではなく
 
 ## 参照ファイル
 
-- **common テンプレート**: `packages/core/templates/common/REQUIREMENTS.md` / `ARCHITECTURE.md`
+- **common テンプレート**: `../documenting-specifications/templates/requirements-common.md` / `architecture-common.md`
 - **2 ティア構造の解説**: `packages/core/docs/stdd-methodology.md` §2.0
 - **機能単位リバース**: [reverse-engineering-feature-spec skill](../reverse-engineering-feature-spec/SKILL.md)
 - **Specテンプレート**: [documenting-specifications skill](../documenting-specifications/SKILL.md)

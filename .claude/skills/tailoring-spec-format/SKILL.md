@@ -38,7 +38,7 @@ STDD 導入（既存プロジェクト, step 3-4）・立ち上げ（新規プ�
 □ docs/common/REQUIREMENTS.md / ARCHITECTURE.md（common ティアの構成）
 □ 代表 feature spec（REQUIREMENTS.md / TECH_DESIGN.md）の実物
 □ 現在の .stdd.config.yml（docs.layout / apps / commands）
-□ 利用中のテンプレ（packages/core/templates/ または プロジェクト側コピー）
+□ 利用中のテンプレ（`.claude/skills/documenting-specifications/templates/` または プロジェクト側コピー）
 □ (step 7 のみ) 運用中の全 feature spec のばらつき・過不足
 ```
 
@@ -62,7 +62,7 @@ PLAN が無い文脈（ブラッシュアップ単体実行など）では、プ
 
 ### 4. テンプレ・設定へ反映（機械的）
 
-決定に従って、**プロジェクト側**の成果物を更新する（STDD core の `packages/core/templates/` 本体は壊さない）。
+決定に従って、**プロジェクト側**の成果物を更新する（STDD core の `.claude/skills/*/templates/` 本体は壊さない）。
 
 ```
 □ .stdd.config.yml の docs.layout を更新（必要なら common_* を追加/変更）
@@ -81,7 +81,7 @@ PLAN が無い文脈（ブラッシュアップ単体実行など）では、プ
 
 - **決定は人間**。skill は選択肢提示・記録・反映に徹する。
 - 一度に全項目を片付けず、**決定ポイントごとに合意**を取る。
-- **STDD core テンプレ（`packages/core/templates/`）を直接編集しない**。反映先はプロジェクト側。
+- **STDD core テンプレ（`.claude/skills/*/templates/`）を直接編集しない**。反映先はプロジェクト側。
 - 決定は決定ログに集約し、spec 本体に経緯・「変更前/後」を書かない（SSOT）。
 
 ---
@@ -98,6 +98,6 @@ PLAN が無い文脈（ブラッシュアップ単体実行など）では、プ
 
 - **導入ガイド（なぜ/判断基準）**: [guide-for-existing-project.md](../../../packages/core/docs/guide-for-existing-project.md) §step 3-4
 - **導入ドライバー**: [introducing-stdd skill](../introducing-stdd/SKILL.md)
-- **spec テンプレ**: `packages/core/templates/`（feature） / `packages/core/templates/common/`（common）
+- **spec テンプレ**: `../documenting-specifications/templates/`（feature / common） / `../documenting-plans/templates/`（PLAN）
 - **spec 作成スキル**: [documenting-specifications skill](../documenting-specifications/SKILL.md)
 - **設定スキーマ**: `packages/core/schema/.stdd.config.schema.json`

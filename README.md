@@ -42,25 +42,6 @@ claude                        # ② Claude Code を起動
 進捗は `docs/common/plans/`（新規=`stdd-bootstrap.md` / 既存=`stdd-introduction.md`）に保持され、セッションを跨いで再開できます。
 新規 / 既存が明確な場合は、ルーターを介さず `starting-new-with-stdd` / `introducing-stdd` を直接指名しても構いません。
 
-<details>
-<summary>手動セットアップ（CLI / スキルを使わず構成する場合の参考）</summary>
-
-1. リポジトリを取得: `git clone https://github.com/careerchain-ys/stdd.git`
-2. `.stdd.config.yml` を作成（`packages/core/README.md` の「最小構成例」を調整）。
-3. テンプレートをコピー:
-
-   ```bash
-   mkdir -p docs/<app>/<feature_path>
-   cp stdd/packages/core/templates/REQUIREMENTS.md docs/<app>/<feature_path>/
-   cp stdd/packages/core/templates/TECH_DESIGN.md  docs/<app>/<feature_path>/
-   # 全体版（common ティア）を使う場合
-   mkdir -p docs/common && cp stdd/packages/core/templates/common/*.md docs/common/
-   ```
-
-4. `.claude/agents/` および `.claude/skills/` を配置（またはコピー）して Claude Code で実行。
-
-</details>
-
 ---
 
 ## ディレクトリ構成
@@ -72,9 +53,8 @@ stdd/
 ├── LICENSE                    # Apache License 2.0
 ├── NOTICE                     # 著作権表記
 ├── packages/
-│   ├── core/                  # 方法論ドキュメント / テンプレ / JSON Schema
+│   ├── core/                  # 方法論ドキュメント / JSON Schema
 │   │   ├── docs/              # methodology / 各導入ガイド / workflow-diagram
-│   │   ├── templates/         # REQUIREMENTS / TECH_DESIGN / PLAN / common
 │   │   └── schema/
 │   └── stdd/                  # 導入 CLI（npm パッケージ `@careerchain/stdd`）
 ├── templates/                 # 参照用プロジェクトテンプレート
@@ -86,7 +66,7 @@ stdd/
 │   └── worktree/              # git worktree + devcontainer 向け skill
 ├── .claude/                   # Claude Code 用ファイル群
 │   ├── agents/                # エージェント定義
-│   └── skills/                # core skill 群
+│   └── skills/                # core skill 群（spec / PLAN テンプレート同梱）
 └── docs/                      # 方針・オーサリング規約ドキュメント
 ```
 

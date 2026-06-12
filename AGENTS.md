@@ -66,7 +66,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 - **JSON**: インデント 2 スペース。`plugin.json` は各プラグインのメタデータ（`id` / `name` / `version` / `skills` / `description`）を記述する
 - **YAML**: インデント 2 スペース。`.stdd.config.yml` は kebab-case
 - **ファイル名**: skill / agent / plugin の ID は kebab-case
-- **Spec / PLAN ドキュメント**: `packages/core/templates/` 配下の構造を踏襲
+- **Spec / PLAN ドキュメント**: `.claude/skills/documenting-specifications/templates/` ・ `.claude/skills/documenting-plans/templates/` 配下の構造を踏襲
 
 詳細は `.claude/skills/documenting-specifications/SKILL.md` および `.claude/skills/documenting-plans/SKILL.md` を参照してください。
 
@@ -119,9 +119,9 @@ stdd 本体（ドキュメント・テンプレート）は監査スクリプト
 | --------------------- | ----------------------------------------------- |
 | 方法論ドキュメント    | `packages/core/docs/stdd-methodology.md`        |
 | 開発フロー図          | `packages/core/docs/workflow-diagram.md`        |
-| Spec テンプレート     | `packages/core/templates/REQUIREMENTS.md`       |
-| 技術設計テンプレート  | `packages/core/templates/TECH_DESIGN.md`        |
-| PLAN テンプレート     | `packages/core/templates/PLAN.md`               |
+| Spec テンプレート     | `.claude/skills/documenting-specifications/templates/`            |
+| 技術設計テンプレート  | `.claude/skills/documenting-specifications/templates/tech-design.md` |
+| PLAN テンプレート     | `.claude/skills/documenting-plans/templates/plan.md`             |
 | 設定 JSON Schema      | `packages/core/schema/.stdd.config.schema.json` |
 | core skill 群         | `.claude/skills/`                               |
 | エージェント定義      | `.claude/agents/`                               |
