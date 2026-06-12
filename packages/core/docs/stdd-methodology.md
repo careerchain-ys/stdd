@@ -50,7 +50,7 @@ Spec は **プロジェクト全体 (common ティア)** と **機能単位 (fea
 - **feature ティア**は、個々の機能のユーザージャーニーと技術設計・テスト戦略を記述する。common ティアを**下方参照**する側であり、common と矛盾しないこと。
 - 全体版の技術設計を `TECH_DESIGN.md` ではなく `ARCHITECTURE.md` と呼ぶのは、システム全体 (ARCHITECTURE) と機能単位 (TECH_DESIGN) を名前で区別するため。
 - 配置は `.stdd.config.yml` の `docs.layout.common_requirements` / `docs.layout.common_architecture` で設定する (任意。common ティアを使わないプロジェクトでは省略可)。
-- テンプレートは `packages/core/templates/common/REQUIREMENTS.md` / `ARCHITECTURE.md` を参照する。
+- テンプレートは `.claude/skills/documenting-specifications/templates/requirements-common.md` / `architecture-common.md` を参照する。
 
 以下 2.1〜2.3 は **feature ティア**の各ファイルの中身を述べる。
 
@@ -238,7 +238,7 @@ Red を確認する目的:
 - `workflow-diagram.md` — 各フローを Mermaid で図示
 - `guide-for-existing-project.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
 - `guide-for-new-project.md` — 新規プロジェクトの STDD 立ち上げ手順（最初から順行）
-- `../templates/REQUIREMENTS.md` — ビジネス要件テンプレ
-- `../templates/TECH_DESIGN.md` — 技術設計テンプレ
-- `../templates/PLAN.md` — 実装計画テンプレ
+- `.claude/skills/documenting-specifications/templates/requirements.md` — ビジネス要件テンプレ
+- `.claude/skills/documenting-specifications/templates/tech-design.md` — 技術設計テンプレ
+- `.claude/skills/documenting-plans/templates/plan.md` — 実装計画テンプレ
 - `../schema/.stdd.config.schema.json` — プロジェクト設定の JSON Schema
