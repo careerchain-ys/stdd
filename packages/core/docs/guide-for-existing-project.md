@@ -59,7 +59,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向（順行）。
 
 ### step 1: common spec のリバース
 
-- `reverse-engineering-common-spec` を実行し `docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md` を生成。
+- `reverse-engineering-common-spec` を実行し `docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md`（システム概要）+ `TABLE_DEFINITION.md`（テーブル定義）+ `API_SPEC.md`（API がある場合）を生成。
 - 出力の `<!-- 要確認 -->` は「人間に確認すべき項目」として後で潰す。
 
 ### step 1.5: 機能インベントリと優先順 ★
@@ -81,8 +81,8 @@ step 1・2 の実物を見ながら、このプロジェクト固有の spec フ
 **テーラリング・チェックリスト**:
 
 ```
-□ 必須/任意の spec ファイルを決める（REQUIREMENTS / TECH_DESIGN / SCREEN_ITEMS_DEFINITION / wireframes）
-□ common ARCHITECTURE にプロジェクト固有セクションを足すか（認証・認可 / RLS / 通知 / 権限境界 等）
+□ 必須/任意の spec ファイルを決める（feature 必須: REQUIREMENTS / TECH_DESIGN / TEST_PLAN、任意: wireframes。common: REQUIREMENTS / ARCHITECTURE / TABLE_DEFINITION / API_SPEC / DESIGN(任意)。画面項目定義は TECH_DESIGN のセクション）
+□ common ARCHITECTURE（システム概要）にプロジェクト固有セクションを足すか（認証・認可 / RLS / 通知 / 権限境界 等）。データモデルは TABLE_DEFINITION、API 契約は API_SPEC に分離
 □ docs.layout のパス規約を確定（単一/複数アプリ、feature_path の切り方）
 □ Priority(P0/P1/P2) 基準をこのプロジェクトのビジネス優先度に合わせて言語化
 □ テスト層の責務分担（E2E は P0 のみ 等）を既存テスト資産に合わせて調整

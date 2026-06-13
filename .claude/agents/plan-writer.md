@@ -22,7 +22,7 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）を読み取り、�
 ## あなたの責務
 
 1. **スコープ確認**: REQUIREMENTS.mdのどの範囲（P0/P1/P2）を実装するか判断
-2. **タスク分解**: TECH_DESIGN.mdのTest Strategyに基づき、テスト→実装の順序でタスクを分解
+2. **タスク分解**: TEST_PLAN.mdのテスト戦略に基づき、テスト→実装の順序でタスクを分解
 3. **ファイル構成**: 作成・変更するファイル一覧を明確化（新規/既存修正/既存維持を区別）
 4. **実装詳細**: 各ファイルの実装方針を簡潔に記載
 
@@ -33,20 +33,20 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）を読み取り、�
 以下を必ず読み込む:
 
 - `REQUIREMENTS.md` - 業務要件・機能要件（ユースケース：振る舞い＋受入基準）・Priority
-- `TECH_DESIGN.md` - 技術設計・Test Strategy
-- `SCREEN_ITEMS_DEFINITION.md` - 画面項目定義（存在する場合）
+- `TECH_DESIGN.md` - 技術設計（画面 feature では画面項目定義セクションを含む）
+- `TEST_PLAN.md` - テスト戦略（ユースケース別テストマッピング・テスト総数と内訳）
 
 ### Step 2: 実装スコープの決定
 
 auto-implementでの実行モードに応じてスコープを決定:
 
 - `full`: 全P0 + P1を対象、P2は任意
-- `impl-only`: TECH_DESIGN.mdのTest Strategyに基づき全範囲
+- `impl-only`: TEST_PLAN.mdのテスト戦略に基づき全範囲
 - `quick`: 最小限のスコープ
 
 ### Step 3: タスク分解
 
-TECH_DESIGN.mdのTest Strategyに従い、以下の順序でタスクを作成:
+TEST_PLAN.mdのテスト戦略に従い、以下の順序でタスクを作成:
 
 1. **Specドキュメント更新**（既存機能の場合のみ）
 2. **テスト作成（Red状態）**: Unit → Integration → E2E
@@ -111,7 +111,7 @@ PLANドキュメントのテンプレートは以下を参照:
 
 ## 品質基準
 
-- TECH_DESIGN.mdのTest Strategyに記載された全テストケースがタスクとしてカバーされていること
+- TEST_PLAN.mdのテスト戦略に記載された全テストケースがタスクとしてカバーされていること
 - テスト→実装の順序が守られていること
 - ファイル構成がCLAUDE.mdの規約に沿っていること（フォルダ構成、Zodスキーマ配置等）
 - タスクの粒度が実装可能な単位であること

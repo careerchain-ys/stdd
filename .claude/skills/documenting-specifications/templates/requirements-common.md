@@ -98,6 +98,7 @@ common は全体横断のため、前段に「サービス概要 / 登場アク�
 ## 記述しない内容（責務分界）
 
 - 機能個別の詳細要件（ユースケース・受入基準・指標）→ 各 feature の **REQUIREMENTS.md**
-- システム構成図・データモデル・レイヤ規約・技術スタック詳細 → common の **ARCHITECTURE.md**
+- システム構成図・レイヤ規約・技術スタック詳細 → common の **ARCHITECTURE.md**
+- テーブル定義 → common の **TABLE_DEFINITION.md** ／ API 仕様 → common の **API_SPEC.md**
 - E2E テストの実装詳細 → テストコード
 - 履歴・経緯・version（SSOT 原則）

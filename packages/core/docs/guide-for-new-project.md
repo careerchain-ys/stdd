@@ -67,7 +67,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 
 ### step 3: common ティアの前方設計 ★
 
-- `docs/common/REQUIREMENTS.md`（サービス目的・登場アクター・アプリ構成）と `ARCHITECTURE.md`（システム構成・レイヤ規約・初期データモデル）を人間と起こす。step 1 のコンセプトを起点にする。
+- `docs/common/REQUIREMENTS.md`（サービス目的・登場アクター・アプリ構成）と `ARCHITECTURE.md`（システム概要：システム構成・レイヤ規約）を人間と起こす。データモデルは `TABLE_DEFINITION.md`、API 契約は `API_SPEC.md`（API がある場合）に分けて起こす。step 1 のコンセプトを起点にする。
 - **前方設計ゆえ「実装が真実」は効かない**。確定し切らない部分は**仮説**として置き、feature 開発で検証して更新する前提で書く（過度に作り込まない）。
 
 ### step 4: 最初の feature

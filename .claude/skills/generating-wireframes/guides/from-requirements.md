@@ -41,9 +41,9 @@ P0 / P1 のユースケースで、受入基準（EARS）の「エラー時（IF
 | ステータス管理（カンバン） | `wf-kanban--3` + `wf-kanban__col` + `wf-card` |
 | 確認 / 申込ダイアログ | `wf-modal`（`wf-modal__head/body/foot`） |
 
-## 4. 文言は SCREEN_ITEMS_DEFINITION.md / REQUIREMENTS.md から取る
+## 4. 文言は TECH_DESIGN.md の画面項目定義 / REQUIREMENTS.md から取る
 
-- フォーム項目名・必須/任意・選択肢は `SCREEN_ITEMS_DEFINITION.md` があればそれが出所（なければ REQUIREMENTS.md の表示要素から）。
+- フォーム項目名・必須/任意・選択肢は `TECH_DESIGN.md` の画面項目定義セクション（画面 feature にあれば）が出所（なければ REQUIREMENTS.md の表示要素から）。
 - ボタン文言・タブ名・空状態メッセージは REQUIREMENTS.md のユースケース（振る舞い / 受入基準）から拾う。
 - **想像で増やさない**。Spec にない項目・ボタンを WF に足すと、WF が Spec を上書きしてしまい SSOT が壊れる。足したくなったら先に REQUIREMENTS.md を更新する。
 

@@ -39,18 +39,18 @@ REQUIREMENTS.md (What & Why)
 ### 2.0 Spec の 2 ティア構造 (common / feature)
 
 Spec は **プロジェクト全体 (common ティア)** と **機能単位 (feature ティア)** の 2 つの高度を持つ。
-どちらも「What/Why = REQUIREMENTS」「How = 技術設計」という同じ二項構造を、異なる高度で繰り返す。
+横断要素 (テーブル定義・API 仕様) は common に集約し、feature はそれを参照する。
 
-| ティア      | What / Why                | How                          | 配置例                                                    |
-| ----------- | ------------------------- | ---------------------------- | --------------------------------------------------------- |
-| **common**  | `REQUIREMENTS.md` (全体版) | `ARCHITECTURE.md` (全体版)    | `docs/common/REQUIREMENTS.md` / `ARCHITECTURE.md`         |
-| **feature** | `REQUIREMENTS.md`         | `TECH_DESIGN.md`             | `docs/<app>/<feature>/REQUIREMENTS.md` / `TECH_DESIGN.md` |
+| ティア      | ドキュメント | 配置例 |
+| ----------- | --- | --- |
+| **common**  | `REQUIREMENTS.md`（業務要件）/ `ARCHITECTURE.md`（システム概要）/ `TABLE_DEFINITION.md`（テーブル定義）/ `API_SPEC.md`（API 仕様）/ `DESIGN.md`（任意） | `docs/common/` |
+| **feature** | `REQUIREMENTS.md` / `TECH_DESIGN.md` / `TEST_PLAN.md` | `docs/<app>/<feature>/` |
 
-- **common ティア**は、サービスの目的・登場アクター・アプリ構成 (REQUIREMENTS) と、システム構成・リポジトリ構成・レイヤ規約・データモデル (ARCHITECTURE) を俯瞰する正典。複数 feature が前提とする横断的な文脈を一箇所に集約する。
-- **feature ティア**は、個々の機能のユーザージャーニーと技術設計・テスト戦略を記述する。common ティアを**下方参照**する側であり、common と矛盾しないこと。
-- 全体版の技術設計を `TECH_DESIGN.md` ではなく `ARCHITECTURE.md` と呼ぶのは、システム全体 (ARCHITECTURE) と機能単位 (TECH_DESIGN) を名前で区別するため。
-- 配置は `.stdd.config.yml` の `docs.layout.common_requirements` / `docs.layout.common_architecture` で設定する (任意。common ティアを使わないプロジェクトでは省略可)。
-- テンプレートは `.claude/skills/documenting-specifications/templates/requirements-common.md` / `architecture-common.md` を参照する。
+- **common ティア**は、サービスの目的・アクター・アプリ構成 (REQUIREMENTS)、システム概要＝構成・スタック・連携・セキュリティ・インフラ (ARCHITECTURE)、全テーブル定義 (TABLE_DEFINITION)、API 契約 (API_SPEC) を俯瞰する正典。複数 feature が前提とする横断的な文脈を一箇所に集約する。
+- **feature ティア**は、個々の機能の要件 (REQUIREMENTS)・技術設計 (TECH_DESIGN)・テスト戦略 (TEST_PLAN) を記述する。common ティアを**下方参照**する側であり、テーブル・API を再定義せず common と矛盾しないこと。
+- 全体版の技術設計を `TECH_DESIGN.md` ではなく `ARCHITECTURE.md` と呼ぶのは、システム全体 (ARCHITECTURE) と機能単位 (TECH_DESIGN) を名前で区別するため。データモデル・API は ARCHITECTURE から `TABLE_DEFINITION.md` / `API_SPEC.md` に分離する。
+- 配置は `.stdd.config.yml` の `docs.layout.common_*` で設定する (任意。common ティアを使わないプロジェクトでは省略可)。
+- テンプレートは `.claude/skills/documenting-specifications/templates/`（`requirements-common.md` / `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）を参照する。
 
 以下 2.1〜2.3 は **feature ティア**の各ファイルの中身を述べる。
 
@@ -59,31 +59,39 @@ Spec は **プロジェクト全体 (common ティア)** と **機能単位 (fea
 - 解決する問題、対象ユーザー、ビジネス目標
 - すべての User Journey (正常系、エラーケース、エッジケース)
 - 各 Journey に Priority (P0 / P1 / P2) を付与
-- UI / UX デザイン (HTML ワイヤーフレームへのリンク、表示要素、空状態 / エラー状態。WF は `generating-wireframes` スキルで生成)
+- UI / UX デザイン (HTML ワイヤーフレームへのリンク、表示要素。画面状態〔通常 / 空 / ローディング / エラー〕の設計は TECH_DESIGN.md。WF は `generating-wireframes` スキルで生成)
 - 成功基準、スコープ外
 
 **読者**: ステークホルダー、PM、デザイナー、エンジニア
 
 ### 2.2 TECH_DESIGN.md (技術設計 / 内部仕様)
 
-- 機能固有のアーキテクチャとデータフロー
-- 主要な設計判断 (選択 + 理由)
-- データモデル (ER 図 / 型定義 / バリデーションルール)
-- API 設計 (エンドポイント / Request-Response 型 / ビジネスロジック概要)
-- **Test Strategy**: REQUIREMENTS.md の全 Journey を E2E / Integration / Unit のどれでカバーするかの対応表
-- エラーハンドリング戦略 (エラーコード、HTTP ステータス、実装方針)
-- セキュリティ要件、パフォーマンス要件
-- Integration Points (外部システム / 他機能との統合点)
+章構成: 概要 / 主要な設計判断（任意）/ 画面項目定義（画面 feature は必須）/ ロジック設計（コア）/ エラーハンドリング戦略 / 非機能要件（任意）。
+
+- **概要**: 機能の目的・スコープ・参照する common テーブル/API
+- **主要な設計判断** (選択 + 理由): この機能特有の判断のみ
+- **画面項目定義**: UI × バリデーション × DB マッピング（DB カラムは `TABLE_DEFINITION.md` を参照）
+- **ロジック設計**: 集計式・変換・ドメインルール・トランザクション境界・複数テーブル横断の流れ（手順 / 擬似コード）
+- **エラーハンドリング戦略**: API / 処理の失敗を本機能がどう捌くか
+- **非機能要件**: REQUIREMENTS に記載がある場合のみ実現方法
+
+データ構造は `TABLE_DEFINITION.md`、API 契約は `API_SPEC.md` を**参照**（再定義しない）。テスト戦略は `TEST_PLAN.md` に分離する。
 
 **読者**: エンジニア、AI エージェント、アーキテクト
 
-### 2.2.1 REQUIREMENTS.md と TECH_DESIGN.md の違い
+### 2.2.1 TEST_PLAN.md (テスト戦略)
+
+- REQUIREMENTS.md の全ユースケースを E2E / Integration / Unit のどれでカバーするかの対応表（根拠つき）
+- TECH_DESIGN.md ロジック設計の「その他処理フロー」がある場合、それも対応表でカバー
+- テスト総数と内訳
+
+### 2.2.2 REQUIREMENTS.md と TECH_DESIGN.md の違い
 
 | 項目     | REQUIREMENTS.md                  | TECH_DESIGN.md                                          |
 | -------- | -------------------------------- | ------------------------------------------------------- |
 | **視点** | ユーザー視点 (What & Why)        | 技術視点 (How)                                          |
 | **読者** | ステークホルダー、PM、デザイナー | エンジニア、アーキテクト、AI エージェント               |
-| **内容** | ユーザージャーニー、ビジネス目標 | アーキテクチャ、API 設計、内部仕様、仕様とテストの対応 |
+| **内容** | ユーザージャーニー、ビジネス目標 | 画面項目・ロジック設計・エラーハンドリング・非機能要件 |
 
 ### 2.3 含めないもの (両方)
 
@@ -149,7 +157,7 @@ P0 のフローのみ E2E で守り、それ以外は Integration / Unit に役�
         ↓
 3. ステークホルダーレビュー
         ↓
-4. TECH_DESIGN.md 作成 (アーキテクチャ + Test Strategy)
+4. TECH_DESIGN.md 作成 (ロジック設計等) + TEST_PLAN.md 作成 (Test Strategy)
         ↓
 5. アーキテクトレビュー
         ↓
@@ -175,7 +183,7 @@ P0 のフローのみ E2E で守り、それ以外は Integration / Unit に役�
         ↓
 3. ステークホルダーレビュー
         ↓
-4. TECH_DESIGN.md 更新 (Test Strategy 反映)
+4. TECH_DESIGN.md / TEST_PLAN.md 更新 (テーブル・API 変更は common にも反映)
         ↓
 5. アーキテクトレビュー
         ↓
@@ -226,7 +234,7 @@ Red を確認する目的:
 1. **仕様レビューを最優先する**。実装前に Spec を凍結し、後工程の手戻りを最小化する
 2. **E2E は P0 のみ**。安易に増やさない (4.3 参照)
 3. **エラーケースも Journey として記述する** (4.4 参照)
-4. **Test Strategy を TECH_DESIGN.md で明示する**。各 Journey にどのテストレベルを充てるか、その理由とともに表で示す
+4. **Test Strategy を TEST_PLAN.md で明示する**。各ユースケースにどのテストレベルを充てるか、その理由とともに表で示す
 5. **ドキュメントは実装ディレクトリに対応させる**。`docs.layout` で定義したパターンに従い、機械的に対応関係を保つ
 6. **セッション開始時にスコープを確認する**。大きな機能は複数 PLAN に分割する
 7. **Spec に進捗ステータスを書かない**。"実装済み" "対応中" のような時系列情報は PLAN とコミット履歴に任せる
@@ -238,7 +246,6 @@ Red を確認する目的:
 - `workflow-diagram.md` — 各フローを Mermaid で図示
 - `guide-for-existing-project.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
 - `guide-for-new-project.md` — 新規プロジェクトの STDD 立ち上げ手順（最初から順行）
-- `.claude/skills/documenting-specifications/templates/requirements.md` — ビジネス要件テンプレ
-- `.claude/skills/documenting-specifications/templates/tech-design.md` — 技術設計テンプレ
+- `.claude/skills/documenting-specifications/templates/` — spec テンプレ（feature: `requirements.md` / `tech-design.md` / `test-plan.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `requirements-common.md` / `design-common.md`）
 - `.claude/skills/documenting-plans/templates/plan.md` — 実装計画テンプレ
 - `../schema/.stdd.config.schema.json` — プロジェクト設定の JSON Schema

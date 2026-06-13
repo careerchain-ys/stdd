@@ -14,18 +14,13 @@ packages/core/
 ├── docs/
 │   ├── stdd-methodology.md       # STDD とは / なぜ TDD でなく STDD か / 開発フロー
 │   └── workflow-diagram.md       # 各フローを Mermaid で図示
-├── templates/
-│   ├── REQUIREMENTS.md           # ビジネス要件テンプレ (コピーして使用)
-│   ├── TECH_DESIGN.md            # 技術設計テンプレ (コピーして使用)
-│   ├── SCREEN_ITEMS_DEFINITION.md # 画面項目定義テンプレ (オプション / コピーして使用)
-│   ├── PLAN.md                   # 実装計画テンプレ (コピーして使用)
-│   └── common/                   # common ティア (プロジェクト全体) テンプレ
-│       ├── REQUIREMENTS.md       # サービス全体のビジネス要件
-│       └── ARCHITECTURE.md       # サービス全体の技術設計
 ├── schema/
 │   └── .stdd.config.schema.json  # .stdd.config.yml の JSON Schema (Draft 2020-12)
 └── README.md                     # 本ファイル
 ```
+
+> spec / PLAN テンプレートは `.claude/skills/documenting-specifications/templates/`（spec 各種）と
+> `.claude/skills/documenting-plans/templates/`（PLAN）に集約されている。
 
 ---
 
@@ -34,7 +29,7 @@ packages/core/
 1. `docs/stdd-methodology.md` を読んで STDD の全体像を掴む
 2. `docs/workflow-diagram.md` でフローを視覚的に把握する
 3. 自プロジェクトに `.stdd.config.yml` を作成し、`schema/.stdd.config.schema.json` で IDE 補完 / 検証を有効化する
-4. `templates/` を実機能のディレクトリにコピーして書き始める
+4. `documenting-specifications` スキルのテンプレート（`.claude/skills/documenting-specifications/templates/`）を参照して spec を書き始める
 
 ---
 

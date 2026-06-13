@@ -93,7 +93,7 @@ GitHub Projectのステータス更新の手順は [references/github-project.md
 
 ```
 Team Lead（オーケストレーター）      ← このスキル自身
- ├→ Spec Writer          : REQUIREMENTS.md + TECH_DESIGN.md 作成
+ ├→ Spec Writer          : REQUIREMENTS.md + TECH_DESIGN.md + TEST_PLAN.md 作成
  ├→ Spec Reviewer        : Spec の品質・整合性・漏れをレビュー
  ├→ Plan Writer          : タスク分解・実装計画（PLANドキュメント）を作成
  ├→ Implementer          : テスト作成 → 実装（STDDフロー）

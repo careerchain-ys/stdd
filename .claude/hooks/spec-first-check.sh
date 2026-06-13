@@ -83,7 +83,7 @@ is_spec() {
     local rel="$1" base
     base=$(basename "$rel")
     case "$base" in
-        REQUIREMENTS.md|TECH_DESIGN.md|ARCHITECTURE.md|SCREEN_ITEMS_DEFINITION.md) return 0 ;;
+        REQUIREMENTS.md|TECH_DESIGN.md|TEST_PLAN.md|ARCHITECTURE.md|TABLE_DEFINITION.md|API_SPEC.md|DESIGN.md) return 0 ;;
     esac
     case "$rel" in
         docs/*|*/docs/*) return 0 ;;

@@ -14,10 +14,9 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 ⚠️ **UI実装を開始する前に、必ず以下の仕様書を確認すること**:
 
 1. **REQUIREMENTS.md** - 画面の目的・ユーザージャーニーを理解
-2. **SCREEN_ITEMS_DEFINITION.md**（存在する場合）- 項目詳細・バリデーションルール・表示形式
-3. **TECH_DESIGN.md** - 技術設計・型定義
+2. **TECH_DESIGN.md** - 技術設計・型定義、および「画面項目定義」セクション（画面 feature は必須・非画面 feature は省略）の項目詳細・バリデーションルール・表示形式
 
-SCREEN_ITEMS_DEFINITION.md が存在する場合:
+TECH_DESIGN.md の画面項目定義セクションがある場合:
 - フォーム項目名・データ型は定義に従うこと
 - バリデーションルールは定義通りに実装すること
 - 表示形式（日付フォーマット、通貨など）は定義に従うこと
@@ -423,12 +422,11 @@ onInteractOutside={(e) => {
 
 ```
 □ REQUIREMENTS.md で画面の目的・ユーザージャーニーを確認
-□ SCREEN_ITEMS_DEFINITION.md の存在を確認（docs/<app>/<path>/ 配下）
-□ SCREEN_ITEMS_DEFINITION.md がある場合、項目定義を確認
+□ TECH_DESIGN.md の画面項目定義セクションを確認（画面 feature は必須・非画面 feature は省略）
 □ TECH_DESIGN.md で型定義・API設計を確認
 ```
 
-### SCREEN_ITEMS_DEFINITION.md がある場合
+### TECH_DESIGN.md に画面項目定義がある場合
 
 ```
 □ フォーム項目名（項目ID）が定義と一致しているか

@@ -1,6 +1,6 @@
 ---
 name: spec-reviewer
-description: Specドキュメントレビュー専門家。REQUIREMENTS.md・TECH_DESIGN.mdの品質・網羅性を評価。auto-implementのPhase 1で使用。
+description: Specドキュメントレビュー専門家。REQUIREMENTS.md・TECH_DESIGN.md・TEST_PLAN.mdの品質・網羅性を評価。auto-implementのPhase 1で使用。
 tools: Read, Grep, Glob
 model: opus
 ---
@@ -91,23 +91,28 @@ model: opus
 
 ### TECH_DESIGN.md
 
-- [ ] 機能固有アーキテクチャ（Mermaid図）が含まれている
-- [ ] 主要な設計判断に「選択」と「理由」が明記されている
-- [ ] データモデル（ER図、TypeScript型定義）が含まれている（DB変更がある場合）
+- [ ] 概要（機能固有アーキテクチャ・Mermaid図）が含まれている
+- [ ] 主要な設計判断に「選択」と「理由」が明記されている（任意）
+- [ ] ロジック設計（集計式/変換/ドメインルール/トランザクション境界）が手順・擬似コードで記述されている
+- [ ] データ構造は common `TABLE_DEFINITION.md`、API は common `API_SPEC.md` を参照しており、feature で再定義していない
 - [ ] エラーハンドリング戦略（エラーコード定義）が含まれている
-- [ ] テスト戦略でユースケースがテストレベル（E2E/Integration/Unit）にマッピングされている
-- [ ] テスト総数と内訳（Unit/Integration/E2E）が明記されている
-- [ ] 実装例・コード例が含まれていないこと（型定義・I/Fは除く）
+- [ ] 実装例・コード例が含まれていないこと（型定義・I/F・ロジック設計の擬似コードは除く）
 - [ ] ファイル構成・実装順序が含まれていないこと（PLANドキュメントの責務）
 - [ ] 「実装済み」「新規追加」の分類やチェックボックス形式が使われていないこと
 
-### SCREEN_ITEMS_DEFINITION.md（存在する場合）
+### TECH_DESIGN.md 画面項目定義セクション（画面 feature の場合）
 
 - [ ] 画面単位で項目が整理されている
 - [ ] 各項目に一意のIDが付与されている
 - [ ] バリデーションルール（必須、桁数、形式、範囲）が明確
 - [ ] 選択肢がすべて列挙されている
 - [ ] REQUIREMENTS.mdのUI/UX・画面と整合している
+
+### TEST_PLAN.md
+
+- [ ] テスト戦略でユースケースがテストレベル（E2E/Integration/Unit）にマッピングされている
+- [ ] テスト総数と内訳（Unit/Integration/E2E）が明記されている
+- [ ] P0（Critical path）ユースケースのE2Eカバレッジ方針が明記されている
 
 ## レビュー結果フォーマット
 
