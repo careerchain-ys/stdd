@@ -44,7 +44,7 @@ cd e2e && npm run test
 
 2. **TECH_DESIGN.md ⇔ 実装**:
    - ファイル構成がTECH_DESIGN.mdと一致しているか
-   - 処理ロジック（集計式/変換/ドメインルール/トランザクション境界）が実装と一致しているか
+   - ロジック設計（集計式/変換/ドメインルール/トランザクション境界）が実装と一致しているか
    - API 契約は common `API_SPEC.md`、データ構造は common `TABLE_DEFINITION.md` と実装が一致しているか
 
 3. **TEST_PLAN.md ⇔ テスト**:

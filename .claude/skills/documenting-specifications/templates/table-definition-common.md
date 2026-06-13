@@ -13,8 +13,8 @@
 
 **含めない**:
 
-- インデックス / RLS / トリガ等の DB メタデータ詳細 → 必要なら各 feature の `TECH_DESIGN.md`（処理ロジック / 非機能要件）
-- 集計・変換などの処理ロジック → 各 feature の `TECH_DESIGN.md`（処理ロジック）
+- インデックス / RLS / トリガ等の DB メタデータ詳細 → 必要なら各 feature の `TECH_DESIGN.md`（ロジック設計 / 非機能要件）
+- 集計・変換などのロジック設計 → 各 feature の `TECH_DESIGN.md`（ロジック設計）
 - 実装の進捗・履歴（SSoT として常に最新のスキーマのみ保持する）
 
 ## 確度マーカーの運用
@@ -72,7 +72,7 @@
 
 ## 記述しない内容（責務分界）
 
-- 集計・変換・ドメインロジック → 各 feature の `TECH_DESIGN.md`（処理ロジック）
+- 集計・変換・ドメインロジック → 各 feature の `TECH_DESIGN.md`（ロジック設計）
 - 画面項目とのマッピング → 各 feature の `TECH_DESIGN.md`（画面項目定義）
 - インデックス / RLS / トリガ等の詳細 → 必要に応じて feature の `TECH_DESIGN.md`
 - 履歴・経緯・version（SSoT 原則）

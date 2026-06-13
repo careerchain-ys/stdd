@@ -43,7 +43,7 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
    docs/<app>/<path>/TECH_DESIGN.md
    ```
 
-   - 章構成: 概要 / 主要な設計判断（任意）/ 画面項目定義（画面 feature は必須）/ 処理ロジック（コア）/ エラーハンドリング戦略 / 非機能要件（任意）
+   - 章構成: 概要 / 主要な設計判断（任意）/ 画面項目定義（画面 feature は必須）/ ロジック設計（コア）/ エラーハンドリング戦略 / 非機能要件（任意）
    - データ構造は common の `TABLE_DEFINITION.md`、API は common の `API_SPEC.md` を**参照**（再定義しない）
    - [テンプレート](templates/tech-design.md) を参照
 
@@ -53,7 +53,7 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
    docs/<app>/<path>/TEST_PLAN.md
    ```
 
-   - テスト戦略（ユースケースを E2E/Integration/Unit にマッピング）・テストファイル構成を記述
+   - テスト戦略（REQUIREMENTS のユースケース＋ TECH_DESIGN のロジック設計を E2E/Integration/Unit にマッピング）
    - [テンプレート](templates/test-plan.md) を参照
 
 > 横断要素（テーブル定義・API 仕様）は common ティアに集約する。新規テーブル / API が生じたら common の
@@ -198,11 +198,11 @@ HTMLテンプレートは `lib/email/templates/` で管理。
 
 **目的**: 機能（画面単位）の技術設計。実装者が**ロジックを起こせる粒度**で記述する。
 
-**章構成**: 概要 / 主要な設計判断（任意）/ 画面項目定義（画面 feature は必須）/ 処理ロジック（コア）/ エラーハンドリング戦略 / 非機能要件（任意）
+**章構成**: 概要 / 主要な設計判断（任意）/ 画面項目定義（画面 feature は必須）/ ロジック設計（コア）/ エラーハンドリング戦略 / 非機能要件（任意）
 
 **記述する内容**:
 
-- **処理ロジック**: 集計式・変換・ドメインルール・トランザクション境界・副作用・複数テーブル横断の流れ（手順 / 擬似コード / 計算式）
+- **ロジック設計**: 集計式・変換・ドメインルール・トランザクション境界・副作用・複数テーブル横断の流れ（手順 / 擬似コード / 計算式）
 - **画面項目定義**: UI × バリデーション × DB マッピング（画面 feature のみ。DB カラムは TABLE_DEFINITION を参照）
 - **エラーハンドリング戦略**: API / 処理の失敗を本機能がどう捌くか
 - データ構造・API は common の `TABLE_DEFINITION.md` / `API_SPEC.md` を**参照**（再定義しない）
@@ -215,11 +215,12 @@ HTMLテンプレートは `lib/email/templates/` で管理。
 
 ### TEST_PLAN.md（テスト計画書）
 
-**目的**: 機能のテスト戦略。ユースケースをテストレベル（E2E / Integration / Unit）にマッピングし、テストファイル構成を定義する。
+**目的**: 機能のテスト戦略。**REQUIREMENTS のユースケース**と **TECH_DESIGN のロジック設計（その他処理フロー）**の両方をテストレベル（E2E / Integration / Unit）に漏れなくマッピングする。
 
 **記述する内容**:
 
-- ユースケース別テスト戦略（テストレベル × 根拠）
+- §1 ユースケース別テスト戦略（REQUIREMENTS §2.1 の全ユースケース × テストレベル × 根拠）
+- §2 その他処理フロー別テスト戦略（TECH_DESIGN §4.2 がある場合）
 - **テスト総数と内訳**（例: 合計 33 件 - Unit 18 件, Integration 9 件, E2E 6 件）
 
 ### common ティアの技術ドキュメント
@@ -250,7 +251,7 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）の作成・レビ�
 
 - **テンプレート（feature）**
   - [REQUIREMENTS.md](templates/requirements.md)
-  - [TECH_DESIGN.md](templates/tech-design.md) ← 概要 / 設計判断 / 画面項目定義 / 処理ロジック / エラーハンドリング / 非機能要件
+  - [TECH_DESIGN.md](templates/tech-design.md) ← 概要 / 設計判断 / 画面項目定義 / ロジック設計 / エラーハンドリング / 非機能要件
   - [TEST_PLAN.md](templates/test-plan.md) ← テスト戦略
 - **テンプレート（common）**
   - [REQUIREMENTS.md](templates/requirements-common.md)
@@ -295,11 +296,11 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）の作成・レビ�
 ### TECH_DESIGN.md 作成時
 
 ```
-□ 1. 概要（目的・スコープ・参照する common テーブル/API）＋ 1.1 対応ユースケース表
+□ 1. 概要（目的・スコープ）＋ 1.1 対応ユースケース表 ＋ 1.2 使用 API（API を持つ機能）
 □ REQUIREMENTS の全ユースケースが §1.1 対応表に載り、設計（§3/§4）に紐づいている（設計漏れなし）
 □ 2. 主要な設計判断 - この機能特有の判断のみ（無ければ章ごと省略）
 □ 3. 画面項目定義 - 画面 feature は必須（UI × バリデーション × DB マッピング ＋ 画面状態〔通常/空/ローディング/エラー〕）。非画面は省略
-□ 4. 処理ロジック - 集計式・変換・ドメインルール・トランザクション境界（ユースケース単位・手順/擬似コード）
+□ 4. ロジック設計 - 4.1 ユースケース別ロジック（常に）＋ 4.2 その他処理フロー（機能固有ロジックがあれば）
 □ 5. エラーハンドリング戦略 - API/処理の失敗を本機能がどう捌くか
 □ 6. 非機能要件 - REQUIREMENTS に記載がある場合のみ実現方法（無ければ章ごと省略）
 □ テーブル・API を再定義していない（common の TABLE_DEFINITION / API_SPEC を参照）
@@ -309,11 +310,10 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）の作成・レビ�
 ### TEST_PLAN.md 作成時
 
 ```
-□ REQUIREMENTS §2.1 の全ユースケースが 1 行ずつ載っている（名前一致・漏れなし）
-□ ユースケース別テスト戦略（E2E/Integration/Unit × 根拠）
+□ §1: REQUIREMENTS §2.1 の全ユースケースが 1 行ずつ載っている（名前一致・漏れなし）
+□ §2: TECH_DESIGN §4.2 その他処理フローがある場合、全フローが 1 行ずつ載っている
 □ 振る舞い（手順）→E2E、受入基準（EARS）→Unit/Integration の対応で組まれている
 □ 各テストレベルの選択に根拠（Rationale）がある
-□ テストファイル構成（E2E/Integration/Unit の配置）
 □ REQUIREMENTS の Priority（P0/P1/P2）と対応している
 ```
 

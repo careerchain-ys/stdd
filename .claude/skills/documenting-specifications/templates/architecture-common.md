@@ -14,7 +14,7 @@
 | 1.1 システム構成概要 | 全体構成・特徴・リポジトリ構成・レイヤ規約 | 常に |
 | 1.2 使用技術スタック | フロント / バックエンド / テスト / CI・CD | 常に |
 | 1.3 システム間連携 | 主要連携・連携方針・外部連携 | 常に |
-| 1.4 データフロー概要 | 全体の代表フロー（認証 / 参照 / 更新 等） | 常に |
+| 1.4 データフロー | 代表的なリクエストの流れ 1 本（シーケンス図） | 常に |
 | 1.5 セキュリティ概要 | 認証・アクセス制御 / 通信 / データ保護 | 常に |
 | 1.6 インフラ構成概要 | ホスティング / 可用性 / 運用・監視 | 常に |
 
@@ -22,7 +22,7 @@
 
 - データモデル（テーブル・カラム定義）→ [`TABLE_DEFINITION.md`](./table-definition-common.md)
 - API 仕様（エンドポイント・契約）→ [`API_SPEC.md`](./api-spec-common.md)
-- 機能単位の処理ロジック・画面項目・テスト戦略 → 各 feature の `TECH_DESIGN.md` / `TEST_PLAN.md`
+- 機能単位のロジック設計・画面項目・テスト戦略 → 各 feature の `TECH_DESIGN.md` / `TEST_PLAN.md`
 - 実装の進捗・履歴・変更経緯（SSoT として常に最新の構成のみ保持する）
 
 **サービスの目的・アクター・業務要件**は同階層の [`REQUIREMENTS.md`](./requirements-common.md)（common）を参照する。
@@ -130,19 +130,28 @@ flowchart TB
 
 - [外部システム連携。なければ「現時点で未定義」]
 
-### 1.4 データフロー概要
+### 1.4 データフロー
 
-（代表的な横断フローを 1〜数本。機能個別のフローは各 feature の TECH_DESIGN に置く）
+（代表的なリクエストの流れを 1 本、シーケンス図で示す。機能個別のフローは各 feature の TECH_DESIGN に置く）
 
-**[認証フロー]**
+```mermaid
+sequenceDiagram
+    participant UI as UI
+    participant App as アプリケーション層
+    participant Svc as Service
+    participant Repo as Repository
+    participant DB as DB
 
-1. ...
-2. ...
-
-**[データ参照 / 更新フロー]**
-
-1. ...
-2. ...
+    UI->>App: 呼び出し
+    App->>App: 認証 / 入力チェック
+    App->>Svc: 実行
+    Svc->>Repo: ビジネスロジック
+    Repo->>DB: CRUD
+    DB-->>Repo: rows
+    Repo-->>Svc: Entity / Model
+    Svc-->>App: 結果
+    App-->>UI: レスポンス
+```
 
 ### 1.5 セキュリティ概要
 
@@ -174,6 +183,6 @@ flowchart TB
 - サービスの目的・アクター・ビジネス要件 → common の [`REQUIREMENTS.md`](./requirements-common.md)
 - テーブル・カラム定義 → common の [`TABLE_DEFINITION.md`](./table-definition-common.md)
 - API 契約 → common の [`API_SPEC.md`](./api-spec-common.md)
-- 機能個別の処理ロジック・画面項目・テスト → 各 feature の `TECH_DESIGN.md` / `TEST_PLAN.md`
-- 関数 / メソッドの具体実装コード（型定義 / I/F は可）
+- 機能個別のロジック設計・画面項目・テスト → 各 feature の `TECH_DESIGN.md` / `TEST_PLAN.md`
+- 関数 / メソッドの具体実装コード。特定の型定義は載せない（データ構造は `TABLE_DEFINITION.md`、I/F は `API_SPEC.md`）
 - 履歴・経緯・version（SSoT 原則）

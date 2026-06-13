@@ -62,7 +62,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
    ↓
 3. Playwright MCPでUIキャプチャ → Figmaファイル作成
    ↓
-4. TECH_DESIGN.md作成（処理ロジック中心の技術設計。データモデル/APIは common 参照）
+4. TECH_DESIGN.md作成（ロジック設計中心の技術設計。データモデル/APIは common 参照）
    ↓
 4.5 TEST_PLAN.md作成（テスト戦略）
    ↓
@@ -249,9 +249,9 @@ REQUIREMENTS.md作成後、Playwright MCPを使って実装済みUIのスクリ�
 
 ## Phase 4: TECH_DESIGN.md作成
 
-`documenting-specifications` skillのテンプレートに従って作成する。章構成は **1.概要 / 2.主要な設計判断(任意) / 3.画面項目定義(画面 feature のみ必須) / 4.処理ロジック(コア) / 5.エラーハンドリング戦略 / 6.非機能要件(任意)**。
+`documenting-specifications` skillのテンプレートに従って作成する。章構成は **1.概要 / 2.主要な設計判断(任意) / 3.画面項目定義(画面 feature のみ必須) / 4.ロジック設計(コア) / 5.エラーハンドリング戦略 / 6.非機能要件(任意)**。
 
-> **データモデル / API は common ティアが正典**。TECH_DESIGN にはデータモデルや ER 図、API 設計を持たず、common の `TABLE_DEFINITION.md` / `API_SPEC.md` を**参照**する。TECH_DESIGN のコアは処理ロジック。テスト戦略は別ファイル `TEST_PLAN.md`（Phase 4.5）。
+> **データモデル / API は common ティアが正典**。TECH_DESIGN にはデータモデルや ER 図、API 設計を持たず、common の `TABLE_DEFINITION.md` / `API_SPEC.md` を**参照**する。TECH_DESIGN のコアはロジック設計。テスト戦略は別ファイル `TEST_PLAN.md`（Phase 4.5）。
 
 ### リバースエンジニアリング固有のルール
 
@@ -288,7 +288,7 @@ const phoneSchema = z.string()
 //   - エラー: 「電話番号は10文字以上で入力してください」「数字とハイフンのみ入力可能です」
 ```
 
-**3. 処理ロジックは実装のフローを正確に反映する**
+**3. ロジック設計は実装のフローを正確に反映する**
 
 入力 → バリデーション → ビジネスロジック → 永続化 → 出力 の流れを、実装の Server Actions / service 層から正確に書き起こす。データモデル（テーブル・ER）は common の `TABLE_DEFINITION.md`、API 契約は common の `API_SPEC.md` を参照し、TECH_DESIGN では重複して持たない。
 
@@ -427,7 +427,7 @@ TEST_PLAN.mdのテスト戦略で定めたテストレベルに従って作成�
 ```
 □ 型定義はdomain/models配下から正確にコピーした
 □ バリデーションルールはschema.tsから正確に転記した
-□ 処理ロジック（入力→検証→ロジック→永続化→出力）を実装から書き起こした
+□ ロジック設計（入力→検証→ロジック→永続化→出力）を実装から書き起こした
 □ データモデル/ER/API は common の TABLE_DEFINITION.md / API_SPEC.md を参照（TECH_DESIGN に重複して持っていない）
 □ 画面 feature の場合、画面項目定義セクションを記載した
 □ 実装例・コード例が含まれていないことを確認した（型定義・I/Fは除く）

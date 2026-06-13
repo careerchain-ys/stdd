@@ -25,7 +25,7 @@
    - REQUIREMENTS.md「2.4 UI/UX・画面」から `./wireframes/index.html` にリンク
    - UI を持たない機能（バッチ・API のみ等）はスキップ
 4. `TECH_DESIGN.md` を作成:
-   - 技術設計方針（概要 / 主要な設計判断 / 処理ロジック / エラーハンドリング戦略）
+   - 技術設計方針（概要 / 主要な設計判断 / ロジック設計 / エラーハンドリング戦略）
    - 画面 feature では「画面項目定義」セクションを含める（非画面 feature は省略）
    - データ構造は common `TABLE_DEFINITION.md`、API は common `API_SPEC.md` を参照
 5. `TEST_PLAN.md` を作成（テスト戦略・テストケース一覧。feature 単位の独立ドキュメント）

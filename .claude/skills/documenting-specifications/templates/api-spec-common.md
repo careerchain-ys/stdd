@@ -13,7 +13,7 @@
 
 **含めない**:
 
-- 各操作の**処理アルゴリズム**（どう集計・計算するか）→ 各 feature の `TECH_DESIGN.md`（処理ロジック）
+- 各操作の**処理アルゴリズム**（どう集計・計算するか）→ 各 feature の `TECH_DESIGN.md`（ロジック設計）
 - クライアント側のエラーハンドリング方針 → 各 feature の `TECH_DESIGN.md`（エラーハンドリング戦略）
 - データ構造の定義 → [`TABLE_DEFINITION.md`](./table-definition-common.md)
 
@@ -23,7 +23,7 @@
 # [サービス名] API 仕様
 
 > API 入出力契約の正典（SSoT）。各機能の `TECH_DESIGN.md` は本書を参照する。
-> 処理アルゴリズムは各 feature の `TECH_DESIGN.md`（処理ロジック）に置く。
+> 処理アルゴリズムは各 feature の `TECH_DESIGN.md`（ロジック設計）に置く。
 >
 > **最終更新**: [yyyy-mm-dd] / **ベース URL**: [https://example.com/api] / **認証**: [Bearer / Cookie 等]
 
@@ -91,7 +91,7 @@
 
 ## 記述しない内容（責務分界）
 
-- 処理アルゴリズム・集計ロジック → 各 feature の `TECH_DESIGN.md`（処理ロジック）
+- 処理アルゴリズム・集計ロジック → 各 feature の `TECH_DESIGN.md`（ロジック設計）
 - クライアントのエラー UX（リトライ / トースト等）→ 各 feature の `TECH_DESIGN.md`（エラーハンドリング戦略）
 - データ構造 → `TABLE_DEFINITION.md`
 - 履歴・経緯・version（SSoT 原則）

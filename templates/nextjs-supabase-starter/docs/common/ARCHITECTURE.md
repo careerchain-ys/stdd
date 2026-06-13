@@ -107,18 +107,24 @@ flowchart TB
 
 - [外部システム連携。なければ「現時点で未定義」]
 
-### 1.4 データフロー概要
+### 1.4 データフロー
 
-**[認証フロー]**
+（代表的なリクエストの流れを 1 本、シーケンス図で示す。機能個別のフローは各 feature の TECH_DESIGN に置く）
 
-1. ユーザーが認証情報を入力 → Supabase Auth へ認証要求
-2. 成功 → セッショントークンを保持しアプリへ遷移 / 失敗 → エラー表示
-3. 認証ガードが各遷移でトークンを検証し、未認証はログインへリダイレクト
+```mermaid
+sequenceDiagram
+    participant UI as UI (Next.js)
+    participant Guard as 認証ガード
+    participant SB as Supabase (Auth / DB)
 
-**[データ参照 / 更新フロー]**
-
-1. 認証済みユーザーの操作で Supabase へクエリ発行（`deleted_at IS NULL` 等で絞り込み）
-2. 結果をクライアントで加工・表示
+    UI->>Guard: 画面遷移
+    Guard->>SB: セッション検証
+    SB-->>Guard: 有効 / 無効
+    Guard-->>UI: 未認証ならログインへリダイレクト
+    UI->>SB: データ取得クエリ（deleted_at IS NULL 等）
+    SB-->>UI: 結果（RLS 適用）
+    UI->>UI: 加工・表示
+```
 
 ### 1.5 セキュリティ概要
 
