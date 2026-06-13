@@ -47,7 +47,7 @@ docs/common/plans/stdd-introduction.md
 | step | 実行内容 | 呼ぶスキル | ★停止して確認 |
 | ---- | -------- | ---------- | ------------- |
 | 0 | `.stdd.config.yml` を対話的に作成（下記「step 0」詳細）/ テンプレ・skill 配置 | — | 構成（単一/複数アプリ・パス規約） |
-| 1 | common ティア生成 | `reverse-engineering-common-spec` | 生成後の `<!-- 要確認 -->` 一覧 |
+| 1 | common ティア生成 | `reverse-engineering-common-spec` | 生成後の**要確認マーカー**一覧 |
 | 1.5 | 機能インベントリ + 優先順 → 導入PLAN へ記載 | — | ★ 機能一覧と優先順（P0 から） |
 | 2 | 代表機能 1 つをリバース | `reverse-engineering-feature-spec` | ★ Spec 粒度・スコープ |
 | 3-4 | フォーマット策定 → テンプレ特化 | `tailoring-spec-format` | ★★ フォーマット決定（テーラリング） |
@@ -62,7 +62,7 @@ docs/common/plans/stdd-introduction.md
 
 1. **プロジェクト点検**: ディレクトリ構成・`package.json`・ルーティングをざっと把握。
 2. **step 0（対話的セットアップ）**: `.stdd.config.yml` が無ければ、下記「step 0」手順で 点検 → 草案 → 確認 → 書き込み を対話的に行う。
-3. **step 1 実行**: `reverse-engineering-common-spec` を呼び、common ティアを生成。`<!-- 要確認 -->` を一覧化して人間に提示。
+3. **step 1 実行**: `reverse-engineering-common-spec` を呼び、common ティアを生成。**要確認マーカー**（仮説つき）を一覧化して人間に提示。
 4. **step 1.5（★人間判断）**: ルーティング・主要ドメインから機能を洗い出し、**優先順をユーザーと合意**。
 5. **導入PLAN 生成**: `templates/introduction-plan.md` を雛形に `docs/common/plans/stdd-introduction.md` を作成し、機能を優先順で並べる。
 6. 「次は step 2（代表機能のリバース）」を提示して停止。
@@ -100,7 +100,7 @@ docs/common/plans/stdd-introduction.md
 
 ### 0-2. 草案を提示
 
-点検結果から `.stdd.config.yml` の草案を生成して提示する。先頭に `yaml-language-server` の schema ディレクティブを付ける。**推定できなかった項目は「要確認」として明示し、ユーザーに尋ねる**。
+点検結果から `.stdd.config.yml` の草案を生成して提示する。先頭に `yaml-language-server` の schema ディレクティブを付ける。**推定し切れない項目も空欄にせず、推定値（仮説）を入れた上でコメントに `# ⚠️要確認: …` を添えてユーザーに是非を尋ねる**（spec の[要確認マーカー](../documenting-specifications/SKILL.md)と同じ「仮説＋確認」の原則を config 草案にも適用）。
 
 ```yaml
 # yaml-language-server: $schema=<schema の URL または相対パス>
