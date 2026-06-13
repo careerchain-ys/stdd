@@ -96,7 +96,7 @@ stdd/
 
 ---
 
-## 現状の制約（v0.1.0 時点）
+## 現状の制約（v0.1.3 時点）
 
 - 公式に対応している AI エージェントは **Claude Code** のみです（`.claude/agents/` および `.claude/skills/` 配下のファイルがそのまま動作）。他エージェントは agents.md 標準に準拠した `AGENTS.md` を提供しているため随時対応を検討中です。
 - skill / agent / hook は `.stdd.config.yml` 駆動で動作します（`apps[].path` / `commands.*` / `project.primary_branch` 等を実行時に参照）。下流プロジェクト固有値のハードコードは除去済みです。記述規約は [`docs/config-driven-authoring.md`](docs/config-driven-authoring.md) を参照してください。
