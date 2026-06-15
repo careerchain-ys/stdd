@@ -1,6 +1,6 @@
 # ARCHITECTURE.md テンプレート（common）
 
-**目的**: プロジェクト全体のシステム概要を俯瞰する正典。STDD における common ティアの技術設計で、各 feature の `TECH_DESIGN.md` の上位ティアにあたる（システム全体 = ARCHITECTURE / 機能単位 = TECH_DESIGN）。
+**目的**: プロジェクト全体のシステム概要を俯瞰する SSoT。STDD における common 階層の技術設計で、各 feature の `TECH_DESIGN.md` の上位階層にあたる（システム全体 = ARCHITECTURE / 機能単位 = TECH_DESIGN）。
 
 **配置**: `docs/common/ARCHITECTURE.md`（`.stdd.config.yml` の `docs.layout.common_architecture` に従う）
 
@@ -29,7 +29,7 @@
 
 ## 確度マーカーの運用
 
-- 実装・ヒアリングから確信が持てない箇所は **要確認マーカー** を置く（リバース直後・前方設計時など）。必ず**仮説とセット**で `**⚠️要確認**｜仮説: … ／確認: …`（表・行内は `⚠️要確認(仮説: … / 確認: …)`）の形にし、ユーザーが是非を確定したら除去する。構文の正典は [documenting-specifications SKILL「要確認マーカー」](../SKILL.md) を参照。
+- 実装・ヒアリングから確信が持てない箇所は **要確認マーカー** を置く（リバース直後・前方設計時など）。必ず**仮説とセット**で `**⚠️要確認**｜仮説: … ／確認: …`（表・行内は `⚠️要確認(仮説: … / 確認: …)`）の形にし、ユーザーが是非を確定したら除去する。構文の SSoT は [documenting-specifications SKILL「要確認マーカー」](../SKILL.md) を参照。
 - 指標やデータの確からしさを区別する場合は `[可]`（直接算出可能）/ `[近似]`（代理母集団・近似指標）等のマークを併記する。
 
 ## テンプレート構造
@@ -39,7 +39,7 @@
 ````markdown
 # [サービス名] アーキテクチャ設計書
 
-> **位置づけ**: 本書は [サービス名] 全体のシステム概要を俯瞰する正典（common ティアの技術設計）。
+> **位置づけ**: 本書は [サービス名] 全体のシステム概要を俯瞰する SSoT（common 階層の技術設計）。
 > サービスの目的・アクターなどのビジネス要件は [`REQUIREMENTS.md`](./REQUIREMENTS.md) を参照。
 > データモデルは [`TABLE_DEFINITION.md`](./TABLE_DEFINITION.md)、API 仕様は [`API_SPEC.md`](./API_SPEC.md) を参照。
 > 機能・画面単位の技術設計は `docs/<app>/<feature>/TECH_DESIGN.md` を参照。

@@ -2,7 +2,7 @@
 共通 API_SPEC.md — STDD API 仕様ドキュメント (プロジェクト全体)
 
 位置づけ:
-  - API 入出力契約（パス / メソッド / パラメータ / リクエスト / レスポンス / エラー）の正典 (SSoT)。
+  - API 入出力契約（パス / メソッド / パラメータ / リクエスト / レスポンス / エラー）の SSoT。
   - 各 feature の TECH_DESIGN.md は本書を参照し、エンドポイントを再定義しない。
   - 処理アルゴリズム（どう集計・計算するか）は各 feature の TECH_DESIGN.md（ロジック設計）に置く。
 
@@ -14,7 +14,7 @@
 
 # [サービス名] API 仕様
 
-> API 入出力契約の正典（SSoT）。各機能の `TECH_DESIGN.md` は本書を参照する。
+> API 入出力契約の SSoT。各機能の `TECH_DESIGN.md` は本書を参照する。
 > 処理アルゴリズムは各 feature の `TECH_DESIGN.md`（ロジック設計）に置く。
 >
 > **最終更新**: [yyyy-mm-dd] / **ベース URL**: `/api` / **認証**: Supabase セッション（Cookie）

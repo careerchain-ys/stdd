@@ -1,6 +1,6 @@
 # TABLE_DEFINITION.md テンプレート（common）
 
-**目的**: プロジェクトの全テーブル定義を集約する正典（実装・DB 設計・QA の SSoT）。各 feature の `TECH_DESIGN.md` は本書を**参照**し、テーブル・カラムを再定義しない。
+**目的**: プロジェクトの全テーブル定義を集約する SSoT（実装・DB 設計・QA が参照する）。各 feature の `TECH_DESIGN.md` は本書を**参照**し、テーブル・カラムを再定義しない。
 
 **配置**: `docs/common/TABLE_DEFINITION.md`（`.stdd.config.yml` の `docs.layout.common_table_definition` に従う）
 
@@ -19,14 +19,14 @@
 
 ## 確度マーカーの運用
 
-- 確信が持てないカラム・型は、説明欄に **要確認マーカー** を仮説とセットで置く（`⚠️要確認(仮説: … / 確認: …)`）。ユーザーが是非を確定したら除去する。構文の正典は [documenting-specifications SKILL「要確認マーカー」](../SKILL.md) を参照。
+- 確信が持てないカラム・型は、説明欄に **要確認マーカー** を仮説とセットで置く（`⚠️要確認(仮説: … / 確認: …)`）。ユーザーが是非を確定したら除去する。構文の SSoT は [documenting-specifications SKILL「要確認マーカー」](../SKILL.md) を参照。
 
 ## テンプレート構造
 
 ````markdown
 # [サービス名] テーブル定義
 
-> 全テーブル定義の正典（SSoT）。各機能の `TECH_DESIGN.md` は本書を参照する。
+> 全テーブル定義の SSoT。各機能の `TECH_DESIGN.md` は本書を参照する。
 > 生成された型定義 / マイグレーションを正とし、本書はそれに追従する。
 >
 > **最終更新**: [yyyy-mm-dd]

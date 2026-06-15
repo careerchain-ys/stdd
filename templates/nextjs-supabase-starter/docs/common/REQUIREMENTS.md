@@ -3,8 +3,8 @@
 
 位置づけ:
   - 本ファイルは STDD の REQUIREMENTS.md の「全体版」。プロジェクト全体のビジネス要件を
-    俯瞰する正典 (SSoT) であり、feature 単位の REQUIREMENTS.md の上位ティアにあたる。
-  - 機能・ページ単位の要件は docs/<app>/<feature>/REQUIREMENTS.md を参照する (feature ティア)。
+    俯瞰する SSoT であり、feature 単位の REQUIREMENTS.md の上位階層にあたる。
+  - 機能・ページ単位の要件は docs/<app>/<feature>/REQUIREMENTS.md を参照する (feature 階層)。
   - プロジェクト全体の技術設計は ./ARCHITECTURE.md を参照する。
 
 目的:
@@ -27,7 +27,7 @@
 
 # [サービス名] 共通要件定義
 
-> **位置づけ**: 本ドキュメントは [サービス名] 全体のビジネス要件を俯瞰する正典である。STDD における `REQUIREMENTS.md` の全体版にあたる。
+> **位置づけ**: 本ドキュメントは [サービス名] 全体のビジネス要件を俯瞰する SSoT である。STDD における `REQUIREMENTS.md` の全体版にあたる。
 > システム構成やデータモデルなどの技術設計は [`ARCHITECTURE.md`](./ARCHITECTURE.md) を参照。
 > 機能・ページ単位の要件は `docs/<app>/<feature>/REQUIREMENTS.md` を参照。
 >

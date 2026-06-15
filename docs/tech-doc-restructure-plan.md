@@ -15,17 +15,17 @@
 
 ## 2. To-be ドキュメント・ラインナップ
 
-### 共通設計（common ティア）
+### 共通設計（common 階層）
 
 | ドキュメント | 状態 | 役割 |
 | --- | --- | --- |
 | `REQUIREMENTS.md` | 既存・不変 | 全体の業務 / 機能 / 非機能要件 |
 | `ARCHITECTURE.md` | 再編（命名維持） | システム概要に集約（データモデル・API は外出し） |
-| `TABLE_DEFINITION.md` | 新設 | 全テーブル定義の正典（feature から参照） |
-| `API_SPEC.md` | 新設 | API 仕様の正典（OpenAPI 風 Markdown、feature から参照） |
+| `TABLE_DEFINITION.md` | 新設 | 全テーブル定義の SSoT（feature から参照） |
+| `API_SPEC.md` | 新設 | API 仕様の SSoT（OpenAPI 風 Markdown、feature から参照） |
 | `DESIGN.md` | 新設・任意 | デザイン標準 |
 
-### 個別設計（feature ティア・画面単位）
+### 個別設計（feature 階層・画面単位）
 
 | ドキュメント | 状態 | 役割 |
 | --- | --- | --- |
@@ -96,7 +96,7 @@
 
 ## 4. 責務分界（重複防止の肝）
 
-| 対象 | 正典 |
+| 対象 | SSoT |
 | --- | --- |
 | データ構造（テーブル・カラム） | `TABLE_DEFINITION.md`（common） |
 | API 入出力契約・エラーコードカタログ | `API_SPEC.md`（common） |
@@ -165,7 +165,7 @@ Phase 3  スキル / エージェント層
   [x] auto-implement 系（テスト戦略 → TEST_PLAN）/ 6 agents / implementing-ui プラグイン / spec-first フック除外リスト
 
 Phase 4  方法論・ガイド層
-  [x] stdd-methodology.md（2 ティア構造・doc lineup・命名）
+  [x] stdd-methodology.md（2 階層構造・doc lineup・命名）
   [x] guides（new/existing）/ AGENTS.md / README（root/core）
 
 Phase 5  サンプル
