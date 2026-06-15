@@ -18,7 +18,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 | `docs/common/TABLE_DEFINITION.md` | 全テーブル定義の SSoT（カード形式・ER図なし） |
 | `docs/common/API_SPEC.md` | API 契約の SSoT（OpenAPI 風 Markdown。API がある場合） |
 
-テンプレートは `../documenting-specifications/templates/requirements-common.md` / `architecture-common.md` を参照する。
+このうち `ARCHITECTURE.md` / `TABLE_DEFINITION.md` / `API_SPEC.md` は技術 spec (tech_specs) の common 分にあたる（→ `stdd-methodology.md` §2）。テンプレートは `../documenting-specifications/templates/requirements-common.md` / `architecture-common.md` を参照する。
 
 ## 位置づけ — 導入時に一度だけ
 

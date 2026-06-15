@@ -130,22 +130,22 @@
             "common_architecture": {
               "type": "string",
               "minLength": 1,
-              "description": "Optional path template for the project-wide (common tier) ARCHITECTURE.md — the whole-service system overview (構成・スタック・連携・セキュリティ・インフラ). Data model and API are split into common_table_definition / common_api_spec. No app/feature variables apply. Example: 'docs/common/ARCHITECTURE.md'. Omit when the project does not use a common tier."
+              "description": "Optional path template for the project-wide (common tier) ARCHITECTURE.md — the whole-service system overview (構成・スタック・連携・セキュリティ・インフラ). Data model and API are split into common_table_definition / common_api_spec. Part of the technical specs (tech_specs). No app/feature variables apply. Example: 'docs/common/ARCHITECTURE.md'. Omit when the project does not use a common tier."
             },
             "common_table_definition": {
               "type": "string",
               "minLength": 1,
-              "description": "Optional path template for the project-wide (common tier) TABLE_DEFINITION.md — the single source of truth for all table/column definitions. Feature TECH_DESIGN.md references it instead of redefining schema. No app/feature variables apply. Example: 'docs/common/TABLE_DEFINITION.md'. Omit when the project does not use a common tier."
+              "description": "Optional path template for the project-wide (common tier) TABLE_DEFINITION.md — the single source of truth for all table/column definitions. Feature TECH_DESIGN.md references it instead of redefining schema. Part of the technical specs (tech_specs). No app/feature variables apply. Example: 'docs/common/TABLE_DEFINITION.md'. Omit when the project does not use a common tier."
             },
             "common_api_spec": {
               "type": "string",
               "minLength": 1,
-              "description": "Optional path template for the project-wide (common tier) API_SPEC.md — the single source of truth for API contracts (OpenAPI-style Markdown). Feature TECH_DESIGN.md references it. No app/feature variables apply. Example: 'docs/common/API_SPEC.md'. Omit for projects without a custom API (e.g. direct DB access)."
+              "description": "Optional path template for the project-wide (common tier) API_SPEC.md — the single source of truth for API contracts (OpenAPI-style Markdown). Feature TECH_DESIGN.md references it. Part of the technical specs (tech_specs). No app/feature variables apply. Example: 'docs/common/API_SPEC.md'. Omit for projects without a custom API (e.g. direct DB access)."
             },
             "common_design": {
               "type": "string",
               "minLength": 1,
-              "description": "Optional path template for the project-wide (common tier) DESIGN.md — design standards (tokens / component conventions / layout). No app/feature variables apply. Example: 'docs/common/DESIGN.md'. Omit when the project does not maintain design standards."
+              "description": "Optional path template for the project-wide (common tier) DESIGN.md — design standards (tokens / component conventions / layout). Part of the technical specs (tech_specs). No app/feature variables apply. Example: 'docs/common/DESIGN.md'. Omit when the project does not maintain design standards."
             },
             "requirements": {
               "type": "string",
@@ -155,12 +155,12 @@
             "tech_design": {
               "type": "string",
               "minLength": 1,
-              "description": "Path template for TECH_DESIGN.md (概要 / 設計判断 / 画面項目定義 / 処理ロジック / エラーハンドリング / 非機能要件). Same variables as 'requirements'."
+              "description": "Path template for TECH_DESIGN.md (概要 / 設計判断 / 画面項目定義 / 処理ロジック / エラーハンドリング / 非機能要件). Part of the technical specs (tech_specs). Same variables as 'requirements'."
             },
             "test_plan": {
               "type": "string",
               "minLength": 1,
-              "description": "Path template for TEST_PLAN.md — the feature's test strategy (use-case to test-level mapping). Split out of TECH_DESIGN. Same variables as 'requirements'. Example: 'docs/{{app.id}}/{{feature_path}}/TEST_PLAN.md'."
+              "description": "Path template for TEST_PLAN.md — the feature's test strategy (use-case to test-level mapping). Split out of TECH_DESIGN. Part of the technical specs (tech_specs). Same variables as 'requirements'. Example: 'docs/{{app.id}}/{{feature_path}}/TEST_PLAN.md'."
             },
             "wireframes": {
               "type": "string",
