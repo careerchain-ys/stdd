@@ -15,6 +15,10 @@ apps:
     # port: 3000   # dev サーバのポート。QA の Playwright MCP 動作確認で URL 構築に使う
 
 commands:
+  # 使用 stack に合わせて置き換える（STDD は stack 非依存）。例:
+  #   Node/TS:  typecheck: "npx tsc --noEmit"  test: "npm test"            build: "npm run build"
+  #   Python:   typecheck: "mypy ."            test: "pytest"             build: ""
+  #   Rails:    typecheck: ""                  test: "bin/rails test"     build: ""
   typecheck: "npx tsc --noEmit"
   test: "npm test"
   build: "npm run build"

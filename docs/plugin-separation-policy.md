@@ -92,8 +92,7 @@ git worktree + devcontainer を用いたマルチ環境並列開発向けのプ�
 10. `create-pr`
 11. `review-pr-with-agents`
 12. `kaizen`
-13. `searching-existing-solutions`
-14. `software-architecture`
+13. `software-architecture`
 
 これらの skill 内に含まれる下流プロジェクト固有値（`user_app` / `admin_app` / `develop` 等のサンプル値）は、
 Phase 1 で Handlebars 変数（`{{apps[].path}}` / `{{project.primary_branch}}` 等）に置換する。
