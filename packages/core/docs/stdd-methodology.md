@@ -34,6 +34,8 @@ STDD は AI エージェント (Claude Code 等) との協働を前提に設計�
 
 ## 2. Spec ドキュメントの構成
 
+Spec は、用途による 2 種別（要件 spec / 技術 spec (tech_specs)）と、適用範囲による 2 階層（common / feature）で整理される。種別は 2.1〜2.2、階層は 2.0 で述べる。
+
 ### 2.0 Spec の 2 階層構造 (common / feature)
 
 Spec は、プロジェクト全体を見る common 階層と、機能単位を見る feature 階層の 2 つに分かれる。テーブル定義や API 仕様のような横断的な要素は common に集約し、feature 側はそれを参照する。
@@ -58,56 +60,26 @@ feature 階層の役割は次のとおり。
 - 配置は `.stdd.config.yml` の `docs.layout.common_*` で設定する（任意。common 階層を使わないプロジェクトでは省略可）
 - テンプレートは `.claude/skills/documenting-specifications/templates/` を参照する（`requirements-common.md` / `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
 
-以下 2.1〜2.3 では、feature 階層の各ファイルの中身を述べる。
+### 2.1 要件 spec (REQUIREMENTS.md)
 
-### 2.1 REQUIREMENTS.md (ビジネス要件 / ユーザー視点)
-
-記述する内容は次のとおり。
-
-- 解決する問題、対象ユーザー、ビジネス目標
-- すべての User Journey（正常系、エラーケース、エッジケース）
-- 各 Journey への Priority (P0 / P1 / P2) の付与
-- UI / UX デザイン（HTML ワイヤーフレームへのリンク、表示要素）
-- 成功基準、スコープ外
+「何を・なぜ作るか」をユーザー視点で記述する。解決する問題・対象ユーザー・ビジネス目標、Priority (P0 / P1 / P2) 付きの User Journey、UI / UX、成功基準など。
 
 読者: ステークホルダー、PM、デザイナー、エンジニア
 
-### 2.2 TECH_DESIGN.md (技術設計 / 内部仕様)
+### 2.2 技術 spec (tech_specs)
 
-章構成は、概要 / 主要な設計判断（任意）/ 画面項目定義（画面 feature は必須）/ ロジック設計（コア）/ エラーハンドリング戦略 / 非機能要件（任意）。各章の内容は次のとおり。
+「どう作るか」を技術視点で記述する設計書の総称。次のファイルで構成される。
 
-- 概要: 機能の目的・スコープ・参照する common のテーブルや API
-- 主要な設計判断（選択と理由）: この機能特有の判断のみ
-- 画面項目定義: UI × バリデーション × DB マッピング（DB カラムは `TABLE_DEFINITION.md` を参照）
-- ロジック設計: 集計式・変換・ドメインルール・トランザクション境界・複数テーブル横断の流れ（手順 / 擬似コード）
-- エラーハンドリング戦略: API や処理の失敗を本機能がどう捌くか
-- 非機能要件: REQUIREMENTS に記載がある場合のみ、その実現方法
+- `ARCHITECTURE.md` — システム全体の構成・スタック・連携（common）
+- `TECH_DESIGN.md` — 機能単位の技術設計：概要・設計判断・画面項目定義・ロジック設計・エラーハンドリング（feature）
+- `TABLE_DEFINITION.md` — 全テーブル定義（common）
+- `API_SPEC.md` — API 契約（common）
+- `TEST_PLAN.md` — テスト戦略：どのユースケースをどのテストレベルで担保するか（feature）
+- `DESIGN.md` — デザイン標準（common・任意）
 
-データ構造 (`TABLE_DEFINITION.md`)・API 契約 (`API_SPEC.md`)・テスト戦略 (`TEST_PLAN.md`) は別ファイルに持ち、ここでは参照のみとする（再定義しない）。
+各ファイルは役割ごとに分かれ、TECH_DESIGN は TABLE_DEFINITION / API_SPEC を参照してテーブルや API を再定義しない。
 
 読者: エンジニア、AI エージェント、アーキテクト
-
-### 2.2.1 TEST_PLAN.md (テスト戦略)
-
-記述する内容は次のとおり。
-
-- REQUIREMENTS.md の全ユースケースを E2E / Integration / Unit のどれでカバーするかの対応表（根拠つき）
-- TECH_DESIGN.md のロジック設計に「その他処理フロー」がある場合、それも対応表でカバー
-- テスト総数と内訳
-
-### 2.2.2 REQUIREMENTS.md と TECH_DESIGN.md の違い
-
-| 項目 | REQUIREMENTS.md                  | TECH_DESIGN.md                                         |
-| ---- | -------------------------------- | ------------------------------------------------------ |
-| 視点 | ユーザー視点 (What & Why)        | 技術視点 (How)                                         |
-| 読者 | ステークホルダー、PM、デザイナー | エンジニア、アーキテクト、AI エージェント              |
-| 内容 | ユーザージャーニー、ビジネス目標 | 画面項目・ロジック設計・エラーハンドリング・非機能要件 |
-
-### 2.3 含めないもの (両方共通)
-
-- 「実装済み」「実装中」などの進捗ステータス（Spec は常に最新の仕様のみを保持する）
-- 関数やコンポーネントの具体的な実装コード（型定義 / API 定義 / バリデーションルールは可）
-- チェックボックス形式の TODO（これは PLAN ドキュメントに記載する）
 
 ---
 
