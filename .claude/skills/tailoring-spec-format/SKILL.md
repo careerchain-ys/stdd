@@ -48,7 +48,7 @@ STDD 導入（既存プロジェクト, step 3-4）・立ち上げ（新規プ�
 
 | 決定ポイント | 論点 | 反映先 |
 | ------------ | ---- | ------ |
-| **spec ファイル構成** | feature 必須（REQUIREMENTS / TECH_DESIGN / TEST_PLAN）・任意（wireframes）と common（TABLE_DEFINITION / API_SPEC / DESIGN）をどう組むか | プロジェクトのテンプレ・運用ルール |
+| **spec ファイル構成** | feature 必須（要件 spec: REQUIREMENTS／技術 spec: TECH_DESIGN / TEST_PLAN）・任意（wireframes）と common（技術 spec: TABLE_DEFINITION / API_SPEC / DESIGN）をどう組むか | プロジェクトのテンプレ・運用ルール |
 | **common 固有セクション** | common ARCHITECTURE に足す横断トピック（認証・認可 / RLS・権限 / 通知 / 監査ログ 等） | `docs/common/ARCHITECTURE.md` |
 | **docs.layout パス規約** | 単一/複数アプリ、`feature_path` の切り方、common の置き場 | `.stdd.config.yml` の `docs.layout` |
 | **Priority 基準** | このプロジェクトでの P0/P1/P2 の具体定義（何を Critical とするか） | テンプレ注記 + 決定ログ |

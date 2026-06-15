@@ -76,7 +76,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 
 STDD では **Spec → Test → Implementation** の順序を厳守します。
 
-1. **Spec 作成**: `REQUIREMENTS.md`（ビジネス要件）・`TECH_DESIGN.md`（技術設計）・`TEST_PLAN.md`（テスト戦略）を先に書く。テーブル・API は common の `TABLE_DEFINITION.md` / `API_SPEC.md` に集約し feature から参照する。UI を持つ機能では `generating-wireframes` スキルで HTML ワイヤーフレームを生成し、REQUIREMENTS.md の「UI/UX デザイン」から参照する
+1. **Spec 作成**: `REQUIREMENTS.md`（ビジネス要件）・`TECH_DESIGN.md`（技術設計）・`TEST_PLAN.md`（テスト戦略）を先に書く。技術系の設計書（`TECH_DESIGN` / `TEST_PLAN` と common の `ARCHITECTURE` / `TABLE_DEFINITION` / `API_SPEC` / `DESIGN`）は技術 spec (tech_specs) と総称する。テーブル・API は common の `TABLE_DEFINITION.md` / `API_SPEC.md` に集約し feature から参照する。UI を持つ機能では `generating-wireframes` スキルで HTML ワイヤーフレームを生成し、REQUIREMENTS.md の「UI/UX デザイン」から参照する
 2. **Test 作成**: TEST_PLAN.md のテスト戦略に基づきテストを書く（Red 状態の確認）
 3. **Implementation**: テストが Green になるよう最小限の実装を行う
 

@@ -81,7 +81,7 @@ step 1・2 の実物を見ながら、このプロジェクト固有の spec フ
 **テーラリング・チェックリスト**:
 
 ```
-□ 必須/任意の spec ファイルを決める（feature 必須: REQUIREMENTS / TECH_DESIGN / TEST_PLAN、任意: wireframes。common: REQUIREMENTS / ARCHITECTURE / TABLE_DEFINITION / API_SPEC / DESIGN(任意)。画面項目定義は TECH_DESIGN のセクション）
+□ 必須/任意の spec ファイルを決める（feature 必須: REQUIREMENTS〔要件 spec〕/ TECH_DESIGN・TEST_PLAN〔技術 spec〕、任意: wireframes。common: REQUIREMENTS と ARCHITECTURE / TABLE_DEFINITION / API_SPEC / DESIGN〔技術 spec、DESIGN は任意〕。技術系の設計書の総称が技術 spec (tech_specs)。画面項目定義は TECH_DESIGN のセクション）
 □ common ARCHITECTURE（システム概要）にプロジェクト固有セクションを足すか（認証・認可 / RLS / 通知 / 権限境界 等）。データモデルは TABLE_DEFINITION、API 契約は API_SPEC に分離
 □ docs.layout のパス規約を確定（単一/複数アプリ、feature_path の切り方）
 □ Priority(P0/P1/P2) 基準をこのプロジェクトのビジネス優先度に合わせて言語化

@@ -1,7 +1,7 @@
 ---
 name: documenting-specifications
 description: |-
-  REQUIREMENTS.md（業務要件・機能要件・非機能要件）・TECH_DESIGN.md（技術設計）・TEST_PLAN.md（テスト戦略）と、common 階層の ARCHITECTURE / TABLE_DEFINITION / API_SPEC / DESIGN のテンプレートとガイドラインを提供する。STDD 方法論に従った仕様ドキュメントの作成・更新を支援する。
+  REQUIREMENTS.md（業務要件・機能要件・非機能要件）・TECH_DESIGN.md（技術設計）・TEST_PLAN.md（テスト戦略）と、common 階層の ARCHITECTURE / TABLE_DEFINITION / API_SPEC / DESIGN のテンプレートとガイドラインを提供する。技術系の設計書（TECH_DESIGN / ARCHITECTURE / TABLE_DEFINITION / API_SPEC / TEST_PLAN / DESIGN）は総称して技術 spec (tech_specs) と呼ぶ。STDD 方法論に従った仕様ドキュメントの作成・更新を支援する。
 when_to_use: |-
   「spec」「仕様書」「設計書」「要件定義」「REQUIREMENTS.md」「TECH_DESIGN.md」「TEST_PLAN.md」「テーブル定義」「API仕様」「Spec and Test Driven Development」「STDD」「仕様駆動」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep
@@ -67,7 +67,7 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
 
 ## Spec の 2 階層構造（common / feature）
 
-本スキルが扱う feature 階層（機能単位）の spec は、上位の **common 階層**（プロジェクト全体）を前提とする。
+本スキルが扱う feature 階層（機能単位）の spec は、上位の **common 階層**（プロジェクト全体）を前提とする。spec は用途でも 2 種別に分かれ、**要件 spec**（`REQUIREMENTS.md`）と **技術 spec (tech_specs)**（`ARCHITECTURE` / `TECH_DESIGN` / `TABLE_DEFINITION` / `API_SPEC` / `TEST_PLAN` / `DESIGN`）で構成される（→ `stdd-methodology.md` §2）。
 
 | 階層      | ドキュメント | 配置例 |
 | ----------- | --- | --- |
@@ -273,6 +273,8 @@ Spec を書く過程で、確信が持てない／ユーザーに確定しても
 - **テスト総数と内訳**（例: 合計 33 件 - Unit 18 件, Integration 9 件, E2E 6 件）
 
 ### common 階層の技術ドキュメント
+
+以下は技術 spec (tech_specs) のうち common 階層に置くもの。
 
 - **ARCHITECTURE.md**: システム概要（構成 / スタック / 連携 / セキュリティ / インフラ）。データモデル・API は持たない。
 - **TABLE_DEFINITION.md**: 全テーブル定義の SSoT（カード形式・ER 図なし）。feature が参照する。
