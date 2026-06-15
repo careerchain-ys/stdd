@@ -118,10 +118,11 @@ stdd/
 
 ## 現状の制約（v0.1.0 時点）
 
+- **対象は「ブラウザで操作する Web アプリ」に限定**しています。方法論・テンプレート自体は技術スタック非依存で、任意の Web フレームワーク（Next.js / Rails / Django / Laravel など）で立ち上げられますが、QA フローのブラウザ動作確認（Playwright MCP）やワイヤーフレーム / UI キャプチャが**ブラウザ UI を前提**とするため、ネイティブモバイルアプリ（React Native 等）や UI を持たない CLI / バックエンド専用サービスは現状の主対象外です。
 - 公式に対応している AI エージェントは **Claude Code** のみです（`.claude/agents/` および `.claude/skills/` 配下のファイルがそのまま動作）。他エージェントは agents.md 標準に準拠した `AGENTS.md` を提供しているため随時対応を検討中です。
 - skill / agent / hook は `.stdd.config.yml` 駆動で動作します（`apps[].path` / `commands.*` / `project.primary_branch` 等を実行時に参照）。下流プロジェクト固有値のハードコードは除去済みです。記述規約は [`docs/config-driven-authoring.md`](docs/config-driven-authoring.md) を参照してください。
 - 別レイアウトのプロジェクト（単一アプリ・複数アプリ・別命名等）で使う場合は、`.stdd.config.yml` の `apps[]` / `commands` を調整すれば対応できます。
-- `npx @careerchain/stdd init` は STDD ツール（`.claude/` / `.stdd.config.yml` / `docs/`）の導入に専念します。アプリの骨組み（Next.js + Supabase + Playwright 等）は `starting-new-with-stdd` スキルが Claude セッション内で構築します。`starting-new-with-stdd` / `guide-for-new-project.md` は Next.js + Supabase + Playwright を主な対象としています。
+- `npx @careerchain/stdd init` は STDD ツール（`.claude/` / `.stdd.config.yml` / `docs/`）の導入に専念します。アプリの骨組みは `starting-new-with-stdd` スキルが Claude セッション内で構築します。同スキルは stack 非依存で、ユーザーの指定に応じて分岐します（Next.js/Supabase 明示 → 同梱 starter、それ以外明示 → そのフレームワーク公式 scaffold を汎用駆動、未指定 → コンセプトに適合する stack を提案）。`nextjs-supabase`（+ Playwright）は同梱のデフォルト starter です。
 - CLI の npm パッケージ名は `@careerchain/stdd`（`npx @careerchain/stdd init`）。ローカルで試す場合は、clone 後 `npm install && npm run build` し、対象ディレクトリで `node <stdd>/packages/stdd/dist/cli.js init` を実行してください。
 
 ---
