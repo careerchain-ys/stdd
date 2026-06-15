@@ -100,7 +100,7 @@ docs/common/plans/stdd-introduction.md
 
 ### 0-2. 草案を提示
 
-点検結果から `.stdd.config.yml` の草案を生成して提示する。先頭に `yaml-language-server` の schema ディレクティブを付ける。**推定し切れない項目も空欄にせず、推定値（仮説）を入れた上でコメントに `# ⚠️要確認: …` を添えてユーザーに是非を尋ねる**（spec の[要確認マーカー](../documenting-specifications/SKILL.md)と同じ「仮説＋確認」の原則を config 草案にも適用）。
+点検結果から `.stdd.config.yml` の草案を生成して提示する。先頭に `yaml-language-server` の schema ディレクティブを付ける。**推定し切れない項目も空欄にせず、推定値（仮説）を入れた上でコメントに `# ⚠️要確認: …` を添えてユーザーに是非を尋ねる**（spec の[要確認マーカー](../documenting-requirements/SKILL.md)と同じ「仮説＋確認」の原則を config 草案にも適用）。
 
 ```yaml
 # yaml-language-server: $schema=<schema の URL または相対パス>

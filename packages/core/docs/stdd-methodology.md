@@ -58,7 +58,7 @@ feature 階層の役割は次のとおり。
 命名と配置の補足。
 
 - 配置は `.stdd.config.yml` の `docs.layout.common_*` で設定する（任意。common 階層を使わないプロジェクトでは省略可）
-- テンプレートは `.claude/skills/documenting-specifications/templates/` を参照する（`requirements-common.md` / `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
+- テンプレートは `.claude/skills/documenting-requirements/templates/`（`requirements-common.md`）と `.claude/skills/documenting-tech-specs/templates/`（`architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）を参照する
 
 ### 2.1 要件 spec (REQUIREMENTS.md)
 
@@ -189,6 +189,7 @@ Mermaid 図は `workflow-diagram.md` を参照。
 - `workflow-diagram.md` — 各フローを Mermaid で図示
 - `guide-for-existing-project.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
 - `guide-for-new-project.md` — 新規プロジェクトの STDD 立ち上げ手順（最初から順行）
-- `.claude/skills/documenting-specifications/templates/` — spec テンプレ（feature: `requirements.md` / `tech-design.md` / `test-plan.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `requirements-common.md` / `design-common.md`）
+- `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
+- `.claude/skills/documenting-tech-specs/templates/` — 技術 spec テンプレ（feature: `tech-design.md` / `test-plan.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
 - `.claude/skills/documenting-plans/templates/plan.md` — 実装計画テンプレ
 - `../schema/.stdd.config.schema.json` — プロジェクト設定の JSON Schema

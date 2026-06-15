@@ -4,16 +4,27 @@
 
 ## Reviewer エージェント運用の前提（必読）
 
-`spec-reviewer` / `test-reviewer` / `code-reviewer` は **独立した Evaluator** として懐疑的にチューニングされている。Team Lead は以下を順守すること:
+`requirements-reviewer` / `tech-specs-reviewer` / `test-reviewer` / `code-reviewer` は **独立した Evaluator** として懐疑的にチューニングされている。Team Lead は以下を順守すること:
 
 - **Reviewer の判定は原則そのまま受け入れる**: NEEDS CHANGES / ⚠️ 要修正 / ❌ Blocked を「厳しすぎる」と判断して無視しない。各 Reviewer は Hard Threshold を1項目でも下回ったら必ず NEEDS CHANGES 以下を出すよう設計されている。
-- **差し戻し時は Reviewer 出力をそのまま渡す**: Reviewer 出力末尾の「Generator への差し戻し指示」セクションを、対象 Generator（spec-writer / implementer）にそのまま引き渡す。Team Lead が要約・再解釈しない。
+- **差し戻し時は Reviewer 出力をそのまま渡す**: Reviewer 出力末尾の「Generator への差し戻し指示」セクションを、対象 Generator（requirements-writer / tech-specs-writer / implementer）にそのまま引き渡す。Team Lead が要約・再解釈しない。
 - **再レビューは差分のみではなく全体を見させる**: 修正後の Spec/テスト/コード全体を Reviewer に渡し、修正により別の Hard Threshold を割っていないか確認させる。
 - **3回ループ超過時**: 後述の各 Phase のループ上限（最大3回）を超えた場合、現状をコミット・push して draft PR を作成する。PR description には **どの Reviewer がどの Hard Threshold で停止させたか** を明記する。
 
-## Phase 1: Spec作成（`full`, `spec-only`のみ）
+## 人間レビューゲート（必読）
 
-**Spec Writerに依頼**して、issueの情報をもとにSpecドキュメントを作成する。
+Spec 工程はエージェント同士のレビューだけで自動承認せず、**節目で必ずユーザー（人間）の確認を仰ぐ**。`requirements-reviewer` / `tech-specs-reviewer` が ✅ 承認を出しても、それは**人間レビューに進める状態になった**という意味であり、フロー全体の承認ではない。
+
+- **ゲート①（要件）**: Phase 1a で `requirements-reviewer` が ✅ 承認したら、REQUIREMENTS.md の要点をユーザーに提示し、**承認を求めて停止**する。ユーザーが承認するまで Phase 1b に進まない。
+- **ゲート②（技術設計）**: Phase 1b で `tech-specs-reviewer` が ✅ 承認したら、TECH_DESIGN.md / TEST_PLAN.md の要点をユーザーに提示し、**承認を求めて停止**する。ユーザーが承認するまで Phase 1.5 に進まない。
+- ユーザーから修正指示が出た場合は、対象 Generator（requirements-writer / tech-specs-writer）に修正を依頼し、エージェントレビュー → 人間ゲートを再度通す。
+- ユーザーの指示で人間ゲートをスキップする運用（完全自動）も可能だが、**既定は停止して確認**とする。
+
+## Phase 1a: 要件作成（`full`, `spec-only`のみ）
+
+要件（What & Why）を確定させるフェーズ。技術設計（Phase 1b）には進まず、まず REQUIREMENTS.md を完成・承認させる。
+
+**Requirements Writerに依頼**して、issue の情報をもとに REQUIREMENTS.md を作成する。
 
 1. `docs/` 配下に該当機能のディレクトリを作成（存在しない場合）
 2. `REQUIREMENTS.md` を作成:
@@ -24,32 +35,78 @@
    - `generating-wireframes` スキルに従い `docs/<app>/<feature-path>/wireframes/` に HTML WF を生成
    - REQUIREMENTS.md「2.4 UI/UX・画面」から `./wireframes/index.html` にリンク
    - UI を持たない機能（バッチ・API のみ等）はスキップ
-4. `TECH_DESIGN.md` を作成:
-   - 技術設計方針（概要 / 主要な設計判断 / ロジック設計 / エラーハンドリング戦略）
-   - 画面 feature では「画面項目定義」セクションを含める（非画面 feature は省略）
-   - データ構造は common `TABLE_DEFINITION.md`、API は common `API_SPEC.md` を参照
-5. `TEST_PLAN.md` を作成（テスト戦略・テストケース一覧。feature 単位の独立ドキュメント）
 
-作成したSpecをコミット。
+作成した REQUIREMENTS.md をコミット。
 
-**Spec Reviewerに依頼**して、作成されたSpecをレビューする。
+**Requirements Reviewerに依頼**して、作成された REQUIREMENTS.md をレビューする。
 
 チェック項目:
 
-- 要件の網羅性（issueの要求がすべてカバーされているか）
-- 技術設計の実現可能性
-- テスト戦略の十分性
-- 既存実装との整合性
+- 要件の網羅性（issue の要求がすべてユースケース・受入基準としてカバーされているか）
+- 3層構造（業務 → 機能 → 非機能）とユースケース品質（Priority＋振る舞い＋EARS）
+- SSOT 準拠（履歴・経緯・issue 言及がないか）
+- 既存・common 階層との整合性
 
-### 判定と差し戻しループ
+### 判定と差し戻しループ（エージェント）
 
-Spec Reviewer の **Hard Threshold（SSOT 違反 0件）** を1件でも下回った場合は必ず ⚠️ 要修正 となる。
+Requirements Reviewer の **Hard Threshold（SSOT 違反 0件）** を1件でも下回った場合は必ず ⚠️ 要修正 となる。
 
-- **⚠️ 要修正**: Spec Reviewer 出力末尾の「Generator への差し戻し指示」をそのまま spec-writer に渡して修正させ、再度 Spec Reviewer に依頼する。**最大3回**ループ。
-- **✅ 承認**: 次の Phase に進む。
-- **3回ループ後も未解消**: 現状をコミットして次の Phase に進むが、未解消の指摘は PR description に明記する。
+- **⚠️ 要修正**: Reviewer 出力末尾の「Generator への差し戻し指示」をそのまま requirements-writer に渡して修正させ、再度 Requirements Reviewer に依頼する。**最大3回**ループ。
+- **✅ 承認**: **人間レビューゲート①**へ進む。
+- **3回ループ後も未解消**: 現状をコミットし、未解消の指摘を保持したまま人間レビューゲート①へ進み、ユーザー判断を仰ぐ。
 
 HIGH/MEDIUM の指摘がある場合は Hard Threshold とは別に判断する。Team Lead は HIGH が複数残っていれば実質的に差し戻す方向で扱う。
+
+### 🧑 人間レビューゲート①（要件）
+
+Requirements Reviewer が ✅ 承認したら（または 3回ループ上限に達したら）、**ユーザーに REQUIREMENTS.md の確認を求めて停止する**。
+
+- REQUIREMENTS.md の要点（ユースケース一覧・Priority・主要な受入基準・スコープ外・未解消の指摘があればそれ）を簡潔に提示する
+- 「この要件で技術設計に進んでよいか」をユーザーに確認する
+- **ユーザーが承認するまで Phase 1b に進まない**
+- 修正指示が出たら requirements-writer に修正を依頼し、Requirements Reviewer の再レビュー → 本ゲートを再度通す
+- ユーザーが明示的に「人間ゲートをスキップして自動で進めてよい」と指示した場合のみ、停止せず Phase 1b に進む
+
+## Phase 1b: 技術設計作成（`full`, `spec-only`のみ）
+
+**人間レビューゲート①で承認された REQUIREMENTS.md を前提**に、技術設計を作成するフェーズ。
+
+**Tech Specs Writerに依頼**して、TECH_DESIGN.md と TEST_PLAN.md を作成する。
+
+1. `TECH_DESIGN.md` を作成:
+   - 技術設計方針（概要＋対応ユースケース表 / 主要な設計判断 / ロジック設計 / エラーハンドリング戦略）
+   - 画面 feature では「画面項目定義」セクションを含める（非画面 feature は省略）
+   - データ構造は common `TABLE_DEFINITION.md`、API は common `API_SPEC.md` を参照（新規テーブル/API が生じたら common 側を更新）
+2. `TEST_PLAN.md` を作成（テスト戦略・テストケース一覧。feature 単位の独立ドキュメント）
+
+作成した技術設計をコミット。
+
+**Tech Specs Reviewerに依頼**して、作成された技術設計をレビューする。
+
+チェック項目:
+
+- 要件カバレッジ（REQUIREMENTS の全ユースケースが TECH_DESIGN §1.1 対応表・TEST_PLAN にマッピングされているか）
+- 技術設計の実現可能性・既存/common 階層との整合性
+- テスト戦略の十分性（テストレベル分類・総数/内訳・P0 E2E 方針）
+- SSOT 準拠（履歴・「統合/集約」フレーミングがないか）
+
+### 判定と差し戻しループ（エージェント）
+
+Tech Specs Reviewer の **Hard Threshold（SSOT 違反 0件 / ユースケースマッピング漏れ 0件 / P0 E2E 方針明記）** を1件でも下回った場合は必ず ⚠️ 要修正 となる。
+
+- **⚠️ 要修正**: Reviewer 出力末尾の「Generator への差し戻し指示」をそのまま tech-specs-writer に渡して修正させ、再度 Tech Specs Reviewer に依頼する。**最大3回**ループ。
+- **✅ 承認**: **人間レビューゲート②**へ進む。
+- **3回ループ後も未解消**: 現状をコミットし、未解消の指摘を保持したまま人間レビューゲート②へ進み、ユーザー判断を仰ぐ。
+
+### 🧑 人間レビューゲート②（技術設計）
+
+Tech Specs Reviewer が ✅ 承認したら（または 3回ループ上限に達したら）、**ユーザーに TECH_DESIGN.md / TEST_PLAN.md の確認を求めて停止する**。
+
+- 技術設計の要点（主要な設計判断・ロジック設計の概略・テスト総数と内訳・P0 E2E 方針・未解消の指摘があればそれ）を簡潔に提示する
+- 「この技術設計で PLAN 作成・実装に進んでよいか」をユーザーに確認する
+- **ユーザーが承認するまで Phase 1.5 に進まない**
+- 修正指示が出たら tech-specs-writer に修正を依頼し、Tech Specs Reviewer の再レビュー → 本ゲートを再度通す
+- ユーザーが明示的に「人間ゲートをスキップして自動で進めてよい」と指示した場合のみ、停止せず Phase 1.5 に進む
 
 ## Phase 1.5: PLANドキュメント作成（`full`, `impl-only`）
 
@@ -118,7 +175,7 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
 
 - **PASS**: Phase 2のステップ2（実装）に戻って作業を継続。
 - **NEEDS CHANGES**: Test Reviewer 出力末尾の「Generator への差し戻し指示」をそのまま implementer に渡してテストを修正させる → テストを再コミット → Test Reviewer に再レビュー依頼。**最大3回**ループ。
-- **CRITICAL ISSUES**: Spec の受入基準がまったく検証されていない等の重大な問題。implementer に差し戻し、場合によっては Phase 1 の spec-writer にもテスト戦略の見直しを依頼する。
+- **CRITICAL ISSUES**: Spec の受入基準がまったく検証されていない等の重大な問題。implementer に差し戻し、場合によっては Phase 1b の tech-specs-writer（テスト戦略 TEST_PLAN.md の見直し）や Phase 1a の requirements-writer（受入基準の見直し）にも依頼する。
 
 3回の修正ループ後も問題が解消されない場合は、現状のテストをコミットして Phase 2 のステップ2に進み、未解消の Hard Threshold 違反項目を PR description に明記する。
 

@@ -20,11 +20,11 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 | --- | --- | --- |
 | SSoT | 最初から **Spec** | 導入時は実装 → 一巡後 Spec |
 | common 階層 | **前方設計**（仮説として書き、feature で検証） | 実装から **逆生成** |
-| 使う中心スキル | `documenting-specifications` / `auto-implement` | `reverse-engineering-*` |
+| 使う中心スキル | `documenting-requirements`・`documenting-tech-specs` / `auto-implement` | `reverse-engineering-*` |
 
 ポイント:
 
-- common 階層は**前方設計**：コードが無いので「目的・アクター・初期アーキ」を**仮説**として置き、feature を作りながら検証・更新する。確定していない箇所は**章を省略せず**、**要確認マーカー**（仮説とセットでユーザーに是非を確認させる注記。構文は `documenting-specifications` の「要確認マーカー」を SSoT とする）を残し、確定したらマーカーを除去して埋める。
+- common 階層は**前方設計**：コードが無いので「目的・アクター・初期アーキ」を**仮説**として置き、feature を作りながら検証・更新する。確定していない箇所は**章を省略せず**、**要確認マーカー**（仮説とセットでユーザーに是非を確認させる注記。構文は `documenting-requirements` の「要確認マーカー」を SSoT とする）を残し、確定したらマーカーを除去して埋める。
 - 最初の feature を 1 本通した時点で立ち上げは実質完了し、以降は通常運用（既存機能の追加・変更）と地続き。
 
 ---
@@ -36,8 +36,8 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 | **0** | scaffold / `.stdd.config.yml` 点検（common 階層前提で確認） | — | △ 構成確認 |
 | **1** | **プロダクトコンセプトのヒアリング**（何を作るか / 要件概要を最低 1 レスポンス） | — | ★ どんなアプリ／要件概要 |
 | **2** | アプリ骨組み生成（stack 固有） | （stack 手順へ委譲） | ★ 構成・コマンド疎通 |
-| **3** | common 階層を**前方設計**（docs/common を埋める） | `documenting-specifications` | ★ 目的・アクター・初期アーキ |
-| **4** | 最初の feature を順行 spec 化（P0 コアから 1 本） | `documenting-specifications` → `generating-wireframes` | ★ 粒度・スコープ |
+| **3** | common 階層を**前方設計**（docs/common を埋める） | `documenting-requirements` → `documenting-tech-specs` | ★ 目的・アクター・初期アーキ |
+| **4** | 最初の feature を順行 spec 化（P0 コアから 1 本） | `documenting-requirements` → `generating-wireframes` → `documenting-tech-specs` | ★ 粒度・スコープ |
 | **5** | spec フォーマット策定 → テンプレ特化 | `tailoring-spec-format` | ★★ フォーマット |
 | **6** | feature を順行 STDD でループ | `documenting-plans` → `auto-implement` → `verifying-consistency` | ★ 粒度（機能ごと） |
 | **7** | 立ち上げ完了 → 通常運用へ地続き | `auto-implement`（以降） | 完了確認 |

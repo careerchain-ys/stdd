@@ -198,7 +198,7 @@ expect(result.error.issues[0].message).toBe('必須項目です')
 
 | スキル                     | 参照パス                                     | 参照タイミング                                              |
 | -------------------------- | -------------------------------------------- | ----------------------------------------------------------- |
-| documenting-specifications | `.claude/skills/documenting-specifications/` | TEST_PLAN.mdテスト戦略の読み取り・Spec準拠判定時            |
+| documenting-tech-specs    | `.claude/skills/documenting-tech-specs/`    | TEST_PLAN.mdテスト戦略の読み取り・Spec準拠判定時            |
 | e2e-testing                | `plugins/playwright/skills/e2e-testing/`     | E2Eテストの品質評価・Locator選択・Web First Assertion判定時 |
 
 ## 必須の事前読み込み

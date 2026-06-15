@@ -32,5 +32,6 @@
 「これは仕様変更か、それとも振る舞いを変えない変更か」を一言ユーザーに確認する。
 
 本格的な機能実装は `auto-implement` スキル、仕様の作成・更新は
-`documenting-specifications` スキル、Spec ⇔ テスト ⇔ 実装 の整合性確認は
-`verifying-consistency` スキルに委譲できる。
+`documenting-requirements` スキル（要件: REQUIREMENTS.md）／ `documenting-tech-specs`
+スキル（技術設計: TECH_DESIGN.md・TEST_PLAN.md・common 技術階層）、Spec ⇔ テスト ⇔ 実装
+の整合性確認は `verifying-consistency` スキルに委譲できる。

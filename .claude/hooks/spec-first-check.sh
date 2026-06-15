@@ -160,7 +160,7 @@ REMINDER="STDD リマインダ: 実装ファイル ($REL) を編集しようと�
 この変更が仕様の振る舞いを変えるなら、いきなり実装を直さず、先に Spec\
 （.stdd.config.yml の docs.layout）とテストを更新してください（Spec → テスト → 実装）。\
 振る舞いを変えないリファクタ・整形・設定変更ならこのまま進めて構いません。\
-本格的な機能実装は auto-implement、仕様更新は documenting-specifications スキルに委譲できます。"
+本格的な機能実装は auto-implement、仕様更新は documenting-requirements（要件）／ documenting-tech-specs（技術設計）スキルに委譲できます。"
 
 if [ "$MODE" = "block" ]; then
     PRIMARY_BRANCH=$(strip_quotes "$(yaml_scalar project primary_branch)")

@@ -181,4 +181,4 @@ flowchart LR
 ## 6. 関連ドキュメント
 
 - `stdd-methodology.md` — STDD の詳細ガイド
-- `.claude/skills/documenting-specifications/templates/` ・ `.claude/skills/documenting-plans/templates/` — 各ドキュメントテンプレ
+- `.claude/skills/documenting-requirements/templates/` ・ `.claude/skills/documenting-tech-specs/templates/` ・ `.claude/skills/documenting-plans/templates/` — 各ドキュメントテンプレ

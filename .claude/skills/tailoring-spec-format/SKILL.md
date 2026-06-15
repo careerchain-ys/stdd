@@ -1,7 +1,7 @@
 ---
 name: tailoring-spec-format
 description: |-
-  このプロジェクト固有の spec フォーマット / ラインナップを策定し、テンプレートや設定へ反映する。STDD 導入（既存）・立ち上げ（新規）の初期フォーマット策定と、運用中のブラッシュアップの両方を担う。common spec と最初の feature spec を素材に、必須/任意の spec ファイル構成・固有セクション・docs.layout・Priority 基準・テスト層責務・命名を決め、決定を導入PLAN / 立ち上げPLANに記録してテンプレ/設定へ反映する。個別機能の spec 作成は documenting-specifications を使う。
+  このプロジェクト固有の spec フォーマット / ラインナップを策定し、テンプレートや設定へ反映する。STDD 導入（既存）・立ち上げ（新規）の初期フォーマット策定と、運用中のブラッシュアップの両方を担う。common spec と最初の feature spec を素材に、必須/任意の spec ファイル構成・固有セクション・docs.layout・Priority 基準・テスト層責務・命名を決め、決定を導入PLAN / 立ち上げPLANに記録してテンプレ/設定へ反映する。個別機能の spec 作成は documenting-requirements（要件）／ documenting-tech-specs（技術設計）を使う。
 when_to_use: |-
   「specフォーマット策定」「テンプレ特化」「テーラリング」「spec構成を決める」「specフォーマットのブラッシュアップ」「STDDをプロジェクトに合わせる」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
@@ -38,7 +38,7 @@ STDD 導入（既存プロジェクト, step 3-4）・立ち上げ（新規プ�
 □ docs/common/REQUIREMENTS.md / ARCHITECTURE.md（common 階層の構成）
 □ 代表 feature spec（REQUIREMENTS.md / TECH_DESIGN.md / TEST_PLAN.md）の実物
 □ 現在の .stdd.config.yml（docs.layout / apps / commands）
-□ 利用中のテンプレ（`.claude/skills/documenting-specifications/templates/` または プロジェクト側コピー）
+□ 利用中のテンプレ（`.claude/skills/documenting-requirements/templates/`・`.claude/skills/documenting-tech-specs/templates/` または プロジェクト側コピー）
 □ (step 7 のみ) 運用中の全 feature spec のばらつき・過不足
 ```
 
@@ -88,7 +88,7 @@ PLAN が無い文脈（ブラッシュアップ単体実行など）では、プ
 
 ## When NOT to Use This Skill
 
-- **個別機能の spec を書く**: `documenting-specifications` を使う
+- **個別機能の spec を書く**: `documenting-requirements`（要件）／ `documenting-tech-specs`（技術設計）を使う
 - **既存実装から spec を起こす**: `reverse-engineering-feature-spec` / `reverse-engineering-common-spec` を使う
 - **導入フロー全体を進める**: `introducing-stdd`（本スキルを step 3-4 / 7 で呼ぶ）
 
@@ -98,6 +98,6 @@ PLAN が無い文脈（ブラッシュアップ単体実行など）では、プ
 
 - **導入ガイド（なぜ/判断基準）**: [guide-for-existing-project.md](../../../packages/core/docs/guide-for-existing-project.md) §step 3-4
 - **導入ドライバー**: [introducing-stdd skill](../introducing-stdd/SKILL.md)
-- **spec テンプレ**: `../documenting-specifications/templates/`（feature / common） / `../documenting-plans/templates/`（PLAN）
-- **spec 作成スキル**: [documenting-specifications skill](../documenting-specifications/SKILL.md)
+- **spec テンプレ**: `../documenting-requirements/templates/`（REQUIREMENTS: feature / common） / `../documenting-tech-specs/templates/`（TECH_DESIGN・TEST_PLAN・common 技術階層） / `../documenting-plans/templates/`（PLAN）
+- **spec 作成スキル**: [documenting-requirements skill](../documenting-requirements/SKILL.md)（要件）／ [documenting-tech-specs skill](../documenting-tech-specs/SKILL.md)（技術設計）
 - **設定スキーマ**: `packages/core/schema/.stdd.config.schema.json`
