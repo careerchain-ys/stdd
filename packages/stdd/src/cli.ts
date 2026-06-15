@@ -4,8 +4,12 @@ import { fileURLToPath } from "node:url";
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import prompts from "prompts";
-import { install, InstallError, type FileAction } from "./install.js";
+import {
+  install,
+  InstallError,
+  type FileAction,
+  type ClaudeMergeSummary,
+} from "./install.js";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const assetsRoot = path.join(packageRoot, "assets");
@@ -35,7 +39,7 @@ function printHelp(): void {
 
   options:
     --name <name>   .stdd.config.yml の project.name（既定: ディレクトリ名）
-    --force         確認なしで既存の .claude/ を上書きする
+    --force         tailoring 済み（編集された）STDD ファイルも最新へ上書きする
     --yes, -y       対話プロンプトをスキップし既定値で進める
     --help, -h      このヘルプを表示
     --version, -v   バージョンを表示
@@ -70,9 +74,20 @@ function deriveProjectName(cwd: string, override: string | undefined): string {
 const ACTION_LABEL: Record<FileAction, string> = {
   created: "作成",
   overwritten: "更新",
+  merged: "マージ（既存に追記）",
   kept: "維持（既存を保持）",
   skipped: "スキップ（既存を保持）",
 };
+
+function claudeSummaryLabel(c: ClaudeMergeSummary): string {
+  const parts: string[] = [];
+  if (c.created.length) parts.push(`新規 ${c.created.length}`);
+  if (c.updated.length) parts.push(`更新 ${c.updated.length}`);
+  if (c.removed.length) parts.push(`削除 ${c.removed.length}`);
+  if (c.skippedConflict.length) parts.push(`衝突回避 ${c.skippedConflict.length}`);
+  if (c.skippedModified.length) parts.push(`保持 ${c.skippedModified.length}`);
+  return parts.length ? parts.join(" / ") : "変更なし";
+}
 
 async function runInit(args: string[]): Promise<void> {
   const flags = parseInitFlags(args);
@@ -84,28 +99,13 @@ async function runInit(args: string[]): Promise<void> {
   console.log(`  対象: ${cwd}`);
   console.log("");
 
-  // 既存の .claude/ がある場合の上書き可否を決める
-  let overwriteClaude = flags.force;
-  const claudeExists = fs.existsSync(path.join(cwd, ".claude"));
-  if (claudeExists && !flags.force) {
-    if (flags.yes || !process.stdout.isTTY) {
-      // 非対話時は安全側（既存を保持）に倒す
-      overwriteClaude = false;
-      console.log("  既存の .claude/ を検出しました → 保持します（上書きするには --force）");
-    } else {
-      const res = await prompts({
-        type: "confirm",
-        name: "overwrite",
-        message: "既存の .claude/ を最新の STDD スキル一式で上書きしますか？",
-        initial: true,
-      });
-      overwriteClaude = res.overwrite === true;
-    }
-  }
+  // .claude/ はファイル単位で非破壊マージするため、既存があっても全削除はしない。
+  // --force は「tailoring 済み（ユーザー編集）STDD ファイルも最新へ上書きする」意味に限定。
+  const overwriteClaude = flags.force;
 
   let result;
   try {
-    result = await install({ targetDir: cwd, assetsRoot, projectName, overwriteClaude });
+    result = await install({ targetDir: cwd, assetsRoot, projectName, overwriteClaude, version: VERSION });
   } catch (err) {
     if (err instanceof InstallError) {
       console.error(`\n  エラー: ${err.message}\n`);
@@ -114,12 +114,26 @@ async function runInit(args: string[]): Promise<void> {
     throw err;
   }
 
+  const c = result.claude;
   console.log("");
   console.log("  ✔ STDD を導入しました");
-  console.log(`    .claude/           : ${ACTION_LABEL[result.claude]}`);
+  console.log(
+    `    .claude/           : ${claudeSummaryLabel(c)}  # 由来は .claude/.stdd/manifest.json`,
+  );
+  console.log(`    .claude/settings.json : ${ACTION_LABEL[result.settings]}`);
   console.log(`    .stdd.config.yml   : ${ACTION_LABEL[result.config]}`);
   console.log(`    .mcp.json          : ${ACTION_LABEL[result.mcp]}  # Playwright MCP（ブラウザ動作確認）`);
   console.log(`    docs/              : ${ACTION_LABEL[result.docs]}`);
+  if (c.skippedConflict.length > 0) {
+    console.log("");
+    console.log("  ⚠ 既存ファイルと衝突したため STDD 版を入れていません（手動確認を推奨）:");
+    c.skippedConflict.forEach((p) => console.log(`      - .claude/${p}`));
+  }
+  if (c.skippedModified.length > 0) {
+    console.log("");
+    console.log("  ℹ 編集済み（tailoring）の STDD ファイルは保持しました（最新化は --force）:");
+    c.skippedModified.forEach((p) => console.log(`      - .claude/${p}`));
+  }
   console.log("");
   console.log("  次の手順:");
   const steps: string[] = [];

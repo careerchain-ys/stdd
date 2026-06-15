@@ -78,6 +78,63 @@ async function injectMcpSettings() {
   await fs.writeFile(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 }
 
+/**
+ * 配布する skill / agent の frontmatter にだけ `source: stdd` マーカーを注入する。
+ * リポジトリ本体（正典）の .claude/ は変更せず、assets/ にコピーされた生成物のみを
+ * パッチする。これにより「導入先プロジェクトで STDD 由来の skill/agent が明示的に
+ * 判別できる」状態を配布物に閉じて実現する（由来の一覧は manifest.json も保持）。
+ * 対象: assets/.claude/skills/<name>/SKILL.md（再帰）, assets/.claude/agents/*.md
+ */
+async function injectStddMarker() {
+  const claudeDir = path.join(assetsDir, ".claude");
+  const files = [
+    ...(await findFiles(path.join(claudeDir, "skills"), (name) => name === "SKILL.md")),
+    ...(await findFiles(path.join(claudeDir, "agents"), (name) => name.endsWith(".md"))),
+  ];
+  let count = 0;
+  for (const file of files) {
+    if (await addSourceMarker(file)) count++;
+  }
+  return count;
+}
+
+/** dir 配下を再帰し、predicate(name) を満たすファイルの絶対パスを返す。dir が無ければ空配列。 */
+async function findFiles(dir, predicate) {
+  let entries;
+  try {
+    entries = await fs.readdir(dir, { withFileTypes: true });
+  } catch (err) {
+    if (err && err.code === "ENOENT") return [];
+    throw err;
+  }
+  const out = [];
+  for (const entry of entries) {
+    const abs = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      out.push(...(await findFiles(abs, predicate)));
+    } else if (predicate(entry.name)) {
+      out.push(abs);
+    }
+  }
+  return out;
+}
+
+/**
+ * frontmatter の先頭キーとして `source: stdd` を挿入する。
+ * frontmatter が無い / 既に source: がある場合は何もしない。挿入したら true。
+ */
+async function addSourceMarker(file) {
+  const content = await fs.readFile(file, "utf8");
+  if (!content.startsWith("---\n")) return false;
+  const fmEnd = content.indexOf("\n---", 3);
+  if (fmEnd === -1) return false;
+  const frontmatter = content.slice(4, fmEnd);
+  if (/^source:/m.test(frontmatter)) return false;
+  const patched = `---\nsource: stdd\n${content.slice(4)}`;
+  await fs.writeFile(file, patched);
+  return true;
+}
+
 async function main() {
   await fs.rm(assetsDir, { recursive: true, force: true });
   await fs.mkdir(assetsDir, { recursive: true });
@@ -92,7 +149,10 @@ async function main() {
     }
   }
   await injectMcpSettings();
-  console.log(`[sync-assets] assets/ を同期しました (${COPIES.length} 件 + MCP 設定注入)`);
+  const marked = await injectStddMarker();
+  console.log(
+    `[sync-assets] assets/ を同期しました (${COPIES.length} 件 + MCP 設定注入 + source:stdd マーカー ${marked} 件)`,
+  );
 }
 
 main().catch((err) => {
