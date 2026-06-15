@@ -214,4 +214,5 @@ C) 特定のユースケースのみ（指定してください）
 
 - [PLANドキュメントテンプレート](./templates/plan.md)
 - [STDD方法論ガイド](../../../packages/core/docs/stdd-methodology.md)
-- [Specドキュメント作成スキル](../documenting-specifications/SKILL.md)
+- [要件定義書作成スキル](../documenting-requirements/SKILL.md)
+- [技術設計書作成スキル](../documenting-tech-specs/SKILL.md)

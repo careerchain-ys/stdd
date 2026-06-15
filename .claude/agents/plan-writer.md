@@ -103,7 +103,8 @@ PLANドキュメントのテンプレートは以下を参照:
 | スキル                     | 参照パス                                     | 参照タイミング                                           |
 | -------------------------- | -------------------------------------------- | -------------------------------------------------------- |
 | documenting-plans          | `.claude/skills/documenting-plans/`          | **常に参照**（テンプレート・構成ルール・チェックリスト） |
-| documenting-specifications | `.claude/skills/documenting-specifications/` | Specドキュメントの構造理解時                             |
+| documenting-requirements   | `.claude/skills/documenting-requirements/`   | REQUIREMENTS（ユースケース・受入基準）の構造理解時       |
+| documenting-tech-specs    | `.claude/skills/documenting-tech-specs/`    | TECH_DESIGN・TEST_PLAN の構造理解時                      |
 | e2e-testing                | `plugins/playwright/skills/e2e-testing/`                | E2Eテストタスクの分解時                                  |
 | software-architecture      | `.claude/skills/software-architecture/`      | ファイル構成・責務分離の判断時                           |
 | implementing-ui            | `plugins/nextjs-supabase/skills/implementing-ui/`            | UIコンポーネントのタスク分解時                           |

@@ -1,7 +1,7 @@
 ---
 name: starting-new-with-stdd
 description: |-
-  新規（コードがまだ無い）プロジェクトを STDD で立ち上げる作業を、Claude セッションで段階的に駆動する。立ち上げガイドに従い、アプリ骨組み生成→common 階層の前方設計→最初の feature→フォーマット策定→feature ループ→通常運用への移行までを、既存スキル（documenting-specifications / generating-wireframes / tailoring-spec-format / documenting-plans / auto-implement / verifying-consistency）を順に呼びながら進める。進捗は立ち上げPLANで保持し、セッションを跨いで再開できる。既に稼働しているコードへの導入は introducing-stdd を使う。
+  新規（コードがまだ無い）プロジェクトを STDD で立ち上げる作業を、Claude セッションで段階的に駆動する。立ち上げガイドに従い、アプリ骨組み生成→common 階層の前方設計→最初の feature→フォーマット策定→feature ループ→通常運用への移行までを、既存スキル（documenting-requirements / documenting-tech-specs / generating-wireframes / tailoring-spec-format / documenting-plans / auto-implement / verifying-consistency）を順に呼びながら進める。進捗は立ち上げPLANで保持し、セッションを跨いで再開できる。既に稼働しているコードへの導入は introducing-stdd を使う。
 when_to_use: |-
   新規（コードがまだ無い）プロジェクトの立ち上げを進める／再開するとき。「新規プロジェクトをstddで立ち上げる」「立ち上げの続き」「greenfield stdd」など、新規フローと確定している場合。新規/既存が未確定の最初の入口は setup-stdd（ルーター）が判定して本スキルへ委譲する。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
@@ -51,8 +51,8 @@ docs/common/plans/stdd-bootstrap.md
 | 0 | scaffold / `.stdd.config.yml` 点検（common 階層前提） | — | 構成（単一/複数アプリ・パス規約） |
 | 1 | **プロダクトコンセプトのヒアリング**（下記「step 1」詳細） | — | ★ どんなアプリ／要件の概要（最低 1 レスポンス） |
 | 2 | **アプリ骨組みを対話駆動**（stack 固有） | （stack 手順へ委譲。下記「step 2」詳細） | ★ 構成・コマンド疎通 |
-| 3 | **common 階層を前方設計**（docs/common を埋める） | `documenting-specifications` | ★ 目的・アクター・初期アーキ |
-| 4 | 最初の feature を順行 spec 化（P0 コアから 1 本） | `documenting-specifications` → `generating-wireframes` | ★ Spec 粒度・スコープ |
+| 3 | **common 階層を前方設計**（docs/common を埋める） | `documenting-requirements`（REQUIREMENTS）→ `documenting-tech-specs`（ARCHITECTURE 等） | ★ 目的・アクター・初期アーキ |
+| 4 | 最初の feature を順行 spec 化（P0 コアから 1 本） | `documenting-requirements` → `generating-wireframes` → `documenting-tech-specs` | ★ Spec 粒度・スコープ |
 | 5 | フォーマット策定 → テンプレ特化 | `tailoring-spec-format` | ★★ フォーマット決定 |
 | 6 | feature を順行 STDD でループ | `documenting-plans` → `auto-implement` | ★ 機能ごとの粒度 |
 | 7 | 通常運用へ移行 | `auto-implement`（以降） | 立ち上げ完了の確認 |
@@ -66,7 +66,7 @@ docs/common/plans/stdd-bootstrap.md
 1. **scaffold 確認**: `npx @careerchain/stdd init` の導入物（`.stdd.config.yml`・`.claude/`・`docs/`）が揃っているか点検。未導入なら `npx @careerchain/stdd init` を案内。
 2. **step 1（★人間判断・最優先）**: 下記「step 1」手順で**プロダクトコンセプトをヒアリング**し、最低 1 レスポンスを得る。技術スタック等の確認より先に必ず実施する。
 3. **step 2（アプリ骨組み）**: 下記「step 2」手順で stack 固有の骨組み生成を対話駆動。step 1 で得たコンセプトを stack 選定の判断材料に使う。
-4. **step 3（★人間判断）**: `documenting-specifications` で `docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md` を**前方設計**（step 1 のコンセプトを起点に、仮説として埋める）。
+4. **step 3（★人間判断）**: `documenting-requirements` で `docs/common/REQUIREMENTS.md` を、`documenting-tech-specs` で `docs/common/ARCHITECTURE.md` を**前方設計**（step 1 のコンセプトを起点に、仮説として埋める）。
 5. **step 4（★人間判断）**: P0 コア機能を 1 つ選び、順行で feature spec を作る。
 6. **立ち上げPLAN 生成**: `templates/bootstrap-plan.md` を雛形に `docs/common/plans/stdd-bootstrap.md` を作成し、step 1 で得たコンセプトを「プロダクトコンセプト」セクションに転記、想定 feature を優先順で並べる。
 7. 「次は step 5（フォーマット策定）」を提示して停止。
@@ -98,7 +98,7 @@ docs/common/plans/stdd-bootstrap.md
 ### 1-2. 進める条件（重要）
 
 - **最低 1 レスポンス**を得たら、その**詳細度に関わらず**次ステップへ進む。追加質問で深掘りしない。
-- 不足は step 3（common 階層の前方設計）以降で**仮説**として補う。仮説には必ず**要確認マーカー**を添えてユーザーに是非を確認させ、feature 開発で検証して更新する（→ [要確認マーカー](../documenting-specifications/SKILL.md)）。
+- 不足は step 3（common 階層の前方設計）以降で**仮説**として補う。仮説には必ず**要確認マーカー**を添えてユーザーに是非を確認させ、feature 開発で検証して更新する（→ [要確認マーカー](../documenting-requirements/SKILL.md)）。
 
 ### 1-3. 記録
 
@@ -161,7 +161,7 @@ docs/common/plans/stdd-bootstrap.md
 
 - **一度に 1 ステップ**。複数 feature を無確認で連続処理しない。
 - **★ポイントでは必ず停止**してユーザーに聞く（アーキ判断・粒度・フォーマット）。
-- common 階層は**前方設計＝仮説**。作り込みすぎず、feature 開発で検証して更新する。確定しない箇所は**章を省略せず**、**要確認マーカー**（`**⚠️要確認**｜仮説: … ／確認: …`）を仮説とセットで置いて網羅性を保つ。構文の SSoT は [documenting-specifications SKILL「要確認マーカー」](../documenting-specifications/SKILL.md)。
+- common 階層は**前方設計＝仮説**。作り込みすぎず、feature 開発で検証して更新する。確定しない箇所は**章を省略せず**、**要確認マーカー**（`**⚠️要確認**｜仮説: … ／確認: …`）を仮説とセットで置いて網羅性を保つ。構文の SSoT は [documenting-requirements SKILL「要確認マーカー」](../documenting-requirements/SKILL.md)。
 - 立ち上げPLAN 以外に進捗・履歴を持たない（SSOT 原則。spec 本体に「今回」「変更前」等を書かない）。
 - 遡行スキル（`reverse-engineering-*`）は使わない（新規にはコードが無い）。
 
@@ -170,7 +170,7 @@ docs/common/plans/stdd-bootstrap.md
 ## When NOT to Use This Skill
 
 - **既に稼働しているコード**への STDD 導入: `introducing-stdd` を使う
-- **単一機能の spec を書く / 実装する**だけ: `documenting-specifications` / `auto-implement` を直接使う
+- **単一機能の spec を書く / 実装する**だけ: `documenting-requirements`・`documenting-tech-specs` / `auto-implement` を直接使う
 - **フォーマット策定だけ**やり直したい: `tailoring-spec-format` を直接使う
 
 ---
@@ -179,7 +179,8 @@ docs/common/plans/stdd-bootstrap.md
 
 - **立ち上げガイド（なぜ/判断基準）**: [guide-for-new-project.md](../../../packages/core/docs/guide-for-new-project.md)
 - **立ち上げPLAN テンプレート**: [templates/bootstrap-plan.md](templates/bootstrap-plan.md)
-- **common / feature spec 作成**: [documenting-specifications skill](../documenting-specifications/SKILL.md)
+- **common / feature 要件作成**: [documenting-requirements skill](../documenting-requirements/SKILL.md)
+- **common / feature 技術設計作成**: [documenting-tech-specs skill](../documenting-tech-specs/SKILL.md)
 - **ワイヤーフレーム**: [generating-wireframes skill](../generating-wireframes/SKILL.md)
 - **フォーマット策定・テーラリング**: [tailoring-spec-format skill](../tailoring-spec-format/SKILL.md)
 - **PLAN 作成**: [documenting-plans skill](../documenting-plans/SKILL.md)

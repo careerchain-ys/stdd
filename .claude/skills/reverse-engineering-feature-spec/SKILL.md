@@ -154,7 +154,7 @@ supabase/generated/database.types.ts
 
 ## Phase 2: REQUIREMENTS.md作成
 
-`documenting-specifications` skillのテンプレートに従って作成する。
+`documenting-requirements` skillのテンプレートに従って作成する。
 
 ### リバースエンジニアリング固有のルール
 
@@ -249,7 +249,7 @@ REQUIREMENTS.md作成後、Playwright MCPを使って実装済みUIのスクリ�
 
 ## Phase 4: TECH_DESIGN.md作成
 
-`documenting-specifications` skillのテンプレートに従って作成する。章構成は **1.概要 / 2.主要な設計判断(任意) / 3.画面項目定義(画面 feature のみ必須) / 4.ロジック設計(コア) / 5.エラーハンドリング戦略 / 6.非機能要件(任意)**。
+`documenting-tech-specs` skillのテンプレートに従って作成する。章構成は **1.概要 / 2.主要な設計判断(任意) / 3.画面項目定義(画面 feature のみ必須) / 4.ロジック設計(コア) / 5.エラーハンドリング戦略 / 6.非機能要件(任意)**。
 
 > **データモデル / API は common 階層が SSoT**。TECH_DESIGN にはデータモデルや ER 図、API 設計を持たず、common の `TABLE_DEFINITION.md` / `API_SPEC.md` を**参照**する。TECH_DESIGN のコアはロジック設計。テスト戦略は別ファイル `TEST_PLAN.md`（Phase 4.5）。
 
@@ -303,7 +303,7 @@ const phoneSchema = z.string()
 
 ## Phase 4.5: TEST_PLAN.md作成
 
-テスト戦略は feature 単位の `TEST_PLAN.md` に記述する（TECH_DESIGN には書かない）。`documenting-specifications` skillのテンプレートに従う。
+テスト戦略は feature 単位の `TEST_PLAN.md` に記述する（TECH_DESIGN には書かない）。`documenting-tech-specs` skillのテンプレートに従う。
 
 **テスト総数は作成後に正確にカウントする**
 
@@ -465,7 +465,7 @@ TEST_PLAN.mdのテスト戦略で定めたテストレベルに従って作成�
 以下の場合はこのスキルを使用しない:
 
 - **プロジェクト全体 / common 階層のリバース**（STDD 導入時の `docs/common/` 作成）: `reverse-engineering-common-spec` skillを使用
-- **新規機能の仕様策定**: `documenting-specifications` skillを使用
+- **新規機能の仕様策定**: `documenting-requirements`（要件）／ `documenting-tech-specs`（技術設計）skillを使用
 - **実装タスクの計画**: `documenting-plans` skillを使用
 - **E2Eテストのみの作成**（Specドキュメントが既に存在する場合）: `e2e-testing` skillを使用
 - **バグ修正**: リバースエンジニアリングではなく直接修正
@@ -475,10 +475,11 @@ TEST_PLAN.mdのテスト戦略で定めたテストレベルに従って作成�
 ## 参照ファイル
 
 - **共通spec（common階層）リバース**: [reverse-engineering-common-spec skill](../reverse-engineering-common-spec/SKILL.md)
-- **Specテンプレート**: [documenting-specifications skill](../documenting-specifications/SKILL.md)
+- **要件テンプレート**: [documenting-requirements skill](../documenting-requirements/SKILL.md)
+- **技術設計・テストテンプレート**: [documenting-tech-specs skill](../documenting-tech-specs/SKILL.md)
 - **E2Eテストガイド**: [e2e-testing skill](../../../plugins/playwright/skills/e2e-testing/SKILL.md)（`playwright` プラグイン）
 - **PLANドキュメント**: [documenting-plans skill](../documenting-plans/SKILL.md)
-- **STDD違反例**: [stdd-violations guide](../documenting-specifications/guides/stdd-violations.md)
+- **STDD違反例**: [stdd-violations guide](../documenting-requirements/guides/stdd-violations.md)
 - **正確性ガイド**: [accuracy guide](guides/accuracy.md)
 - **Figmaキャプチャガイド**: [figma-capture guide](guides/figma-capture.md)
 - **DB型定義**: `supabase/generated/database.types.ts`

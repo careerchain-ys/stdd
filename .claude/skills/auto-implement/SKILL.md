@@ -1,7 +1,7 @@
 ---
 name: auto-implement
 description: |-
-  GitHub issue を起点として、Spec 作成→PLAN 作成→実装（STDD）→QA→コードレビュー→Figma 更新→PR 作成までを専門エージェント（Spec Writer / Implementer / QA Engineer / Code Reviewer 等）にオーケストレーションして自動実行する。
+  GitHub issue を起点として、Spec 作成（要件→技術設計）→PLAN 作成→実装（STDD）→QA→コードレビュー→Figma 更新→PR 作成までを専門エージェント（Requirements Writer / Tech Specs Writer / Implementer / QA Engineer / Code Reviewer 等）にオーケストレーションして自動実行する。
 when_to_use: |-
   「auto implement」「自動実装」「issue から実装」「issue 番号を指定して実装」「Agent Teams で実装」「issue を元に PR まで」「#123 を実装して」など、GitHub issue を起点とした包括的な自動実装の依頼があったとき。
 allowed-tools: Bash, Read, Write, Edit, Grep, Glob, Agent
@@ -93,8 +93,10 @@ GitHub Projectのステータス更新の手順は [references/github-project.md
 
 ```
 Team Lead（オーケストレーター）      ← このスキル自身
- ├→ Spec Writer          : REQUIREMENTS.md + TECH_DESIGN.md + TEST_PLAN.md 作成
- ├→ Spec Reviewer        : Spec の品質・整合性・漏れをレビュー
+ ├→ Requirements Writer   : REQUIREMENTS.md 作成（要件: What & Why）
+ ├→ Requirements Reviewer : REQUIREMENTS.md の品質・網羅性・SSOT をレビュー
+ ├→ Tech Specs Writer    : TECH_DESIGN.md + TEST_PLAN.md 作成（技術設計: How / common 技術階層も担当）
+ ├→ Tech Specs Reviewer  : 技術設計・テスト戦略の品質・整合性・SSOT をレビュー
  ├→ Plan Writer          : タスク分解・実装計画（PLANドキュメント）を作成
  ├→ Implementer          : テスト作成 → 実装（STDDフロー）
  ├→ Test Reviewer        : テスト戦略準拠・形骸的テスト検出・テストコード品質レビュー
@@ -110,15 +112,17 @@ Team Lead（オーケストレーター）      ← このスキル自身
 - 各フェーズで対応するエージェントに作業を依頼する
 - エージェントの成果物を受け取り、次のフェーズに引き渡す
 - 問題が発生した場合は適切なエージェントに修正を依頼し、最大3回の修正ループを管理する
+- **人間レビューゲートを尊重する**: Phase 1a（要件）と Phase 1b（技術設計）はエージェントレビュー承認後に**ユーザー（人間）のレビュー**を仰ぐ。ユーザーの承認を得るまで次フェーズに進まない（詳細は phases.md）
 - 全フェーズの完了後にPRを作成し、ユーザーに報告する
 
 各フェーズの詳細な手順は [references/phases.md](references/phases.md) を参照。
 モードに応じて以下のフェーズを順次実行する:
 
-| Phase     | 名称                   | full | spec-only | impl-only | quick |
-| --------- | ---------------------- | ---- | --------- | --------- | ----- |
-| Phase 1   | Spec作成               | ✓    | ✓         |           |       |
-| Phase 1.5 | PLAN作成               | ✓    |           | ✓         |       |
+| Phase      | 名称                          | full | spec-only | impl-only | quick |
+| ---------- | ----------------------------- | ---- | --------- | --------- | ----- |
+| Phase 1a   | 要件作成 → 人間レビューゲート①  | ✓    | ✓         |           |       |
+| Phase 1b   | 技術設計作成 → 人間レビューゲート② | ✓    | ✓         |           |       |
+| Phase 1.5  | PLAN作成                      | ✓    |           | ✓         |       |
 | Phase 2   | 実装                   | ✓    |           | ✓         | ✓     |
 | Phase 2.5 | テストレビュー         | ✓    |           | ✓         |       |
 | Phase 3   | QA                     | ✓    |           | ✓         |       |
@@ -142,8 +146,12 @@ Team Lead（オーケストレーター）      ← このスキル自身
 ### フェーズ実行結果
 | フェーズ | 状態 | 備考 |
 |---------|------|------|
-| Spec作成 | OK / SKIP | |
-| Specレビュー | OK / SKIP | |
+| 要件作成（REQUIREMENTS） | OK / SKIP | |
+| 要件レビュー | OK / SKIP | |
+| 人間レビューゲート①（要件） | OK / SKIP | |
+| 技術設計作成（TECH_DESIGN+TEST_PLAN） | OK / SKIP | |
+| 技術設計レビュー | OK / SKIP | |
+| 人間レビューゲート②（技術設計） | OK / SKIP | |
 | PLAN作成 | OK / SKIP | |
 | テスト作成 | OK / SKIP | |
 | テストレビュー | OK / SKIP | |

@@ -18,12 +18,12 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 | `docs/common/TABLE_DEFINITION.md` | 全テーブル定義の SSoT（カード形式・ER図なし） |
 | `docs/common/API_SPEC.md` | API 契約の SSoT（OpenAPI 風 Markdown。API がある場合） |
 
-このうち `ARCHITECTURE.md` / `TABLE_DEFINITION.md` / `API_SPEC.md` は技術 spec (tech_specs) の common 分にあたる（→ `stdd-methodology.md` §2）。テンプレートは `../documenting-specifications/templates/requirements-common.md` / `architecture-common.md` を参照する。
+このうち `ARCHITECTURE.md` / `TABLE_DEFINITION.md` / `API_SPEC.md` は技術 spec (tech_specs) の common 分にあたる（→ `stdd-methodology.md` §2）。テンプレートは `../documenting-requirements/templates/requirements-common.md`（REQUIREMENTS）/ `../documenting-tech-specs/templates/architecture-common.md`（ARCHITECTURE。TABLE_DEFINITION / API_SPEC も同ディレクトリ）を参照する。
 
 ## 位置づけ — 導入時に一度だけ
 
 common 階層はプロジェクト全体で 1 組しか存在しない SSoT であり、本スキルは **STDD 導入時に一度だけ**実行する想定。
-作成後の更新（アーキテクチャ変更時など）は本スキルではなく、通常の Spec 更新として `documenting-specifications` で扱う。
+作成後の更新（アーキテクチャ変更時など）は本スキルではなく、通常の Spec 更新として `documenting-requirements`（要件）／ `documenting-tech-specs`（ARCHITECTURE 等の技術設計）で扱う。
 
 ```
 STDD 導入フロー（既存プロジェクト）
@@ -102,7 +102,7 @@ feature 階層と違い、確認する一次情報は **UI 文言ではなく構
 
 ## 確信が持てない箇所は要確認マーカーを残す
 
-実装からの読み取りに確信が持てない箇所は **要確認マーカー**（可視インライン）で明示する。逆生成でも「実装からこう読めた」という**仮説とセット**で置き、その是非をユーザーに確認させる。構文の SSoT は [documenting-specifications SKILL「要確認マーカー」](../documenting-specifications/SKILL.md)。
+実装からの読み取りに確信が持てない箇所は **要確認マーカー**（可視インライン）で明示する。逆生成でも「実装からこう読めた」という**仮説とセット**で置き、その是非をユーザーに確認させる。構文の SSoT は [documenting-requirements SKILL「要確認マーカー」](../documenting-requirements/SKILL.md)。
 これは**一時的な注記**であり、人間レビューで確定したらマーカーを除去する（恒久的に残さない）。SSoT 原則上、確定済みの Spec に作成プロセスや未確定メモを残してはならない。
 
 ```markdown
@@ -128,8 +128,8 @@ feature 階層と違い、確認する一次情報は **UI 文言ではなく構
 ## When NOT to Use This Skill
 
 - **機能 / ページ単位のリバースエンジニアリング**: `reverse-engineering-feature-spec` を使用
-- **新規機能の仕様策定**: `documenting-specifications` を使用
-- **common 階層作成後のアーキテクチャ更新**: 通常の Spec 更新として `documenting-specifications` で扱う
+- **新規機能の仕様策定**: `documenting-requirements`（要件）／ `documenting-tech-specs`（技術設計）を使用
+- **common 階層作成後のアーキテクチャ更新**: 通常の Spec 更新として `documenting-tech-specs`（ARCHITECTURE/TABLE/API）で扱う
 
 ---
 
@@ -142,7 +142,8 @@ feature 階層と違い、確認する一次情報は **UI 文言ではなく構
 
 ## 参照ファイル
 
-- **common テンプレート**: `../documenting-specifications/templates/requirements-common.md` / `architecture-common.md`
+- **common テンプレート**: `../documenting-requirements/templates/requirements-common.md`（REQUIREMENTS）/ `../documenting-tech-specs/templates/architecture-common.md`・`table-definition-common.md`・`api-spec-common.md`（技術階層）
 - **2 階層構造の解説**: `packages/core/docs/stdd-methodology.md` §2.0
 - **機能単位リバース**: [reverse-engineering-feature-spec skill](../reverse-engineering-feature-spec/SKILL.md)
-- **Specテンプレート**: [documenting-specifications skill](../documenting-specifications/SKILL.md)
+- **要件テンプレート**: [documenting-requirements skill](../documenting-requirements/SKILL.md)
+- **技術設計テンプレート**: [documenting-tech-specs skill](../documenting-tech-specs/SKILL.md)

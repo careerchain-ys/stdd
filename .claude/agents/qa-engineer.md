@@ -175,7 +175,8 @@ QAチェック時に以下のスキルのガイドラインを基準として参
 | e2e-testing                | `plugins/playwright/skills/e2e-testing/`                | E2Eテスト実行・品質評価時                                          |
 | implementing-ui            | `plugins/nextjs-supabase/skills/implementing-ui/`            | UIコンポーネントの品質チェック時（レスポンシブ、アクセシビリティ） |
 | software-architecture      | `.claude/skills/software-architecture/`      | アーキテクチャ整合性チェック時                                     |
-| documenting-specifications | `.claude/skills/documenting-specifications/` | Spec⇔実装の整合性チェック時                                        |
+| documenting-requirements   | `.claude/skills/documenting-requirements/`   | 要件（REQUIREMENTS）⇔実装の整合性チェック時                        |
+| documenting-tech-specs    | `.claude/skills/documenting-tech-specs/`    | 技術設計（TECH_DESIGN/TEST_PLAN）⇔実装の整合性チェック時           |
 
 ## 必須の事前読み込み
 

@@ -19,7 +19,8 @@ packages/core/
 └── README.md                     # 本ファイル
 ```
 
-> spec / PLAN テンプレートは `.claude/skills/documenting-specifications/templates/`（spec 各種）と
+> spec / PLAN テンプレートは `.claude/skills/documenting-requirements/templates/`（REQUIREMENTS）・
+> `.claude/skills/documenting-tech-specs/templates/`（TECH_DESIGN・TEST_PLAN・common 技術階層）と
 > `.claude/skills/documenting-plans/templates/`（PLAN）に集約されている。
 
 ---
@@ -29,7 +30,7 @@ packages/core/
 1. `docs/stdd-methodology.md` を読んで STDD の全体像を掴む
 2. `docs/workflow-diagram.md` でフローを視覚的に把握する
 3. 自プロジェクトに `.stdd.config.yml` を作成し、`schema/.stdd.config.schema.json` で IDE 補完 / 検証を有効化する
-4. `documenting-specifications` スキルのテンプレート（`.claude/skills/documenting-specifications/templates/`）を参照して spec を書き始める
+4. `documenting-requirements`（要件）／ `documenting-tech-specs`（技術設計）スキルのテンプレート（`.claude/skills/documenting-requirements/templates/`・`.claude/skills/documenting-tech-specs/templates/`）を参照して spec を書き始める
 
 ---
 

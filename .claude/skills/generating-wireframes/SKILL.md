@@ -56,7 +56,7 @@ docs/<app>/<feature_path>/wireframes/
 
 ### 4. REQUIREMENTS.md の「2.4 UI/UX・画面」を更新
 
-ASCII アートは置かない。代わりに以下を書く（テンプレートは `documenting-specifications` の REQUIREMENTS テンプレートに準拠）:
+ASCII アートは置かない。代わりに以下を書く（テンプレートは `documenting-requirements` の REQUIREMENTS テンプレートに準拠）:
 
 - `./wireframes/index.html` へのリンク（ワイヤーフレーム一覧）
 - 画面ごとに: 画面名・主な操作（ボタン文言）・表示要素の要点
@@ -118,4 +118,4 @@ REQUIREMENTS.md（ユースケース）
 - [templates/index.html](templates/index.html) — 画面一覧ひな型
 - [guides/from-requirements.md](guides/from-requirements.md) — ユースケース → 画面の起こし方
 - [examples/](examples/) — toC / toB のサンプル WF
-- 関連: [documenting-specifications](../documenting-specifications/SKILL.md)（REQUIREMENTS テンプレート）
+- 関連: [documenting-requirements](../documenting-requirements/SKILL.md)（REQUIREMENTS テンプレート）
