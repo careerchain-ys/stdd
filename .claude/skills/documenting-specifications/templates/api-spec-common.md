@@ -1,6 +1,6 @@
 # API_SPEC.md テンプレート（common）
 
-**目的**: プロジェクトの API 仕様（入出力契約）を集約する正典。各 feature の `TECH_DESIGN.md` は本書を**参照**し、エンドポイントを再定義しない。
+**目的**: プロジェクトの API 仕様（入出力契約）を集約する SSoT。各 feature の `TECH_DESIGN.md` は本書を**参照**し、エンドポイントを再定義しない。
 
 **配置**: `docs/common/API_SPEC.md`（`.stdd.config.yml` の `docs.layout.common_api_spec` に従う）
 
@@ -22,7 +22,7 @@
 ````markdown
 # [サービス名] API 仕様
 
-> API 入出力契約の正典（SSoT）。各機能の `TECH_DESIGN.md` は本書を参照する。
+> API 入出力契約の SSoT。各機能の `TECH_DESIGN.md` は本書を参照する。
 > 処理アルゴリズムは各 feature の `TECH_DESIGN.md`（ロジック設計）に置く。
 >
 > **最終更新**: [yyyy-mm-dd] / **ベース URL**: [https://example.com/api] / **認証**: [Bearer / Cookie 等]

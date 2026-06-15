@@ -81,7 +81,7 @@ stdd/
 
 **方法論**
 
-- [`packages/core/docs/stdd-methodology.md`](packages/core/docs/stdd-methodology.md) — STDD 方法論（Spec の 2 ティア構造・テスト戦略・開発フロー）
+- [`packages/core/docs/stdd-methodology.md`](packages/core/docs/stdd-methodology.md) — STDD 方法論（Spec の 2 階層構造・テスト戦略・開発フロー）
 - [`packages/core/docs/workflow-diagram.md`](packages/core/docs/workflow-diagram.md) — 開発フロー図
 
 **開発・運用の参考**

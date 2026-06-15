@@ -2,8 +2,8 @@
 共通 ARCHITECTURE.md — STDD システム概要ドキュメント (プロジェクト全体 / 技術視点)
 
 位置づけ:
-  - 本ファイルは common ティアの技術設計（システム概要）。複数 feature が前提とする横断的な
-    技術文脈（構成・スタック・連携・セキュリティ・インフラ）を俯瞰する正典 (SSoT)。
+  - 本ファイルは common 階層の技術設計（システム概要）。複数 feature が前提とする横断的な
+    技術文脈（構成・スタック・連携・セキュリティ・インフラ）を俯瞰する SSoT。
   - データモデルは ./TABLE_DEFINITION.md、API 仕様は ./API_SPEC.md に分離する（本書には持たない）。
   - サービスの目的・アクター・アプリの責務分担は ./REQUIREMENTS.md を参照する。
   - 機能・ページ単位の技術設計は docs/<app>/<feature>/TECH_DESIGN.md を参照する。
@@ -15,7 +15,7 @@
 
 # [サービス名] アーキテクチャ設計書
 
-> **位置づけ**: 本書は [サービス名] 全体のシステム概要を俯瞰する正典（common ティアの技術設計）。
+> **位置づけ**: 本書は [サービス名] 全体のシステム概要を俯瞰する SSoT（common 階層の技術設計）。
 > サービスの目的・アクターなどのビジネス要件は [`REQUIREMENTS.md`](./REQUIREMENTS.md) を参照。
 > データモデルは [`TABLE_DEFINITION.md`](./TABLE_DEFINITION.md)、API 仕様は [`API_SPEC.md`](./API_SPEC.md) を参照。
 > 機能・画面単位の技術設計は `docs/<app>/<feature>/TECH_DESIGN.md` を参照。

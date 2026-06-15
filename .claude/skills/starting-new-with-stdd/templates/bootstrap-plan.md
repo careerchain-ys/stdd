@@ -26,10 +26,10 @@
 
 ### 基盤
 
-- [ ] step 0: `.stdd.config.yml` 点検（common ティア前提）
+- [ ] step 0: `.stdd.config.yml` 点検（common 階層前提）
 - [ ] step 1: プロダクトコンセプトのヒアリング（下記「プロダクトコンセプト」へ転記）
 - [ ] step 2: アプリ骨組み生成（stack 固有。`apps[].path` / `commands.*` 疎通確認）
-- [ ] step 3: common ティアを前方設計（`docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md`。仮説）
+- [ ] step 3: common 階層を前方設計（`docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md`。仮説）
 - [ ] step 4: 最初の feature を順行 spec 化（[機能名]）
 - [ ] step 5: フォーマット策定 → テンプレ特化（下記「決定ログ」へ）
 
@@ -68,7 +68,7 @@
 
 ---
 
-## 前方設計の要確認事項（common ティア）
+## 前方設計の要確認事項（common 階層）
 
 前方設計で仮説として置き、ユーザーに是非を確認したい事項。spec 本体にも**要確認マーカー**（`**⚠️要確認**｜仮説: … ／確認: …`）を残し、ここに一覧化して追跡する。確定したら spec のマーカーを除去し、この項目を `- [x]` にする。
 

@@ -1,48 +1,48 @@
 ---
 name: reverse-engineering-common-spec
 description: |-
-  既存プロジェクトに STDD を導入する際、コードベース全体をリバースエンジニアリングして common ティアの Spec（docs/common/REQUIREMENTS.md + ARCHITECTURE.md（システム概要）+ TABLE_DEFINITION.md（テーブル定義）+ API_SPEC.md（API がある場合））を作成する。サービス概要・システム構成・リポジトリ構成・レイヤ規約・データモデル・API 契約を俯瞰する正典を、導入時に一度だけ生成する。機能/ページ単位のリバースエンジニアリングには reverse-engineering-feature-spec を使用する。
+  既存プロジェクトに STDD を導入する際、コードベース全体をリバースエンジニアリングして common 階層の Spec（docs/common/REQUIREMENTS.md + ARCHITECTURE.md（システム概要）+ TABLE_DEFINITION.md（テーブル定義）+ API_SPEC.md（API がある場合））を作成する。サービス概要・システム構成・リポジトリ構成・レイヤ規約・データモデル・API 契約を俯瞰する SSoT を、導入時に一度だけ生成する。機能/ページ単位のリバースエンジニアリングには reverse-engineering-feature-spec を使用する。
 when_to_use: |-
-  「STDD導入」「stdd導入」「共通spec生成」「commonティア」「プロジェクト全体のリバースエンジニアリング」「ARCHITECTURE.md作成」「アーキテクチャのドキュメント化」「既存プロジェクトにstdd」に関する作業のとき。
+  「STDD導入」「stdd導入」「共通spec生成」「common階層」「プロジェクト全体のリバースエンジニアリング」「ARCHITECTURE.md作成」「アーキテクチャのドキュメント化」「既存プロジェクトにstdd」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
 # common spec のリバースエンジニアリング
 
-既存（稼働中）プロジェクトに STDD を導入する際、コードベース全体を input にして **common ティア**の Spec を作成する。
+既存（稼働中）プロジェクトに STDD を導入する際、コードベース全体を input にして **common 階層**の Spec を作成する。
 
 | 出力 | 内容 |
 | ---- | ---- |
 | `docs/common/REQUIREMENTS.md` | サービス概要・登場アクター・アプリ構成（プロジェクト全体のビジネス要件） |
 | `docs/common/ARCHITECTURE.md` | システム概要（システム構成・リポジトリ構成・レイヤ規約・スタック・連携・セキュリティ・インフラ。データモデル/API は持たない） |
-| `docs/common/TABLE_DEFINITION.md` | 全テーブル定義の正典（カード形式・ER図なし） |
-| `docs/common/API_SPEC.md` | API 契約の正典（OpenAPI 風 Markdown。API がある場合） |
+| `docs/common/TABLE_DEFINITION.md` | 全テーブル定義の SSoT（カード形式・ER図なし） |
+| `docs/common/API_SPEC.md` | API 契約の SSoT（OpenAPI 風 Markdown。API がある場合） |
 
 テンプレートは `../documenting-specifications/templates/requirements-common.md` / `architecture-common.md` を参照する。
 
 ## 位置づけ — 導入時に一度だけ
 
-common ティアはプロジェクト全体で 1 組しか存在しない正典であり、本スキルは **STDD 導入時に一度だけ**実行する想定。
+common 階層はプロジェクト全体で 1 組しか存在しない SSoT であり、本スキルは **STDD 導入時に一度だけ**実行する想定。
 作成後の更新（アーキテクチャ変更時など）は本スキルではなく、通常の Spec 更新として `documenting-specifications` で扱う。
 
 ```
 STDD 導入フロー（既存プロジェクト）
 
 1. reverse-engineering-common-spec  ← 本スキル（一度だけ）
-        ↓  common ティアが揃う
+        ↓  common 階層が揃う
 2. reverse-engineering-feature-spec ← 機能ごとに繰り返す
         ↓
 3. auto-implement                    ← 以降の新機能は順行 STDD
 ```
 
-**順序の理由**: 先に common ティア（レイヤ規約・共有ドメインモデル・テーブル定義・API 契約）を固定しておくと、後続の機能単位リバース（`reverse-engineering-feature-spec`）の精度と速度が上がる。
+**順序の理由**: 先に common 階層（レイヤ規約・共有ドメインモデル・テーブル定義・API 契約）を固定しておくと、後続の機能単位リバース（`reverse-engineering-feature-spec`）の精度と速度が上がる。
 
 ---
 
 ## 最重要原則 — 実装・設定が真実
 
-common ティアでも **実装が真実（Source of Truth）** である。推測や理想論で書かず、必ず一次情報を確認してから書く。
-feature ティアと違い、確認する一次情報は **UI 文言ではなく構成・設定・型定義** である。
+common 階層でも **実装が真実（Source of Truth）** である。推測や理想論で書かず、必ず一次情報を確認してから書く。
+feature 階層と違い、確認する一次情報は **UI 文言ではなく構成・設定・型定義** である。
 
 | 記述する内容 | 確認元（一次情報） | よくある間違い |
 | ------------ | ------------------ | -------------- |
@@ -102,7 +102,7 @@ feature ティアと違い、確認する一次情報は **UI 文言ではなく
 
 ## 確信が持てない箇所は要確認マーカーを残す
 
-実装からの読み取りに確信が持てない箇所は **要確認マーカー**（可視インライン）で明示する。逆生成でも「実装からこう読めた」という**仮説とセット**で置き、その是非をユーザーに確認させる。構文の正典は [documenting-specifications SKILL「要確認マーカー」](../documenting-specifications/SKILL.md)。
+実装からの読み取りに確信が持てない箇所は **要確認マーカー**（可視インライン）で明示する。逆生成でも「実装からこう読めた」という**仮説とセット**で置き、その是非をユーザーに確認させる。構文の SSoT は [documenting-specifications SKILL「要確認マーカー」](../documenting-specifications/SKILL.md)。
 これは**一時的な注記**であり、人間レビューで確定したらマーカーを除去する（恒久的に残さない）。SSoT 原則上、確定済みの Spec に作成プロセスや未確定メモを残してはならない。
 
 ```markdown
@@ -117,7 +117,7 @@ feature ティアと違い、確認する一次情報は **UI 文言ではなく
 □ docs/common/REQUIREMENTS.md を作成（サービス概要 / アクター / アプリ構成）
 □ docs/common/ARCHITECTURE.md を作成（システム概要：システム構成 / リポジトリ / レイヤ。データモデル/API は持たない）
 □ docs/common/TABLE_DEFINITION.md を作成（全テーブル定義・カード形式・ER 図なし）
-□ docs/common/API_SPEC.md を作成（API がある場合・API 契約の正典）
+□ docs/common/API_SPEC.md を作成（API がある場合・API 契約の SSoT）
 □ テーブル一覧は生成された型定義ファイルと一致している
 □ 固有名詞・社外秘の値を不要に含めていない（公開を想定する場合）
 □ 要確認マーカーは仮説とセットになっており、「人間に確認すべき項目」としてレビュー依頼にまとめた
@@ -129,13 +129,13 @@ feature ティアと違い、確認する一次情報は **UI 文言ではなく
 
 - **機能 / ページ単位のリバースエンジニアリング**: `reverse-engineering-feature-spec` を使用
 - **新規機能の仕様策定**: `documenting-specifications` を使用
-- **common ティア作成後のアーキテクチャ更新**: 通常の Spec 更新として `documenting-specifications` で扱う
+- **common 階層作成後のアーキテクチャ更新**: 通常の Spec 更新として `documenting-specifications` で扱う
 
 ---
 
 ## 次のステップ
 
-1. **機能単位のリバース** → `reverse-engineering-feature-spec`（common ティアを前提に、機能ごとに繰り返す）
+1. **機能単位のリバース** → `reverse-engineering-feature-spec`（common 階層を前提に、機能ごとに繰り返す）
 2. **新機能の実装** → `auto-implement`（以降は Spec → Test → 実装 の順行 STDD）
 
 ---
@@ -143,6 +143,6 @@ feature ティアと違い、確認する一次情報は **UI 文言ではなく
 ## 参照ファイル
 
 - **common テンプレート**: `../documenting-specifications/templates/requirements-common.md` / `architecture-common.md`
-- **2 ティア構造の解説**: `packages/core/docs/stdd-methodology.md` §2.0
+- **2 階層構造の解説**: `packages/core/docs/stdd-methodology.md` §2.0
 - **機能単位リバース**: [reverse-engineering-feature-spec skill](../reverse-engineering-feature-spec/SKILL.md)
 - **Specテンプレート**: [documenting-specifications skill](../documenting-specifications/SKILL.md)

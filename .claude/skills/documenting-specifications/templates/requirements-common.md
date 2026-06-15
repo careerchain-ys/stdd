@@ -1,6 +1,6 @@
 # REQUIREMENTS.md テンプレート（common）
 
-**目的**: プロジェクト全体の要件を俯瞰する正典。各 feature の REQUIREMENTS.md はこれを前提とする。
+**目的**: プロジェクト全体の要件を俯瞰する SSoT。各 feature の REQUIREMENTS.md はこれを前提とする。
 
 **配置**: `docs/common/REQUIREMENTS.md`
 

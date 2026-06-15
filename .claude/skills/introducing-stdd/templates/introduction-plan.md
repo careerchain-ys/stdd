@@ -26,7 +26,7 @@
 ### 基盤
 
 - [ ] step 0: `.stdd.config.yml` 作成・テンプレ/skill 配置
-- [ ] step 1: common ティア生成（`docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md`）
+- [ ] step 1: common 階層生成（`docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md`）
   - [ ] **要確認マーカー**（仮説つき）の解消（人間が是非を確定 → マーカー除去）
 - [ ] step 1.5: 機能インベントリ + 優先順を確定（下記「機能ループ」へ反映）
 - [ ] step 2: 代表機能のリバース（[機能名]）

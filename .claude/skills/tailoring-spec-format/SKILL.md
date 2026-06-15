@@ -35,7 +35,7 @@ STDD 導入（既存プロジェクト, step 3-4）・立ち上げ（新規プ�
 現状を把握する。
 
 ```
-□ docs/common/REQUIREMENTS.md / ARCHITECTURE.md（common ティアの構成）
+□ docs/common/REQUIREMENTS.md / ARCHITECTURE.md（common 階層の構成）
 □ 代表 feature spec（REQUIREMENTS.md / TECH_DESIGN.md / TEST_PLAN.md）の実物
 □ 現在の .stdd.config.yml（docs.layout / apps / commands）
 □ 利用中のテンプレ（`.claude/skills/documenting-specifications/templates/` または プロジェクト側コピー）

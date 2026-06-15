@@ -1,7 +1,7 @@
 ---
 name: documenting-specifications
 description: |-
-  REQUIREMENTS.md（業務要件・機能要件・非機能要件）・TECH_DESIGN.md（技術設計）・TEST_PLAN.md（テスト戦略）と、common ティアの ARCHITECTURE / TABLE_DEFINITION / API_SPEC / DESIGN のテンプレートとガイドラインを提供する。STDD 方法論に従った仕様ドキュメントの作成・更新を支援する。
+  REQUIREMENTS.md（業務要件・機能要件・非機能要件）・TECH_DESIGN.md（技術設計）・TEST_PLAN.md（テスト戦略）と、common 階層の ARCHITECTURE / TABLE_DEFINITION / API_SPEC / DESIGN のテンプレートとガイドラインを提供する。STDD 方法論に従った仕様ドキュメントの作成・更新を支援する。
 when_to_use: |-
   「spec」「仕様書」「設計書」「要件定義」「REQUIREMENTS.md」「TECH_DESIGN.md」「TEST_PLAN.md」「テーブル定義」「API仕様」「Spec and Test Driven Development」「STDD」「仕様駆動」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep
@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 
 # 仕様ドキュメント（REQUIREMENTS / TECH_DESIGN / TEST_PLAN）の作成
 
-STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.md・TECH_DESIGN.md・TEST_PLAN.md（および common ティアの spec）を作成・更新します。
+STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.md・TECH_DESIGN.md・TEST_PLAN.md（および common 階層の spec）を作成・更新します。
 
 ## Quick Start
 
@@ -56,7 +56,7 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
    - テスト戦略（REQUIREMENTS のユースケース＋ TECH_DESIGN のロジック設計を E2E/Integration/Unit にマッピング）
    - [テンプレート](templates/test-plan.md) を参照
 
-> 横断要素（テーブル定義・API 仕様）は common ティアに集約する。新規テーブル / API が生じたら common の
+> 横断要素（テーブル定義・API 仕様）は common 階層に集約する。新規テーブル / API が生じたら common の
 > [`TABLE_DEFINITION.md`](templates/table-definition-common.md) / [`API_SPEC.md`](templates/api-spec-common.md) を更新し、feature からは参照する。
 
 ### 既存機能の仕様書を更新する場合
@@ -65,17 +65,17 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
 2. 変更内容に応じて更新（テーブル・API の変更は common の TABLE_DEFINITION / API_SPEC に反映）
 3. テスト戦略（テスト総数・内訳）は TEST_PLAN.md を更新
 
-## Spec の 2 ティア構造（common / feature）
+## Spec の 2 階層構造（common / feature）
 
-本スキルが扱う feature ティア（機能単位）の spec は、上位の **common ティア**（プロジェクト全体）を前提とする。
+本スキルが扱う feature 階層（機能単位）の spec は、上位の **common 階層**（プロジェクト全体）を前提とする。
 
-| ティア      | ドキュメント | 配置例 |
+| 階層      | ドキュメント | 配置例 |
 | ----------- | --- | --- |
 | **common**  | `REQUIREMENTS.md`（業務要件）/ `ARCHITECTURE.md`（システム概要）/ `TABLE_DEFINITION.md`（テーブル定義）/ `API_SPEC.md`（API 仕様）/ `DESIGN.md`（任意） | `docs/common/` |
 | **feature** | `REQUIREMENTS.md` / `TECH_DESIGN.md` / `TEST_PLAN.md` | `docs/<app>/<feature>/` |
 
-- feature spec は common ティア（サービス目的・アクター・システム構成・テーブル定義・API 仕様）を**前提とし、参照する**。common と矛盾しないこと。**テーブル・API は feature で再定義しない**。
-- common ティアのテンプレート: [`requirements-common.md`](templates/requirements-common.md) / [`architecture-common.md`](templates/architecture-common.md) / [`table-definition-common.md`](templates/table-definition-common.md) / [`api-spec-common.md`](templates/api-spec-common.md) / [`design-common.md`](templates/design-common.md)。既存実装からの common spec 作成は `reverse-engineering-common-spec` スキルを参照。
+- feature spec は common 階層（サービス目的・アクター・システム構成・テーブル定義・API 仕様）を**前提とし、参照する**。common と矛盾しないこと。**テーブル・API は feature で再定義しない**。
+- common 階層のテンプレート: [`requirements-common.md`](templates/requirements-common.md) / [`architecture-common.md`](templates/architecture-common.md) / [`table-definition-common.md`](templates/table-definition-common.md) / [`api-spec-common.md`](templates/api-spec-common.md) / [`design-common.md`](templates/design-common.md)。既存実装からの common spec 作成は `reverse-engineering-common-spec` スキルを参照。
 - REQUIREMENTS は common / feature とも **業務要件 → 機能要件 → 非機能要件** の3層で揃える。非機能要件・横断業務ルール・用語は common に集約し、feature は「common 準拠」で参照する。
 
 ## ドキュメント配置ルール
@@ -173,7 +173,7 @@ HTMLテンプレートは `lib/email/templates/` で管理。
 
 Spec を書く過程で、確信が持てない／ユーザーに確定してもらう必要がある箇所は、**章を省略したり空欄にしたりせず**、その箇所に **要確認マーカー** を置く。テンプレートの章構成は常に維持し、埋められない部分も「仮説＋要確認」で埋めることで spec の**網羅性を担保**する。
 
-> このマーカーは STDD 全体で**唯一の確認用マーカー**。前方設計（新規・`starting-new-with-stdd`）／逆生成（既存・`reverse-engineering-*`）でも同じ構文を使う。各スキルはここを正典として参照する。
+> このマーカーは STDD 全体で**唯一の確認用マーカー**。前方設計（新規・`starting-new-with-stdd`）／逆生成（既存・`reverse-engineering-*`）でも同じ構文を使う。各スキルはここを SSoT として参照する。
 
 ### 唯一の構文（可視インライン）
 
@@ -272,11 +272,11 @@ Spec を書く過程で、確信が持てない／ユーザーに確定しても
 - §2 その他処理フロー別テスト戦略（TECH_DESIGN §4.2 がある場合）
 - **テスト総数と内訳**（例: 合計 33 件 - Unit 18 件, Integration 9 件, E2E 6 件）
 
-### common ティアの技術ドキュメント
+### common 階層の技術ドキュメント
 
 - **ARCHITECTURE.md**: システム概要（構成 / スタック / 連携 / セキュリティ / インフラ）。データモデル・API は持たない。
-- **TABLE_DEFINITION.md**: 全テーブル定義の正典（カード形式・ER 図なし）。feature が参照する。
-- **API_SPEC.md**: API 契約の正典（OpenAPI 風 Markdown）。feature が参照する。
+- **TABLE_DEFINITION.md**: 全テーブル定義の SSoT（カード形式・ER 図なし）。feature が参照する。
+- **API_SPEC.md**: API 契約の SSoT（OpenAPI 風 Markdown）。feature が参照する。
 - **DESIGN.md**（任意）: デザイン標準。
 
 ### Priority（優先度）ガイドライン
@@ -366,7 +366,7 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）の作成・レビ�
 □ REQUIREMENTS の Priority（P0/P1/P2）と対応している
 ```
 
-### common ティア（テーブル定義 / API 仕様）更新時
+### common 階層（テーブル定義 / API 仕様）更新時
 
 ```
 □ TABLE_DEFINITION.md: 新規/変更テーブルをカード形式で記載（型は論理型・FK は説明欄）

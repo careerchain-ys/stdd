@@ -47,7 +47,7 @@ docs/common/plans/stdd-introduction.md
 | step | 実行内容 | 呼ぶスキル | ★停止して確認 |
 | ---- | -------- | ---------- | ------------- |
 | 0 | `.stdd.config.yml` を対話的に作成（下記「step 0」詳細）/ テンプレ・skill 配置 | — | 構成（単一/複数アプリ・パス規約） |
-| 1 | common ティア生成 | `reverse-engineering-common-spec` | 生成後の**要確認マーカー**一覧 |
+| 1 | common 階層生成 | `reverse-engineering-common-spec` | 生成後の**要確認マーカー**一覧 |
 | 1.5 | 機能インベントリ + 優先順 → 導入PLAN へ記載 | — | ★ 機能一覧と優先順（P0 から） |
 | 2 | 代表機能 1 つをリバース | `reverse-engineering-feature-spec` | ★ Spec 粒度・スコープ |
 | 3-4 | フォーマット策定 → テンプレ特化 | `tailoring-spec-format` | ★★ フォーマット決定（テーラリング） |
@@ -62,7 +62,7 @@ docs/common/plans/stdd-introduction.md
 
 1. **プロジェクト点検**: ディレクトリ構成・`package.json`・ルーティングをざっと把握。
 2. **step 0（対話的セットアップ）**: `.stdd.config.yml` が無ければ、下記「step 0」手順で 点検 → 草案 → 確認 → 書き込み を対話的に行う。
-3. **step 1 実行**: `reverse-engineering-common-spec` を呼び、common ティアを生成。**要確認マーカー**（仮説つき）を一覧化して人間に提示。
+3. **step 1 実行**: `reverse-engineering-common-spec` を呼び、common 階層を生成。**要確認マーカー**（仮説つき）を一覧化して人間に提示。
 4. **step 1.5（★人間判断）**: ルーティング・主要ドメインから機能を洗い出し、**優先順をユーザーと合意**。
 5. **導入PLAN 生成**: `templates/introduction-plan.md` を雛形に `docs/common/plans/stdd-introduction.md` を作成し、機能を優先順で並べる。
 6. 「次は step 2（代表機能のリバース）」を提示して停止。
@@ -115,7 +115,7 @@ commands:
   test: <推定>
 docs:
   layout:
-    common_requirements: docs/common/REQUIREMENTS.md    # common ティアを使う場合のみ
+    common_requirements: docs/common/REQUIREMENTS.md    # common 階層を使う場合のみ
     common_architecture: docs/common/ARCHITECTURE.md
     common_table_definition: docs/common/TABLE_DEFINITION.md
     common_api_spec: docs/common/API_SPEC.md             # API がある場合
@@ -133,7 +133,7 @@ docs:
 □ 単一 / 複数アプリ、各アプリの id・path
 □ docs.layout のパス規約（単一アプリなら {{app.id}} を省く等の調整）
 □ test / typecheck コマンドが実際に動くか
-□ common ティアを使うか（使うなら common_requirements / common_architecture を含める）
+□ common 階層を使うか（使うなら common_requirements / common_architecture を含める）
 □ worktree / devcontainer を使うか（workflow セクションを足すか）
 ```
 
@@ -171,7 +171,7 @@ docs:
 ## When NOT to Use This Skill
 
 - **単一機能のリバースだけ**したい: `reverse-engineering-feature-spec` を直接使う
-- **common ティアだけ**作りたい: `reverse-engineering-common-spec` を直接使う
+- **common 階層だけ**作りたい: `reverse-engineering-common-spec` を直接使う
 - **新規機能を実装**したい（導入済みプロジェクト）: `auto-implement` を使う
 - **新規プロジェクト**（コードがまだ無い）の立ち上げ: `starting-new-with-stdd` を使う
 
@@ -181,7 +181,7 @@ docs:
 
 - **導入ガイド（なぜ/判断基準）**: [guide-for-existing-project.md](../../../packages/core/docs/guide-for-existing-project.md)
 - **導入PLAN テンプレート**: [templates/introduction-plan.md](templates/introduction-plan.md)
-- **common ティアのリバース**: [reverse-engineering-common-spec skill](../reverse-engineering-common-spec/SKILL.md)
+- **common 階層のリバース**: [reverse-engineering-common-spec skill](../reverse-engineering-common-spec/SKILL.md)
 - **機能単位のリバース**: [reverse-engineering-feature-spec skill](../reverse-engineering-feature-spec/SKILL.md)
 - **フォーマット策定・テーラリング（step 3-4 / 7）**: [tailoring-spec-format skill](../tailoring-spec-format/SKILL.md)
 - **整合性チェック**: [verifying-consistency skill](../verifying-consistency/SKILL.md)

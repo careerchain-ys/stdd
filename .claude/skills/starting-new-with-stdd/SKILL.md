@@ -1,7 +1,7 @@
 ---
 name: starting-new-with-stdd
 description: |-
-  新規（コードがまだ無い）プロジェクトを STDD で立ち上げる作業を、Claude セッションで段階的に駆動する。立ち上げガイドに従い、アプリ骨組み生成→common ティアの前方設計→最初の feature→フォーマット策定→feature ループ→通常運用への移行までを、既存スキル（documenting-specifications / generating-wireframes / tailoring-spec-format / documenting-plans / auto-implement / verifying-consistency）を順に呼びながら進める。進捗は立ち上げPLANで保持し、セッションを跨いで再開できる。既に稼働しているコードへの導入は introducing-stdd を使う。
+  新規（コードがまだ無い）プロジェクトを STDD で立ち上げる作業を、Claude セッションで段階的に駆動する。立ち上げガイドに従い、アプリ骨組み生成→common 階層の前方設計→最初の feature→フォーマット策定→feature ループ→通常運用への移行までを、既存スキル（documenting-specifications / generating-wireframes / tailoring-spec-format / documenting-plans / auto-implement / verifying-consistency）を順に呼びながら進める。進捗は立ち上げPLANで保持し、セッションを跨いで再開できる。既に稼働しているコードへの導入は introducing-stdd を使う。
 when_to_use: |-
   新規（コードがまだ無い）プロジェクトの立ち上げを進める／再開するとき。「新規プロジェクトをstddで立ち上げる」「立ち上げの続き」「greenfield stdd」など、新規フローと確定している場合。新規/既存が未確定の最初の入口は setup-stdd（ルーター）が判定して本スキルへ委譲する。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
@@ -48,10 +48,10 @@ docs/common/plans/stdd-bootstrap.md
 
 | step | 実行内容 | 呼ぶスキル | ★停止して確認 |
 | ---- | -------- | ---------- | ------------- |
-| 0 | scaffold / `.stdd.config.yml` 点検（common ティア前提） | — | 構成（単一/複数アプリ・パス規約） |
+| 0 | scaffold / `.stdd.config.yml` 点検（common 階層前提） | — | 構成（単一/複数アプリ・パス規約） |
 | 1 | **プロダクトコンセプトのヒアリング**（下記「step 1」詳細） | — | ★ どんなアプリ／要件の概要（最低 1 レスポンス） |
 | 2 | **アプリ骨組みを対話駆動**（stack 固有） | （stack 手順へ委譲。下記「step 2」詳細） | ★ 構成・コマンド疎通 |
-| 3 | **common ティアを前方設計**（docs/common を埋める） | `documenting-specifications` | ★ 目的・アクター・初期アーキ |
+| 3 | **common 階層を前方設計**（docs/common を埋める） | `documenting-specifications` | ★ 目的・アクター・初期アーキ |
 | 4 | 最初の feature を順行 spec 化（P0 コアから 1 本） | `documenting-specifications` → `generating-wireframes` | ★ Spec 粒度・スコープ |
 | 5 | フォーマット策定 → テンプレ特化 | `tailoring-spec-format` | ★★ フォーマット決定 |
 | 6 | feature を順行 STDD でループ | `documenting-plans` → `auto-implement` | ★ 機能ごとの粒度 |
@@ -86,7 +86,7 @@ docs/common/plans/stdd-bootstrap.md
 ## step 1: プロダクトコンセプトのヒアリング（詳細）
 
 **最初に必ず実施する**。技術スタック・骨組み・common ドキュメントなどあらゆる確認の**前に**ユーザーから 1 レスポンスを得る。
-ここで得た内容は step 2（stack 選定の判断材料）と step 3（common ティアの前方設計の起点）の双方に流す。
+ここで得た内容は step 2（stack 選定の判断材料）と step 3（common 階層の前方設計の起点）の双方に流す。
 
 ### 1-1. 何を聞くか
 
@@ -98,7 +98,7 @@ docs/common/plans/stdd-bootstrap.md
 ### 1-2. 進める条件（重要）
 
 - **最低 1 レスポンス**を得たら、その**詳細度に関わらず**次ステップへ進む。追加質問で深掘りしない。
-- 不足は step 3（common ティアの前方設計）以降で**仮説**として補う。仮説には必ず**要確認マーカー**を添えてユーザーに是非を確認させ、feature 開発で検証して更新する（→ [要確認マーカー](../documenting-specifications/SKILL.md)）。
+- 不足は step 3（common 階層の前方設計）以降で**仮説**として補う。仮説には必ず**要確認マーカー**を添えてユーザーに是非を確認させ、feature 開発で検証して更新する（→ [要確認マーカー](../documenting-specifications/SKILL.md)）。
 
 ### 1-3. 記録
 
@@ -161,7 +161,7 @@ docs/common/plans/stdd-bootstrap.md
 
 - **一度に 1 ステップ**。複数 feature を無確認で連続処理しない。
 - **★ポイントでは必ず停止**してユーザーに聞く（アーキ判断・粒度・フォーマット）。
-- common ティアは**前方設計＝仮説**。作り込みすぎず、feature 開発で検証して更新する。確定しない箇所は**章を省略せず**、**要確認マーカー**（`**⚠️要確認**｜仮説: … ／確認: …`）を仮説とセットで置いて網羅性を保つ。構文の正典は [documenting-specifications SKILL「要確認マーカー」](../documenting-specifications/SKILL.md)。
+- common 階層は**前方設計＝仮説**。作り込みすぎず、feature 開発で検証して更新する。確定しない箇所は**章を省略せず**、**要確認マーカー**（`**⚠️要確認**｜仮説: … ／確認: …`）を仮説とセットで置いて網羅性を保つ。構文の SSoT は [documenting-specifications SKILL「要確認マーカー」](../documenting-specifications/SKILL.md)。
 - 立ち上げPLAN 以外に進捗・履歴を持たない（SSOT 原則。spec 本体に「今回」「変更前」等を書かない）。
 - 遡行スキル（`reverse-engineering-*`）は使わない（新規にはコードが無い）。
 

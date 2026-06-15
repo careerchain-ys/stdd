@@ -16,7 +16,7 @@
 
 STDD の定常運用は **Spec → Test → 実装** の一方向（順行）。
 だが既存プロジェクトには実装が先に存在するため、**導入時だけ** 矢印を逆に流し、
-**実装 → Spec → Test** で「動いている実装を正典化（ドキュメント化・テスト化）」する。
+**実装 → Spec → Test** で「動いている実装を SSoT 化（ドキュメント化・テスト化）」する。
 
 | フェーズ | 方向 | SSoT（真実の出所） | 使うスキル |
 | --- | --- | --- | --- |
@@ -27,7 +27,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向（順行）。
 
 - 遡行は **導入時の一度きり**。一巡したら順行に切り替わる。
 - 遡行フェーズでは「実装が真実」。理想論や推測で Spec を書かず、必ず実装・設定・型定義を確認する。
-- 確信が持てない箇所は**要確認マーカー**（`**⚠️要確認**｜仮説: … ／確認: …`）を残す。逆生成でも「実装からこう読めた」という**仮説とセット**で置き、人間レビューで是非を確定したら除去する。構文は `documenting-specifications` の「要確認マーカー」を正典とする。
+- 確信が持てない箇所は**要確認マーカー**（`**⚠️要確認**｜仮説: … ／確認: …`）を残す。逆生成でも「実装からこう読めた」という**仮説とセット**で置き、人間レビューで是非を確定したら除去する。構文は `documenting-specifications` の「要確認マーカー」を SSoT とする。
 
 ---
 
@@ -36,7 +36,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向（順行）。
 | step | 何をするか | 使うスキル | 人間判断 |
 | ---- | ---------- | ---------- | -------- |
 | **0** | セットアップ（`.stdd.config.yml` 作成、テンプレ・skill 配置） | — | △ 構成確認 |
-| **1** | コードベース全体 → common ティア生成 | `reverse-engineering-common-spec` | △ 要確認マーカーの解消 |
+| **1** | コードベース全体 → common 階層生成 | `reverse-engineering-common-spec` | △ 要確認マーカーの解消 |
 | **1.5** | 機能インベントリ作成 + 優先順決定 → 導入PLAN 作成 | — | ★ 優先順 |
 | **2** | 代表機能 1 つをリバース（spec + test） | `reverse-engineering-feature-spec` | ★ 粒度・スコープ |
 | **3-4** | spec フォーマット策定 → テンプレへ反映（テーラリング） | `tailoring-spec-format` | ★★ フォーマット |
@@ -54,7 +54,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向（順行）。
 
 - `.stdd.config.yml` をプロジェクト構成に合わせて作成（`apps[]`, `commands`, `docs.layout`）。
 - 単一アプリか複数アプリかで `docs.layout` のパス規約が変わる。
-- common ティアを使うなら `docs.layout.common_requirements` / `common_architecture` を設定。
+- common 階層を使うなら `docs.layout.common_requirements` / `common_architecture` を設定。
 - 具体的な対話手順（点検 → 草案 → 確認 → 書き込み → schema 検証）は `introducing-stdd` スキルの「step 0: 対話的セットアップ」を参照。
 
 ### step 1: common spec のリバース
@@ -114,7 +114,7 @@ step 1・2 の実物を見ながら、このプロジェクト固有の spec フ
 ## 4. 関連ドキュメント
 
 - セッションで導入を駆動する仕組み: `.claude/skills/introducing-stdd/SKILL.md`
-- 2 ティア構造と方法論: `stdd-methodology.md` §2.0
+- 2 階層構造と方法論: `stdd-methodology.md` §2.0
 - 開発フロー図: `workflow-diagram.md`
-- common ティアのリバース: `.claude/skills/reverse-engineering-common-spec/SKILL.md`
+- common 階層のリバース: `.claude/skills/reverse-engineering-common-spec/SKILL.md`
 - 機能単位のリバース: `.claude/skills/reverse-engineering-feature-spec/SKILL.md`

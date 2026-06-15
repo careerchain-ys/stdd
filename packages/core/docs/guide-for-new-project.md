@@ -19,12 +19,12 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 | | 新規（本ガイド） | 既存（[guide-for-existing-project](./guide-for-existing-project.md)） |
 | --- | --- | --- |
 | SSoT | 最初から **Spec** | 導入時は実装 → 一巡後 Spec |
-| common ティア | **前方設計**（仮説として書き、feature で検証） | 実装から **逆生成** |
+| common 階層 | **前方設計**（仮説として書き、feature で検証） | 実装から **逆生成** |
 | 使う中心スキル | `documenting-specifications` / `auto-implement` | `reverse-engineering-*` |
 
 ポイント:
 
-- common ティアは**前方設計**：コードが無いので「目的・アクター・初期アーキ」を**仮説**として置き、feature を作りながら検証・更新する。確定していない箇所は**章を省略せず**、**要確認マーカー**（仮説とセットでユーザーに是非を確認させる注記。構文は `documenting-specifications` の「要確認マーカー」を正典とする）を残し、確定したらマーカーを除去して埋める。
+- common 階層は**前方設計**：コードが無いので「目的・アクター・初期アーキ」を**仮説**として置き、feature を作りながら検証・更新する。確定していない箇所は**章を省略せず**、**要確認マーカー**（仮説とセットでユーザーに是非を確認させる注記。構文は `documenting-specifications` の「要確認マーカー」を SSoT とする）を残し、確定したらマーカーを除去して埋める。
 - 最初の feature を 1 本通した時点で立ち上げは実質完了し、以降は通常運用（既存機能の追加・変更）と地続き。
 
 ---
@@ -33,10 +33,10 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 
 | step | 何をするか | 使うスキル | 人間判断 |
 | ---- | ---------- | ---------- | -------- |
-| **0** | scaffold / `.stdd.config.yml` 点検（common ティア前提で確認） | — | △ 構成確認 |
+| **0** | scaffold / `.stdd.config.yml` 点検（common 階層前提で確認） | — | △ 構成確認 |
 | **1** | **プロダクトコンセプトのヒアリング**（何を作るか / 要件概要を最低 1 レスポンス） | — | ★ どんなアプリ／要件概要 |
 | **2** | アプリ骨組み生成（stack 固有） | （stack 手順へ委譲） | ★ 構成・コマンド疎通 |
-| **3** | common ティアを**前方設計**（docs/common を埋める） | `documenting-specifications` | ★ 目的・アクター・初期アーキ |
+| **3** | common 階層を**前方設計**（docs/common を埋める） | `documenting-specifications` | ★ 目的・アクター・初期アーキ |
 | **4** | 最初の feature を順行 spec 化（P0 コアから 1 本） | `documenting-specifications` → `generating-wireframes` | ★ 粒度・スコープ |
 | **5** | spec フォーマット策定 → テンプレ特化 | `tailoring-spec-format` | ★★ フォーマット |
 | **6** | feature を順行 STDD でループ | `documenting-plans` → `auto-implement` → `verifying-consistency` | ★ 粒度（機能ごと） |
@@ -51,13 +51,13 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 ### step 0: セットアップ
 
 - `npx @careerchain/stdd init` で導入済みなら `.stdd.config.yml`・`.claude/`・`docs/` が揃っている。点検のみ。
-- 単一アプリか複数アプリかで `docs.layout` のパス規約が変わる。common ティアは既定で有効（`docs.layout.common_requirements` / `common_architecture`）。
+- 単一アプリか複数アプリかで `docs.layout` のパス規約が変わる。common 階層は既定で有効（`docs.layout.common_requirements` / `common_architecture`）。
 
 ### step 1: プロダクトコンセプトのヒアリング ★
 
 - **技術スタック等の確認より前に必ず実施する**。「どんなシステム／アプリ／サービスを作りたいか／要件の概要は？」を聞き、**最低 1 レスポンス**を得る。
 - **詳細度は問わない**。1 レスポンス得たら、追加質問で深掘りせず次ステップへ進める（不足は step 3 で仮説＋要確認マーカーとして補い、feature 開発で検証して更新する前提）。
-- 得た回答は立ち上げPLAN の「プロダクトコンセプト」セクションに**そのまま転記**し、step 2（stack 選定の判断材料）と step 3（common ティア前方設計の起点）の双方で参照する。
+- 得た回答は立ち上げPLAN の「プロダクトコンセプト」セクションに**そのまま転記**し、step 2（stack 選定の判断材料）と step 3（common 階層前方設計の起点）の双方で参照する。
 
 ### step 2: アプリ骨組み生成（stack 固有）
 
@@ -68,7 +68,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
   - **未指定** → コンセプトに適合する stack を踏み込んで提案。素直な Web アプリなら同梱 `nextjs-supabase` をデフォルト候補として一押しし、別 stack が適すれば理由つきで推奨する。
 - 骨組み生成後、`apps[].path` / `commands.*` を実体に合わせて確認（実際に `commands.test` / `typecheck` が動くか）。stack により `commands.typecheck` は `tsc` とは限らない（例: `mypy` / `rubocop` / 省略可）。
 
-### step 3: common ティアの前方設計 ★
+### step 3: common 階層の前方設計 ★
 
 - `docs/common/REQUIREMENTS.md`（サービス目的・登場アクター・アプリ構成）と `ARCHITECTURE.md`（システム概要：システム構成・レイヤ規約）を人間と起こす。データモデルは `TABLE_DEFINITION.md`、API 契約は `API_SPEC.md`（API がある場合）に分けて起こす。step 1 のコンセプトを起点にする。
 - **前方設計ゆえ「実装が真実」は効かない**。確定し切らない部分は**仮説**として置き、**要確認マーカー**を添えてユーザーに是非を確認させる。テンプレートの章は省略せず仮説で埋めて網羅性を保ち、feature 開発で検証して更新する（過度に作り込まない）。
@@ -82,7 +82,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 ### step 5: フォーマット策定とテンプレ特化 ★★
 
 - step 3・4 の実物を見ながら、このプロジェクト固有の spec フォーマットを決め反映する。`tailoring-spec-format` スキルが駆動する。
-- 新規では common ティアがまだ薄い前提で、決定は仮置きでよい（step 7 以降の運用で `tailoring-spec-format` を再実行して育てる）。
+- 新規では common 階層がまだ薄い前提で、決定は仮置きでよい（step 7 以降の運用で `tailoring-spec-format` を再実行して育てる）。
 
 ### step 6: feature ループ
 
@@ -100,7 +100,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 | 観点 | 新規（本ガイド） | 既存 |
 | --- | --- | --- |
 | 遡行（逆生成） | **無し** | 有り（導入時のみ） |
-| common ティア | 前方設計（仮説） | 逆生成（実装が真実） |
+| common 階層 | 前方設計（仮説） | 逆生成（実装が真実） |
 | 最初の向き | 順行 | 遡行 → 順行 |
 | 固有 step | アプリ骨組み生成 | 機能インベントリ + 優先順 |
 | 駆動スキル | `starting-new-with-stdd` | `introducing-stdd` |

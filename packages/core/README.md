@@ -51,18 +51,18 @@ commands:
 
 docs:
   layout:
-    # common ティア (プロジェクト全体の俯瞰 spec。任意)
+    # common 階層 (プロジェクト全体の俯瞰 spec。任意)
     common_requirements: "docs/common/REQUIREMENTS.md"
     common_architecture: "docs/common/ARCHITECTURE.md"
-    # feature ティア (機能単位の spec)
+    # feature 階層 (機能単位の spec)
     requirements: "docs/{{app.id}}/{{feature_path}}/REQUIREMENTS.md"
     tech_design: "docs/{{app.id}}/{{feature_path}}/TECH_DESIGN.md"
     plan: "docs/{{app.id}}/{{feature_path}}/plans/{{date}}.md"
 ```
 
-`common_requirements` / `common_architecture` はプロジェクト全体を俯瞰する **common ティア** の spec
+`common_requirements` / `common_architecture` はプロジェクト全体を俯瞰する **common 階層** の spec
 (`REQUIREMENTS.md` の全体版と `TECH_DESIGN.md` の全体版 = `ARCHITECTURE.md`) を指す。任意項目であり、
-common ティアを使わないプロジェクトでは省略してよい。詳細は
+common 階層を使わないプロジェクトでは省略してよい。詳細は
 [`docs/stdd-methodology.md`](docs/stdd-methodology.md) §2.0 を参照。
 
 このまま `apps/web/` に Next.js / Remix / SvelteKit 等を配置すれば動作する。

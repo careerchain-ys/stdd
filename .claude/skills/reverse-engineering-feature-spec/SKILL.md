@@ -1,7 +1,7 @@
 ---
 name: reverse-engineering-feature-spec
 description: |-
-  既存の機能/ページの実装から feature ティアの Spec ドキュメント（REQUIREMENTS.md + TECH_DESIGN.md + TEST_PLAN.md）とテスト（E2E / Unit / Integration）をリバースエンジニアリングで作成するためのガイドライン。新規機能の仕様策定ではなく、既に動いている機能を正確にドキュメント化・テスト化する場合に使う。プロジェクト全体（common ティア）のリバースには reverse-engineering-common-spec を使用する。
+  既存の機能/ページの実装から feature 階層の Spec ドキュメント（REQUIREMENTS.md + TECH_DESIGN.md + TEST_PLAN.md）とテスト（E2E / Unit / Integration）をリバースエンジニアリングで作成するためのガイドライン。新規機能の仕様策定ではなく、既に動いている機能を正確にドキュメント化・テスト化する場合に使う。プロジェクト全体（common 階層）のリバースには reverse-engineering-common-spec を使用する。
 when_to_use: |-
   「リバースエンジニアリング」「既存コードからspec」「既存機能のドキュメント化」「機能のドキュメント化」「実装からテスト作成」「specカバー率向上」に関する作業のとき。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
@@ -9,9 +9,9 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 # feature spec のリバースエンジニアリング
 
-既に動いている **機能 / ページ単位**の実装コードを精読し、その挙動を正確に反映した feature ティアの Spec ドキュメント（REQUIREMENTS.md + TECH_DESIGN.md + TEST_PLAN.md）とテスト（E2E / Unit / Integration）を作成する。
+既に動いている **機能 / ページ単位**の実装コードを精読し、その挙動を正確に反映した feature 階層の Spec ドキュメント（REQUIREMENTS.md + TECH_DESIGN.md + TEST_PLAN.md）とテスト（E2E / Unit / Integration）を作成する。
 
-> **前提（推奨）**: プロジェクト全体の **common ティア**（`docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md` + `TABLE_DEFINITION.md` + `API_SPEC.md`）が未作成なら、先に `reverse-engineering-common-spec` スキルで作成しておくと、レイヤ規約・共有ドメインモデル・テーブル定義・API 契約を踏まえられて精度が上がる。既にある場合は本スキルから始める。データモデル・API は common ティアが正典のため、feature 側では common の `TABLE_DEFINITION.md` / `API_SPEC.md` を参照する。
+> **前提（推奨）**: プロジェクト全体の **common 階層**（`docs/common/REQUIREMENTS.md` + `ARCHITECTURE.md` + `TABLE_DEFINITION.md` + `API_SPEC.md`）が未作成なら、先に `reverse-engineering-common-spec` スキルで作成しておくと、レイヤ規約・共有ドメインモデル・テーブル定義・API 契約を踏まえられて精度が上がる。既にある場合は本スキルから始める。データモデル・API は common 階層が SSoT のため、feature 側では common の `TABLE_DEFINITION.md` / `API_SPEC.md` を参照する。
 
 ## 最重要原則
 
@@ -251,7 +251,7 @@ REQUIREMENTS.md作成後、Playwright MCPを使って実装済みUIのスクリ�
 
 `documenting-specifications` skillのテンプレートに従って作成する。章構成は **1.概要 / 2.主要な設計判断(任意) / 3.画面項目定義(画面 feature のみ必須) / 4.ロジック設計(コア) / 5.エラーハンドリング戦略 / 6.非機能要件(任意)**。
 
-> **データモデル / API は common ティアが正典**。TECH_DESIGN にはデータモデルや ER 図、API 設計を持たず、common の `TABLE_DEFINITION.md` / `API_SPEC.md` を**参照**する。TECH_DESIGN のコアはロジック設計。テスト戦略は別ファイル `TEST_PLAN.md`（Phase 4.5）。
+> **データモデル / API は common 階層が SSoT**。TECH_DESIGN にはデータモデルや ER 図、API 設計を持たず、common の `TABLE_DEFINITION.md` / `API_SPEC.md` を**参照**する。TECH_DESIGN のコアはロジック設計。テスト戦略は別ファイル `TEST_PLAN.md`（Phase 4.5）。
 
 ### リバースエンジニアリング固有のルール
 
@@ -464,7 +464,7 @@ TEST_PLAN.mdのテスト戦略で定めたテストレベルに従って作成�
 
 以下の場合はこのスキルを使用しない:
 
-- **プロジェクト全体 / common ティアのリバース**（STDD 導入時の `docs/common/` 作成）: `reverse-engineering-common-spec` skillを使用
+- **プロジェクト全体 / common 階層のリバース**（STDD 導入時の `docs/common/` 作成）: `reverse-engineering-common-spec` skillを使用
 - **新規機能の仕様策定**: `documenting-specifications` skillを使用
 - **実装タスクの計画**: `documenting-plans` skillを使用
 - **E2Eテストのみの作成**（Specドキュメントが既に存在する場合）: `e2e-testing` skillを使用
@@ -474,7 +474,7 @@ TEST_PLAN.mdのテスト戦略で定めたテストレベルに従って作成�
 
 ## 参照ファイル
 
-- **共通spec（commonティア）リバース**: [reverse-engineering-common-spec skill](../reverse-engineering-common-spec/SKILL.md)
+- **共通spec（common階層）リバース**: [reverse-engineering-common-spec skill](../reverse-engineering-common-spec/SKILL.md)
 - **Specテンプレート**: [documenting-specifications skill](../documenting-specifications/SKILL.md)
 - **E2Eテストガイド**: [e2e-testing skill](../../../plugins/playwright/skills/e2e-testing/SKILL.md)（`playwright` プラグイン）
 - **PLANドキュメント**: [documenting-plans skill](../documenting-plans/SKILL.md)
