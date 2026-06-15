@@ -30,7 +30,7 @@ claude                        # ② Claude Code を起動
 
 3 ステップの内訳:
 
-1. **`npx @careerchain/stdd init`** — `.claude/`（skill / agent / hook）・`.stdd.config.yml`・`docs/` を**現在のディレクトリ**に配置します。既存ファイルは破壊せず、追加・生成のみ行います（既存の `.stdd.config.yml` は保持）。
+1. **`npx @careerchain/stdd init`** — `.claude/`（skill / agent / hook）・`.stdd.config.yml`・`docs/` を**現在のディレクトリ**に配置します。`.claude/` はファイル単位で**非破壊マージ**（既存の Claude 設定やユーザー自作 skill を汚染しない／`settings.json` は deep-merge）。導入物は `.claude/.stdd/manifest.json` と各ファイルの `source: stdd` マーカーで STDD 由来と判別できます。
 2. **`claude`** — Claude Code を起動します。
 3. **「STDD を導入して」** — `setup-stdd` ルーターがコードの有無を調べ、確認のうえ次へ委譲します。
 

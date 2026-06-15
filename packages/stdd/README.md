@@ -26,18 +26,33 @@ npx @careerchain/stdd init [options]
 | option | 説明 |
 | --- | --- |
 | `--name <name>` | `.stdd.config.yml` の `project.name`（既定: ディレクトリ名） |
-| `--force` | 確認なしで既存の `.claude/` を上書きする |
+| `--force` | tailoring 済み（編集された）STDD ファイルも最新へ上書きする |
 | `--yes`, `-y` | 対話プロンプトをスキップし既定値で進める |
 | `--help`, `-h` | ヘルプを表示 |
 | `--version`, `-v` | バージョンを表示 |
 
 ## 挙動
 
-- **`.claude/`**: 配置する。既に存在する場合は確認のうえ上書き（`--force` で無確認、非対話時は保持）。
-- **`.stdd.config.yml`**: 無ければ生成する。既存の設定は**上書きしない**（保持）。
-- **`docs/`**: 無ければ作成する。
+`.claude/` は**ディレクトリ単位ではなくファイル単位で非破壊マージ**します。既存の Claude 設定や
+ユーザー自作の skill / agent を汚染しません。
 
-既存プロジェクトのソースコードや設定を破壊しないよう、追加・生成のみを行います。
+- **`.claude/`（skill / agent / hook / rules）**: STDD が配布するファイルだけを作成・更新します。
+  - ユーザー自作ファイル（STDD パスと衝突しない）はそのまま保持。
+  - STDD パスにユーザーが置いた同名ファイルは**上書きせず skip**（手動確認を促す）。
+  - ユーザーが編集（tailoring）した STDD ファイルは**保持**（最新化したい場合のみ `--force`）。
+  - 配布から外れた旧 STDD ファイル（未編集）は掃除します。
+- **`.claude/settings.json`**: **deep-merge**。`permissions.allow` / `enabledMcpjsonServers` /
+  `hooks` は union、スカラー競合はユーザー値を優先し、STDD の不足設定のみ追記します。
+- **`.stdd.config.yml`** / **`.mcp.json`**: 無ければ生成、既存は保持。
+- **`docs/`**: 無ければ作成。
+
+### STDD 由来の明示
+
+導入物は以下の 2 系統で「STDD 由来」と判別できます。
+
+- **`.claude/.stdd/manifest.json`**: STDD が導入した全ファイルの相対パス・`sha256`・`source: "stdd"`
+  を記録（更新時の差分・編集検出・将来のアンインストールに利用）。
+- **frontmatter マーカー**: 配布される各 skill / agent の先頭に `source: stdd` を付与。
 
 ## ライセンス
 
