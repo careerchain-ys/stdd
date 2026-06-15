@@ -45,6 +45,7 @@ apps:
     path: apps/web
 
 commands:
+  # 使用 stack に合わせて指定（STDD は stack 非依存。下記は Node/TS の例）
   typecheck: "npx tsc --noEmit"
   test: "npm test"
 

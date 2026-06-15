@@ -61,9 +61,12 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 
 ### step 2: アプリ骨組み生成（stack 固有）
 
-- **stack 依存のため本ガイドにはコマンドを書かない**。具体手順は使用テンプレートの README（nextjs+supabase+playwright なら starter README の「次の手順」）と各プラグイン guide を SSoT とする。
-- `starting-new-with-stdd` スキルが、`.stdd.config.yml` の `plugins` / `framework` を見て該当手順を対話的に提示・実行支援する。step 1 のコンセプトを stack 選定の判断材料に使う。
-- 骨組み生成後、`apps[].path` / `commands.*` を実体に合わせて確認（実際に `commands.test` / `typecheck` が動くか）。
+- **STDD は stack 非依存**。特定フレームワークに縛られず、ユーザーが選んだ任意の stack（Next.js / Rails / Django / Laravel / Vite+React など）で立ち上げられる。**本ガイドにはコマンドを書かない**。
+- `starting-new-with-stdd` スキルが、ユーザーの stack 指定で 3 通りに分岐して対話駆動する（step 1 のコンセプトを判断材料に使う）:
+  - **Next.js / Supabase を指定** → 同梱の `nextjs-supabase-starter`（playwright 込み）を SSoT に立ち上げ。
+  - **それ以外の stack を指定** → そのフレームワーク公式の scaffold CLI を SSoT に汎用駆動。
+  - **未指定** → コンセプトに適合する stack を踏み込んで提案。素直な Web アプリなら同梱 `nextjs-supabase` をデフォルト候補として一押しし、別 stack が適すれば理由つきで推奨する。
+- 骨組み生成後、`apps[].path` / `commands.*` を実体に合わせて確認（実際に `commands.test` / `typecheck` が動くか）。stack により `commands.typecheck` は `tsc` とは限らない（例: `mypy` / `rubocop` / 省略可）。
 
 ### step 3: common ティアの前方設計 ★
 

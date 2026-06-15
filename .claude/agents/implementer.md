@@ -31,11 +31,9 @@ model: opus
 実装を始める前に、必ず以下の順序で既存ソリューションを調査すること:
 
 1. **プロジェクト内検索**: `.stdd.config.yml` の各 `apps[].path` 配下（例: `<apps[].path>/lib/`）、および `packages/shared/`、`domain/service/` 等の共有ディレクトリに同等の実装がないか
-2. **依存パッケージの確認**: `package.json`に含まれるパッケージ（date-fns, zod, react-hook-form等）で解決できないか
-3. **Supabase組み込み機能**: RLS、Storage、Auth、Edge Functions等で対応できないか
+2. **依存パッケージ / ライブラリの確認**: 使用 stack のパッケージマネージャの依存（npm の `package.json` / Python の `pyproject.toml` / Ruby の `Gemfile` 等）で解決できないか
+3. **プラットフォーム / フレームワーク組み込み機能**: 利用中の BaaS・フレームワークの標準機能（例: Supabase の RLS/Storage/Auth、Rails の ActiveRecord、Django の ORM/Auth 等）で対応できないか
 4. 上記で見つからない場合のみ自前実装を行う
-
-詳細: `.claude/skills/searching-existing-solutions/SKILL.md`
 
 ### Step 1: Specドキュメント確認
 
@@ -77,7 +75,6 @@ cd <apps[].path> && <commands.typecheck>
 | e2e-testing           | `plugins/playwright/skills/e2e-testing/`           | **E2Eテスト作成時は必須**（Playwright、Locator選択、フレーキーテスト対策）  |
 | software-architecture | `.claude/skills/software-architecture/` | Domain層・責務分離・設計判断時                                              |
 | kaizen                | `.claude/skills/kaizen/`                | リファクタリング・過剰設計回避の判断時                                      |
-| searching-existing-solutions          | `.claude/skills/searching-existing-solutions/`          | **新規実装前は必須**（既存ソリューション調査、車輪の再発明防止）            |
 
 ## テストコマンド
 

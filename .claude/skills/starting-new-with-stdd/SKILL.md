@@ -112,19 +112,39 @@ docs/common/plans/stdd-bootstrap.md
 新規はアプリ本体がまだ無いので、stack 固有の骨組み（フレームワーク・DB・E2E）を立てる。
 **本スキルは stack 非依存**なので、コマンドの実体は持たず、使用中の stack 手順を SSoT として参照・実行支援する。
 
-### 2-1. stack の特定
+### 2-1. stack の特定（ユーザーの指定で 3 分岐）
 
-`.stdd.config.yml` の `plugins` / `apps[].framework` を読み、骨組み手順の所在を決める。step 1 で得たコンセプトを stack 選定の判断材料に使う。
+まず `.stdd.config.yml` の `plugins` / `apps[].framework` を読む。既に stack が確定していればそれに従う。
+未確定なら、**ユーザーの技術スタック指定の有無・内容**で次の 3 通りに分岐する。step 1 のコンセプトを判断材料に使う。
 
 ```
-□ plugins に "nextjs-supabase" / "playwright" → nextjs+supabase+playwright スターター手順
-   （生成元テンプレートの README「次の手順」が SSoT）
-□ それ以外 / 不明 → ユーザーに stack と骨組み手順を確認
+① ユーザーが Next.js / Supabase を明示的に指定
+   → 同梱の nextjs-supabase starter / plugin に従う
+     （生成元テンプレートの README「次の手順」が SSoT。playwright も同梱）
+
+② ユーザーが Next.js/Supabase 以外の技術を明示的に指定（Rails / Django / Laravel / Vite+React など）
+   → そのフレームワーク公式の scaffold 手順を汎用駆動する（2-2 ルート B）
+     公式ドキュメント / 公式 CLI（例: rails new / django-admin startproject /
+     npm create vite@latest 等）の記述を SSoT とし、本スキルにはコマンドを書かない
+
+③ ユーザーが技術を指定していない
+   → step 1 で得たプロダクトコンセプトを読み、適合する stack を踏み込んで提案する:
+     ・コンセプトが Web アプリ寄りで素直なら「nextjs-supabase なら starter / plugin を
+       同梱しているのですぐ立ち上げられます」とデフォルト候補として一押しする
+     ・コンセプト上ほかの stack が明らかに適する場合（モバイル中心 / データ分析 /
+       既存資産が別言語 等）は、その stack を理由つきで推奨する
+   → ユーザーが nextjs-supabase を選べば①、別 stack を選べば②へ流れる
 ```
+
+> nextjs-supabase は**同梱のデフォルト starter**という位置づけで、唯一の対応 stack ではない。
+> ③ では押し付けず、コンセプトに最も合う選択をユーザーと決める。
 
 ### 2-2. 骨組み生成を対話駆動
 
-該当手順のコマンド（例: `create-next-app` / `supabase init` / Playwright 導入）を**1つずつ提示し、ユーザーの確認のもと実行**する。具体コマンドは本スキルに書かず、参照先（テンプレート README / プラグイン guide）の記述に従う。
+選んだ stack の手順を**1つずつ提示し、ユーザーの確認のもと実行**する。具体コマンドは本スキルに持たず、参照先の記述に従う。
+
+- **ルート A（nextjs-supabase）**: starter テンプレート README / 各プラグイン guide の「次の手順」が SSoT（例: `create-next-app` / `supabase init` / Playwright 導入）。
+- **ルート B（その他あらゆる stack）**: そのフレームワーク公式の scaffold CLI を SSoT とし、初期化コマンドを 1 つずつ確認実行（例: `rails new` / `django-admin startproject` / `npm create vite@latest`）。生成後、テスト / 型チェック / ビルド等のコマンドを把握し、2-3 で `.stdd.config.yml` の `commands.*` を実体に合わせる。
 
 ### 2-3. 設定の実体合わせ（★確認）
 
