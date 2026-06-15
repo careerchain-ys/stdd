@@ -12,7 +12,7 @@ STDD (Spec and Test Driven Development) の **方法論ドキュメント**, **S
 ```
 packages/core/
 ├── docs/
-│   ├── stdd-methodology.md       # STDD とは / なぜ TDD でなく STDD か / 開発フロー
+│   ├── stdd-methodology.md       # STDD とは / 開発フロー
 │   └── workflow-diagram.md       # 各フローを Mermaid で図示
 ├── schema/
 │   └── .stdd.config.schema.json  # .stdd.config.yml の JSON Schema (Draft 2020-12)
