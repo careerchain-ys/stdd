@@ -120,8 +120,6 @@ stdd/
 
 - **対象は「ブラウザで操作する Web アプリ」に限定**しています。方法論・テンプレート自体は技術スタック非依存で、任意の Web フレームワーク（Next.js / Rails / Django / Laravel など）で立ち上げられますが、QA フローのブラウザ動作確認（Playwright MCP）やワイヤーフレーム / UI キャプチャが**ブラウザ UI を前提**とするため、ネイティブモバイルアプリ（React Native 等）や UI を持たない CLI / バックエンド専用サービスは現状の主対象外です。
 - 公式に対応している AI エージェントは **Claude Code** のみです（`.claude/agents/` および `.claude/skills/` 配下のファイルがそのまま動作）。他エージェントは agents.md 標準に準拠した `AGENTS.md` を提供しているため随時対応を検討中です。
-- skill / agent / hook は `.stdd.config.yml` 駆動で動作します（`apps[].path` / `commands.*` / `project.primary_branch` 等を実行時に参照）。下流プロジェクト固有値のハードコードは除去済みです。記述規約は [`docs/config-driven-authoring.md`](docs/config-driven-authoring.md) を参照してください。
-- 別レイアウトのプロジェクト（単一アプリ・複数アプリ・別命名等）で使う場合は、`.stdd.config.yml` の `apps[]` / `commands` を調整すれば対応できます。
 
 ---
 
