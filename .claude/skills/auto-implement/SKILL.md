@@ -91,13 +91,6 @@ devcontainer up --workspace-folder ../worktree-<instance-id> --override-config .
 
 以降の作業はすべてworktree内のdevcontainerで実行する。
 
-## Step 4.5: issueをIn Progressに移動（GitHub issue 起点のときのみ）
-
-**入力が GitHub issue の場合のみ**実行する。issue 以外の入力（自由記述・ドキュメント等）ではスキップしてStep 5に進む。
-
-GitHub Projectのステータス更新の手順は [references/github-project.md](references/github-project.md) を参照。
-`project` スコープが必要。トークンにスコープがない場合もスキップしてStep 5に進む。
-
 ## Step 5: フェーズ実行
 
 このスキルは **Team Lead（オーケストレーター）** として動作し、専門エージェントにタスクを依頼しながら開発フロー全体を統括する。

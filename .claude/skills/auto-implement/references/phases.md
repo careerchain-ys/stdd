@@ -299,5 +299,3 @@ PRのdescriptionには以下を含める:
 - 対応issue番号（`Closes #<issue番号>`）。**GitHub issue 起点のときのみ**。issue 以外の入力では、代わりに対象タスクのサマリを記載する。
 - 実行モード
 - 各フェーズの実行結果サマリ
-
-PR作成後、**GitHub issue 起点のときのみ** GitHub Projectのステータスを「In review」に変更する（[references/github-project.md](github-project.md) の手順に従い、option IDに `"df73e18b"` を指定）。issue 以外の入力ではスキップする。
