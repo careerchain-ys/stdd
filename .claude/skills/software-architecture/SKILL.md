@@ -13,7 +13,12 @@ Clean ArchitectureとDDD（ドメイン駆動設計）の原則に基づく、�
 
 ## Domain層の実装パターン
 
-対象プロジェクトのデータフローは以下の4層構造に従う:
+> **本セクションのコード例は Next.js + Supabase + TypeScript スタックでの一例**。Clean Architecture /
+> DDD のレイヤ責務（Entity / Repository / Service の分離、Interface によるモック差し替え）は
+> スタック非依存の普遍的な原則であり、構文・生成ファイル名・ハンドラ種別は採用スタックに読み替えること。
+> 実際のレイヤ規約は common `ARCHITECTURE.md` を SSoT とする。
+
+データフローの一例（4層構造）:
 
 ```
 DB型（database.types.ts） → Entity型（models/） → Service（service/） → Server Actions（app/*/actions.ts）
@@ -153,11 +158,13 @@ export class SavedAgentService {
 - 複数Repositoryの連携が必要な場合: Serviceで集約する
 - 型変換（Entity → UI型）: Entity自身の`toXxx()`メソッド、またはServiceで実装
 
-### 4. Server Actions
+### 4. アプリケーション層 / ハンドラ（例: Server Actions）
 
-**APIルートよりServer Actionsを優先**する。戻り値は `{ success, error?, data? }` 形式で統一。
+UI からのエントリーポイントとなるハンドラ層。**フレームワークの推奨に従う**（例: Next.js なら
+API ルートより Server Actions を優先）。戻り値は `{ success, error?, data? }` のような統一形式にする。
 
 ```typescript
+// 例: Next.js Server Actions での一例
 // app/feature/actions.ts
 'use server';
 
@@ -212,7 +219,7 @@ export async function approveCertification(id: string) {
 | Entity型          | `XxxEntity`                        | `UserEntity`, `ProjectEntity` |
 | Repository        | `IXxxRepository` / `XxxRepository` | `IProjectRepository`          |
 | Service           | `XxxService`                       | `OpportunityService`          |
-| Server Action関数 | camelCase + 動詞                   | `createProject`, `updateUser` |
+| ハンドラ関数（例: Server Action） | camelCase + 動詞                   | `createProject`, `updateUser` |
 | ファイル/フォルダ | kebab-case                         | `saved-agent/index.ts`        |
 
 **避けるべき名前**: `utils`, `helpers`, `common`, `shared`, `misc`
@@ -224,7 +231,7 @@ export async function approveCertification(id: string) {
 | ---------------------------- | -------------------------------------------- |
 | `utils.ts`に雑多な関数を集約 | ドメインごとにモジュール分割                 |
 | Repositoryにビジネスロジック | Service層に分離                              |
-| UIコンポーネント内でDB操作   | Server Actions経由                           |
+| UIコンポーネント内でDB操作   | アプリケーション層/ハンドラ経由（例: Server Actions）|
 | 使用箇所1つで抽象化          | Rule of Three: 3箇所以上で重複してから抽象化 |
 | `as`型キャスト               | 型注釈、`satisfies`、明示的マッピング関数    |
 | `!`非nullアサーション        | `assert()`で明示チェック                     |
@@ -233,15 +240,18 @@ export async function approveCertification(id: string) {
 
 ## 設計判断のガイドライン
 
-### サーバーコンポーネント vs クライアントコンポーネント
+### サーバー処理 vs クライアント処理（例: Next.js のサーバー/クライアントコンポーネント）
 
-| 基準             | サーバーコンポーネント | クライアントコンポーネント   |
+> 以下はサーバー/クライアント分割を持つフレームワーク（例: Next.js の React Server Components）での一例。
+> 採用フレームワークの描画モデルに読み替えること。
+
+| 基準             | サーバー側             | クライアント側               |
 | ---------------- | ---------------------- | ---------------------------- |
-| データ取得       | DB直接アクセス可能     | Server Actions経由           |
+| データ取得       | DB直接アクセス可能     | ハンドラ経由（例: Server Actions） |
 | インタラクション | なし                   | フォーム、モーダル、状態管理 |
 | SEO              | 対応                   | 非対応                       |
 
-**原則**: デフォルトはサーバーコンポーネント。`'use client'`はインタラクションが必要な場合のみ。
+**原則（例: Next.js）**: デフォルトはサーバーコンポーネント。`'use client'`はインタラクションが必要な場合のみ。
 
 ### 責務の配置判断
 
@@ -249,12 +259,12 @@ export async function approveCertification(id: string) {
 Q1. 単純なCRUD操作？ → Repository
 Q2. 複数Entity間のロジック？ → Service
 Q3. Entity自身の状態チェック/変換？ → Entity（Model）のメソッド
-Q4. UI操作のエントリーポイント？ → Server Action
+Q4. UI操作のエントリーポイント？ → アプリケーション層/ハンドラ（例: Server Action）
 Q5. 表示のための計算/整形？ → コンポーネント or Entity.toXxx()
 ```
 
 ## When NOT to Use This Skill
 
-- **UI実装のみ**: `implementing-ui` skillを使用
-- **DBマイグレーション**: `migrating-supabase` skillを使用
-- **テスト作成**: `e2e-testing` skillを使用
+- **UI実装のみ**: `implementing-ui` skill を使用（`.stdd.config.yml` の `plugins` に列挙時。例: `plugins/nextjs-supabase/skills/implementing-ui/`）
+- **DBマイグレーション**: `migrating-supabase` skill を使用（同上。例: `plugins/nextjs-supabase/skills/migrating-supabase/`）
+- **テスト作成**: E2E プラグインの skill を使用（同上。例: `plugins/playwright/skills/e2e-testing/`）

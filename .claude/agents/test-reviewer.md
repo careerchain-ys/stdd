@@ -81,21 +81,24 @@ TEST_PLAN.md の「テスト戦略」セクションと照合する。
 #### 3b. 独立性・信頼性
 
 - [ ] テスト間で状態を共有していない（前のテストの副作用に依存しない）
-- [ ] 時刻・ランダム値・外部APIに依存する場合、固定化されているか（`jest.useFakeTimers()` / モック）
+- [ ] 時刻・ランダム値・外部APIに依存する場合、固定化されているか（例: `jest.useFakeTimers()` / モック）
 - [ ] Flaky要因がないか（レース条件、非決定的タイミング、`setTimeout`依存）
 - [ ] テストデータがテスト内で完結している、または `beforeEach` で明示的にセットアップされている
 
 #### 3c. アサーション
 
-- [ ] `toEqual` / `toMatchObject` で構造を具体的に検証（`toBeTruthy`の乱用を避ける）
+- [ ] 構造を具体的に検証している（例: Jest の `toEqual`/`toMatchObject`。真偽のみの緩いアサーションの乱用を避ける）
 - [ ] エラーケースで **エラーの種類・メッセージ** を検証している（単に throw したかだけでなく）
-- [ ] 非同期処理に適切に `await` が付いている / `resolves` / `rejects` が使われている
+- [ ] 非同期処理に適切に待機が付いている（例: `await` / `resolves` / `rejects`）
 
-#### 3d. E2E固有
+#### 3d. E2E固有（E2E テストがある場合）
 
-- [ ] Playwright の Web First Assertion（`expect(locator).toBeVisible()` 等）を使用している
-- [ ] `page.waitForTimeout` を使っていない（代わりに `waitFor` / auto-waiting）
-- [ ] Locator は `getByRole` / `getByLabel` / `getByTestId` を優先し、CSSセレクタへの依存を最小化
+> E2E のフレームワーク固有ベストプラクティスは、`.stdd.config.yml` の `plugins` に列挙された
+> E2E プラグイン（例: `plugins/playwright/skills/e2e-testing/`）を SSoT として参照する。以下は代表観点:
+
+- [ ] フレームワークの自動待機アサーションを使用している（例: Playwright の Web First Assertion `expect(locator).toBeVisible()`）
+- [ ] 固定時間待機を使っていない（例: `page.waitForTimeout` を避け `waitFor` / auto-waiting）
+- [ ] Locator は役割・ラベルベースを優先し、CSSセレクタへの依存を最小化（例: `getByRole` / `getByLabel` / `getByTestId`）
 - [ ] テストユーザーは CLAUDE.md のテストユーザー情報を使用している
 
 ### 4. カバレッジ（参考情報）

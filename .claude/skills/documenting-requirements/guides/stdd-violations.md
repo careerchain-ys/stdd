@@ -222,8 +222,8 @@ React Hook Form側ではテストせず、`signupSchema`のUnitテストでカ�
 ```markdown
 ### メール送信実装
 
-`admin.generateLink()` でリンクを生成し、Resend経由でHTMLメールを送信する。
-HTMLテンプレートのカスタマイズ性を確保するため、Supabase Authの組み込みメール送信は使わない。
+リンク生成 API（例: `admin.generateLink()`）でリンクを生成し、メール送信サービス（例: Resend）経由でHTMLメールを送信する。
+HTMLテンプレートのカスタマイズ性を確保するため、認証サービス（例: Supabase Auth）の組み込みメール送信は使わない。
 ```
 
 ❌ **悪い例**（変更前後を比較している）:
@@ -231,7 +231,7 @@ HTMLテンプレートのカスタマイズ性を確保するため、Supabase A
 ```markdown
 ### メール送信実装
 
-**変更前**: `supabase.auth.signUp()`でSupabase Auth経由でメール送信
-**変更後**: `admin.generateLink()` + Resend経由でHTMLメール送信
+**変更前**: 認証サービス（例: Supabase Auth）の組み込みサインアップ API（例: `supabase.auth.signUp()`）経由でメール送信
+**変更後**: リンク生成 API（例: `admin.generateLink()`）+ メール送信サービス（例: Resend）経由でHTMLメール送信
 **変更理由**: テンプレートのカスタマイズ性
 ```

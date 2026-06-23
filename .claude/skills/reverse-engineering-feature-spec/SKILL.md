@@ -21,26 +21,26 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 ```
 ❌ 悪い例: 実装を確認せずに一般的な仕様を書く
-  - 「電話番号は10〜11桁の数字」 ← Zodスキーマを確認していない
+  - 「電話番号は10〜11桁の数字」 ← バリデーション定義（例: Zod スキーマ）を確認していない
   - 「戻るボタンで前のステップに戻る」 ← 実際のボタンラベルは「前へ」
 
 ✅ 良い例: 実装を確認してから書く
-  - 「電話番号は10文字以上（数字とハイフンのみ許可）」 ← schema.tsのZodルールを確認
-  - 「「前へ」ボタンで前のステップに戻る」 ← JSXのボタンテキストを確認
+  - 「電話番号は10文字以上（数字とハイフンのみ許可）」 ← バリデーション定義（例: Zod スキーマ）を確認
+  - 「「前へ」ボタンで前のステップに戻る」 ← ビューのボタンテキストを確認
 ```
 
-**具体的な確認項目**:
+**具体的な確認項目**（「確認元」は**ソースの種別**。括弧内は代表スタックでの一例なので、採用スタックに読み替えること）:
 
-| 項目 | 確認元 | よくある間違い |
+| 項目 | 確認元（ソースの種別） | よくある間違い |
 |------|--------|--------------|
-| ボタンラベル | JSX内のテキスト | 「送信」と書いたが実際は「保存」 |
-| バリデーションルール | Zodスキーマ（schema.ts） | 桁数・形式を想像で書く |
-| エラーメッセージ | Zodのmessageプロパティ | 一般的なメッセージを推測で書く |
-| フォーム項目名 | `<label>` / `getByLabel` / `aria-label` | 項目名を想像で書く |
-| ページ遷移先 | `router.push()` / `redirect()` | パスを想像で書く |
-| API呼び出し | Server Actions / fetch | エンドポイントを想像で書く |
-| DB操作 | repository層のメソッド | テーブル名・カラム名を想像で書く |
-| 型定義 | domain/models配下の型 | フィールド名を想像で書く |
+| ボタンラベル | ビュー/テンプレート内のテキスト（例: JSX） | 「送信」と書いたが実際は「保存」 |
+| バリデーションルール | バリデーション定義（例: Zod スキーマ `schema.ts`） | 桁数・形式を想像で書く |
+| エラーメッセージ | バリデーション定義のメッセージ（例: Zod の message） | 一般的なメッセージを推測で書く |
+| フォーム項目名 | ラベル要素（例: `<label>` / `getByLabel` / `aria-label`） | 項目名を想像で書く |
+| ページ遷移先 | ルーティング/リダイレクト（例: `router.push()` / `redirect()`） | パスを想像で書く |
+| API呼び出し | ハンドラ/通信層（例: Server Actions / fetch） | エンドポイントを想像で書く |
+| DB操作 | データアクセス層のメソッド（例: repository 層） | テーブル名・カラム名を想像で書く |
+| 型定義 | ドメインモデルの型（例: `domain/models` 配下） | フィールド名を想像で書く |
 
 詳細: [正確性ガイド](guides/accuracy.md)
 
@@ -83,53 +83,59 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 以下の順序で実装を精読し、機能の全体像を把握する。
 
-**1. ページコンポーネント**（エントリーポイント）
+**1. ページ/画面コンポーネント**（エントリーポイント）
 ```
+# 例: Next.js での一例
 <app>/app/<path>/page.tsx
 ```
-- サーバーコンポーネント or クライアントコンポーネントの判定
-- データ取得方法（Server Component直接 / Server Actions）
+- レンダリング方式（例: サーバーコンポーネント or クライアントコンポーネント）の判定
+- データ取得方法（例: Server Component直接 / Server Actions）
 - レイアウト構成
 
-**2. クライアントコンポーネント**（UIとインタラクション）
+**2. クライアント/UI コンポーネント**（UIとインタラクション）
 ```
+# 例: Next.js / React での一例
 <app>/app/<path>/*Client.tsx
 <app>/components/<name>.tsx
 ```
 - フォーム項目、ボタンラベル、表示テキストを**正確に**読み取る
-- 状態管理（useState, useForm）
+- 状態管理（例: useState, useForm）
 - 条件分岐によるUI出し分け
 
-**3. バリデーションスキーマ**（入力ルール）
+**3. バリデーション定義**（入力ルール）
 ```
+# 例: Zod スキーマでの一例
 <app>/app/<path>/schema.ts
 <app>/lib/schemas/<name>.ts
 ```
-- Zodスキーマの各フィールドのルールを**正確に**読み取る
-  - `min()`, `max()`, `regex()`, `refine()` の具体値
-  - `message` プロパティのエラーメッセージ文言
-  - `optional()`, `nullable()` の有無
+- バリデーション定義（例: Zod スキーマ）の各フィールドのルールを**正確に**読み取る
+  - 桁数・上限・形式・カスタム検証（例: Zod の `min()`, `max()`, `regex()`, `refine()`）の具体値
+  - エラーメッセージ文言（例: Zod の `message` プロパティ）
+  - 任意/null 許容の有無（例: Zod の `optional()`, `nullable()`）
 
-**4. Server Actions**（ビジネスロジック）
+**4. ハンドラ/ビジネスロジック層**（ビジネスロジック）
 ```
+# 例: Server Actions での一例
 <app>/app/<path>/actions.ts
 <app>/actions/<name>.ts
 ```
 - 入力→処理→出力のフロー
 - エラーハンドリング
 
-**5. Domain層**（データモデルとDB操作）
+**5. ドメイン層**（データモデルとデータアクセス）
 ```
+# 例: domain 層での一例
 <app>/domain/models/<name>.ts
 <app>/domain/repository/<name>.ts
 <app>/domain/service/<name>.ts
 ```
-- Entity型定義
-- CRUD操作の実装
-- ビジネスルール
+- Entity型定義（例: domain/models 配下）
+- CRUD操作の実装（例: データアクセス層 / repository）
+- ビジネスルール（例: ドメインサービス層 / service）
 
 **6. DBスキーマ**（テーブル定義）
 ```
+# 例: Supabase の生成された DB 型定義での一例
 supabase/generated/database.types.ts
 ```
 - テーブル名、カラム名を**正確に**確認
@@ -149,6 +155,8 @@ supabase/generated/database.types.ts
 □ 使用しているDB テーブル・カラム
 □ 外部サービス連携（API呼び出し等）
 ```
+
+> 上記のファイルパスは代表スタック（例: Next.js / Supabase）での一例。採用スタックの配置に読み替えること。
 
 ---
 
@@ -257,9 +265,10 @@ REQUIREMENTS.md作成後、Playwright MCPを使って実装済みUIのスクリ�
 
 **1. 型定義は実装から正確にコピーする**
 
-domain/models配下のEntity型、スキーマの型をそのまま記載する。推測で型を書かない。テーブル定義そのものは common の `TABLE_DEFINITION.md` を参照する。
+ドメインモデルの型（例: domain/models 配下の Entity 型）やスキーマの型をそのまま記載する。推測で型を書かない。テーブル定義そのものは common の `TABLE_DEFINITION.md` を参照する。
 
 ```typescript
+// 例: TypeScript での一例
 // ❌ 想像で書いた型
 interface UserProfile {
   name: string;        // ← 実際は first_name + last_name
@@ -275,9 +284,10 @@ interface UserEntity {
 }
 ```
 
-**2. バリデーションルールはZodスキーマから正確に転記する**
+**2. バリデーションルールはバリデーション定義（例: Zod スキーマ）から正確に転記する**
 
 ```typescript
+// 例: Zod スキーマ（schema.ts）での一例
 // schema.ts の実際のコード
 const phoneSchema = z.string()
   .min(10, { message: '電話番号は10文字以上で入力してください' })
@@ -290,13 +300,13 @@ const phoneSchema = z.string()
 
 **3. ロジック設計は実装のフローを正確に反映する**
 
-入力 → バリデーション → ビジネスロジック → 永続化 → 出力 の流れを、実装の Server Actions / service 層から正確に書き起こす。データモデル（テーブル・ER）は common の `TABLE_DEFINITION.md`、API 契約は common の `API_SPEC.md` を参照し、TECH_DESIGN では重複して持たない。
+入力 → バリデーション → ビジネスロジック → 永続化 → 出力 の流れを、実装のハンドラ/ビジネスロジック層（例: Server Actions / service 層）から正確に書き起こす。データモデル（テーブル・ER）は common の `TABLE_DEFINITION.md`、API 契約は common の `API_SPEC.md` を参照し、TECH_DESIGN では重複して持たない。
 
 **4. データモデル / API への言及は common を参照する**
 
 ```
 ❌ TECH_DESIGN にテーブル定義・ER 図・API 設計を書く（common と二重管理になる）
-✅ common の TABLE_DEFINITION.md / API_SPEC.md を参照し、supabase/generated/database.types.ts の定義と一致させる
+✅ common の TABLE_DEFINITION.md / API_SPEC.md を参照し、生成された DB 型定義（例: Supabase の supabase/generated/database.types.ts）と一致させる
 ```
 
 ---
@@ -310,10 +320,10 @@ const phoneSchema = z.string()
 TEST_PLAN.mdにはテスト総数を記載するが、テストを実際に書いた後にitブロック数を正確にカウントして更新する。
 
 ```
-# カウント方法（Jest）
+# 例: Jest でのカウント方法（テストフレームワークに合わせて読み替える）
 grep -c "it(" path/to/test.test.tsx
 
-# カウント方法（Playwright）
+# 例: Playwright でのカウント方法
 grep -c "test(" e2e/tests/user-app/feature.spec.ts
 ```
 
@@ -331,8 +341,9 @@ grep -c "test(" e2e/tests/user-app/feature.spec.ts
    - テストデータ（seedデータ）がどのユーザー・どの状態で入っているか確認
    - 実際のUI操作で画面遷移・表示を確認
 
-2. **Locatorは実装のJSXから正確に取得する**
+2. **Locatorは実装のビュー/テンプレート（例: JSX）から正確に取得する**
    ```typescript
+   // 例: JSX + Playwright での一例
    // 実装を確認
    <button aria-label="保存">保存して次へ</button>
 
@@ -342,6 +353,7 @@ grep -c "test(" e2e/tests/user-app/feature.spec.ts
 
 3. **テストデータはseedファイルから確認する**
    ```
+   # 例: Supabase の seed での一例
    supabase/seeds/*.sql
    ```
 
@@ -388,22 +400,22 @@ TEST_PLAN.mdのテスト戦略で定めたテストレベルに従って作成�
 ### コードリーディング完了時
 
 ```
-□ ページコンポーネントを読んだ
-□ クライアントコンポーネントを読んだ
-□ バリデーションスキーマを読んだ
-□ Server Actionsを読んだ
-□ Domain層（models, repository, service）を読んだ
-□ database.types.tsで関連テーブルを確認した
+□ ページ/画面コンポーネントを読んだ
+□ クライアント/UI コンポーネントを読んだ
+□ バリデーション定義（例: Zod スキーマ）を読んだ
+□ ハンドラ/ビジネスロジック層（例: Server Actions）を読んだ
+□ ドメイン層（例: models, repository, service）を読んだ
+□ 生成された DB 型定義（例: Supabase の database.types.ts）で関連テーブルを確認した
 □ seedデータを確認した
 ```
 
 ### REQUIREMENTS.md作成時
 
 ```
-□ ボタンラベル・リンクテキストは実装のJSXから転記した
-□ フォーム項目名は実装の<label>やaria-labelから転記した
-□ エラーメッセージはZodスキーマのmessageから転記した
-□ 画面遷移はrouter.push/redirectの実際のパスを記載した
+□ ボタンラベル・リンクテキストは実装のビュー/テンプレート（例: JSX）から転記した
+□ フォーム項目名は実装のラベル要素（例: <label> / aria-label）から転記した
+□ エラーメッセージはバリデーション定義のメッセージ（例: Zod の message）から転記した
+□ 画面遷移はルーティング/リダイレクト（例: router.push / redirect）の実際のパスを記載した
 □ すべてのユースケースにPriority（P0/P1/P2）＋振る舞い（手順）＋受入基準（EARS）を付与した
 □ 「備考」セクションにリバースエンジニアリング注記を追加した
 ```
@@ -425,8 +437,8 @@ TEST_PLAN.mdのテスト戦略で定めたテストレベルに従って作成�
 ### TECH_DESIGN.md作成時
 
 ```
-□ 型定義はdomain/models配下から正確にコピーした
-□ バリデーションルールはschema.tsから正確に転記した
+□ 型定義はドメインモデル（例: domain/models 配下）から正確にコピーした
+□ バリデーションルールはバリデーション定義（例: Zod スキーマ schema.ts）から正確に転記した
 □ ロジック設計（入力→検証→ロジック→永続化→出力）を実装から書き起こした
 □ データモデル/ER/API は common の TABLE_DEFINITION.md / API_SPEC.md を参照（TECH_DESIGN に重複して持っていない）
 □ 画面 feature の場合、画面項目定義セクションを記載した
@@ -443,7 +455,7 @@ TEST_PLAN.mdのテスト戦略で定めたテストレベルに従って作成�
 ### テスト作成時
 
 ```
-□ E2EテストのLocatorは実装のJSXテキストから取得した
+□ E2EテストのLocatorは実装のビュー/テンプレート（例: JSX）のテキストから取得した
 □ テストデータはseedファイルの内容を確認した
 □ TEST_PLAN.mdのテスト戦略に記載されたテストケースを網羅した
 □ テスト実行して全件パスした
@@ -482,4 +494,4 @@ TEST_PLAN.mdのテスト戦略で定めたテストレベルに従って作成�
 - **STDD違反例**: [stdd-violations guide](../documenting-requirements/guides/stdd-violations.md)
 - **正確性ガイド**: [accuracy guide](guides/accuracy.md)
 - **Figmaキャプチャガイド**: [figma-capture guide](guides/figma-capture.md)
-- **DB型定義**: `supabase/generated/database.types.ts`
+- **DB型定義**: 生成された DB 型定義（例: Supabase の `supabase/generated/database.types.ts`）
