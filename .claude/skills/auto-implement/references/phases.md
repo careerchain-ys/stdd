@@ -24,7 +24,7 @@ Spec 工程はエージェント同士のレビューだけで自動承認せず
 
 要件（What & Why）を確定させるフェーズ。技術設計（Phase 1b）には進まず、まず REQUIREMENTS.md を完成・承認させる。
 
-**Requirements Writerに依頼**して、issue の情報をもとに REQUIREMENTS.md を作成する。
+**Requirements Writerに依頼**して、入力（タスク記述。GitHub issue の場合はその情報、それ以外は Step 1 のヒアリングで確定したタスク記述）をもとに REQUIREMENTS.md を作成する。
 
 1. `docs/` 配下に該当機能のディレクトリを作成（存在しない場合）
 2. `REQUIREMENTS.md` を作成:
@@ -42,7 +42,7 @@ Spec 工程はエージェント同士のレビューだけで自動承認せず
 
 チェック項目:
 
-- 要件の網羅性（issue の要求がすべてユースケース・受入基準としてカバーされているか）
+- 要件の網羅性（入力（タスク記述）の要求がすべてユースケース・受入基準としてカバーされているか）
 - 3層構造（業務 → 機能 → 非機能）とユースケース品質（Priority＋振る舞い＋EARS）
 - SSOT 準拠（履歴・経緯・issue 言及がないか）
 - 既存・common 階層との整合性
@@ -296,8 +296,8 @@ UI変更を伴う実装の場合、対象のSpecドキュメント（REQUIREMENT
 
 PRのdescriptionには以下を含める:
 
-- 対応issue番号（`Closes #<issue番号>`）
+- 対応issue番号（`Closes #<issue番号>`）。**GitHub issue 起点のときのみ**。issue 以外の入力では、代わりに対象タスクのサマリを記載する。
 - 実行モード
 - 各フェーズの実行結果サマリ
 
-PR作成後、GitHub Projectのステータスを「In review」に変更する（[references/github-project.md](github-project.md) の手順に従い、option IDに `"df73e18b"` を指定）。
+PR作成後、**GitHub issue 起点のときのみ** GitHub Projectのステータスを「In review」に変更する（[references/github-project.md](github-project.md) の手順に従い、option IDに `"df73e18b"` を指定）。issue 以外の入力ではスキップする。
