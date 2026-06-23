@@ -1,6 +1,6 @@
 {
   "name": "@careerchain/stdd",
-  "version": "0.1.4",
+  "version": "1.0.0",
   "description": "STDD (Spec and Test Driven Development) を既存・新規プロジェクトに導入する CLI",
   "license": "Apache-2.0",
   "type": "module",
