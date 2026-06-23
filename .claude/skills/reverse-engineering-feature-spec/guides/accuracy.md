@@ -19,9 +19,10 @@ Specはその真実を忠実にドキュメント化したもの
 
 ### 1. UIテキスト（ボタンラベル、見出し、プレースホルダー）
 
-**確認元**: JSXのテキストノード、`aria-label`、`placeholder`
+**確認元**: ビュー/テンプレートのテキストノード（例: JSX）、`aria-label`、`placeholder`
 
 ```typescript
+// 例: JSX での一例
 // 実装コード例
 <Button type="submit">保存して次へ</Button>
 <h1>プロフィール登録</h1>
@@ -36,9 +37,10 @@ Specはその真実を忠実にドキュメント化したもの
 
 ### 2. バリデーションルール
 
-**確認元**: Zodスキーマ（`schema.ts` / `lib/schemas/*.ts`）
+**確認元**: バリデーション定義（例: Zod スキーマ `schema.ts` / `lib/schemas/*.ts`）
 
 ```typescript
+// 例: Zod スキーマでの一例
 // 実装コード例
 const schema = z.object({
   phone: z.string()
@@ -54,13 +56,14 @@ const schema = z.object({
 | 10文字以上、数字とハイフンのみ | 10〜11桁の数字（ハイフン許可） |
 | エラー: 「電話番号は10文字以上で入力してください」 | エラー: 「電話番号の形式が不正です」 |
 
-**特に注意**: `min()` / `max()` の値、`regex()` のパターン、`message` の文言を正確に転記すること。
+**特に注意**: 桁数・上限（例: Zod の `min()` / `max()`）の値、形式パターン（例: `regex()`）、エラー文言（例: `message`）を正確に転記すること。
 
 ### 3. エラーメッセージ
 
-**確認元**: Zodスキーマの`message`、Server Actionsの`return { error: '...' }`、toast/Snackbarの文言
+**確認元**: バリデーション定義のメッセージ（例: Zod の `message`）、ハンドラ/ビジネスロジック層の戻り値（例: Server Actions の `return { error: '...' }`）、toast/Snackbarの文言
 
 ```typescript
+// 例: Server Actions での一例
 // Server Actions
 if (!user) {
   return { error: 'ユーザーが見つかりません' };
@@ -77,9 +80,10 @@ showSnackbar('プロフィールを更新しました', 'success');
 
 ### 4. 画面遷移・URL
 
-**確認元**: `router.push()`, `redirect()`, `<Link href="...">`, `useRouter`
+**確認元**: ルーティング/リダイレクト（例: `router.push()`, `redirect()`, `<Link href="...">`, `useRouter`）
 
 ```typescript
+// 例: Next.js での一例
 // 実装コード例
 router.push('/dashboard');
 redirect('/onboarding?step=2');
@@ -92,9 +96,10 @@ redirect('/onboarding?step=2');
 
 ### 5. フォーム項目
 
-**確認元**: `<label>`, `<FormLabel>`, `aria-label`, React Hook Formの`register`名
+**確認元**: ラベル要素（例: `<label>`, `<FormLabel>`, `aria-label`）、フォームライブラリのフィールド登録（例: React Hook Form の `register` 名）
 
 ```typescript
+// 例: React + React Hook Form での一例
 // 実装コード例
 <FormField name="last_name" label="姓" required />
 <FormField name="first_name" label="名" required />
@@ -108,9 +113,10 @@ redirect('/onboarding?step=2');
 
 ### 6. 型定義・データモデル
 
-**確認元**: `domain/models/*.ts`, `database.types.ts`
+**確認元**: ドメインモデルの型（例: `domain/models/*.ts`）、生成された DB 型定義（例: Supabase の `database.types.ts`）
 
 ```typescript
+// 例: TypeScript / domain/models での一例
 // 実装コード例 - domain/models/user.ts
 export interface UserEntity {
   id: string;
@@ -131,9 +137,10 @@ export interface UserEntity {
 
 ### 7. DB操作・テーブル名
 
-**確認元**: `database.types.ts`, repository層の`.from('table_name')`
+**確認元**: 生成された DB 型定義（例: Supabase の `database.types.ts`）、データアクセス層のクエリ（例: repository 層の `.from('table_name')`）
 
 ```typescript
+// 例: Supabase repository での一例
 // 実装コード例 - repository
 const { data } = await supabase
   .from('users')
@@ -154,28 +161,28 @@ const { data } = await supabase
 
 ```
 ❌ 「電話番号は10〜11桁の数字」（日本の一般常識）
-✅ 「電話番号は10文字以上、数字とハイフンのみ」（実際のZodスキーマ）
+✅ 「電話番号は10文字以上、数字とハイフンのみ」（実際のバリデーション定義。例: Zod スキーマ）
 ```
 
 ### パターン2: 似ているが違う文言
 
 ```
 ❌ 「戻る」ボタン（一般的なUI用語）
-✅ 「前へ」ボタン（実際のJSXテキスト）
+✅ 「前へ」ボタン（実際のビュー/テンプレートのテキスト。例: JSX）
 ```
 
 ### パターン3: カラム名の推測
 
 ```
 ❌ career テーブル（単数形で推測）
-✅ careers テーブル（database.types.tsで確認）
+✅ careers テーブル（生成された DB 型定義で確認。例: Supabase の database.types.ts）
 ```
 
 ### パターン4: nullable の見落とし
 
 ```
 ❌ first_name: string（nullableを見落とし）
-✅ first_name: string | null（database.types.tsで確認）
+✅ first_name: string | null（生成された DB 型定義で確認。例: Supabase の database.types.ts）
 ```
 
 ### パターン5: テスト総数の不正確
@@ -208,8 +215,9 @@ Spec・テスト・実装の3点整合性を自動チェックする。不整合
 ```bash
 # REQUIREMENTS.mdに書いたボタンラベルが実装に存在するか確認
 # <app.path> は .stdd.config.yml の apps[].path（複数アプリは apps[] をループ）
-grep -r "保存して次へ" <app.path>/app/
+grep -r "保存して次へ" <app.path>/
 
 # TECH_DESIGN.mdに書いたバリデーションルールが実装に存在するか確認
-grep -r "min(10" <app.path>/app/
+# 例: Zod スキーマの min(10 を検索（採用スタックの記法に読み替える）
+grep -r "min(10" <app.path>/
 ```

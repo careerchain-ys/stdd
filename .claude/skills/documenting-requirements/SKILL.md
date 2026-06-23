@@ -94,8 +94,8 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
 ```markdown
 ### メール送信実装
 
-**変更前**: Supabase Auth経由でメール送信
-**変更後**: Resend経由でHTMLメール送信
+**変更前**: 認証サービス（例: Supabase Auth / Auth0 / Cognito）経由でメール送信
+**変更後**: メール送信サービス（例: Resend / SendGrid / SES）経由でHTMLメール送信
 **変更理由**: テンプレートのカスタマイズ性のため
 ```
 
@@ -104,7 +104,7 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
 ```markdown
 ### メール送信実装
 
-`admin.generateLink()` でリンクを生成し、Resend経由でHTMLメールを送信する。
+リンク生成 API（例: `admin.generateLink()`）でリンクを生成し、メール送信サービス（例: Resend）経由でHTMLメールを送信する。
 HTMLテンプレートは `lib/email/templates/` で管理。
 ```
 
