@@ -34,6 +34,11 @@ STDD は AI エージェント (Claude Code 等) との協働を前提に設計�
 
 STDD の中核は、Spec → テスト → 実装 という一方向の流れを崩さないことにある。矢印は決して遡行しない。
 
+これにより、
+
+- Spec と実装の乖離が構造的に発生しなくなる
+- AI エージェントやステークホルダーは Spec だけ読めば最新仕様を把握できる
+
 ```mermaid
 flowchart LR
     subgraph SSoT["Single Source of Truth (Spec)"]
