@@ -52,7 +52,7 @@ stdd/
 ├── NOTICE                     # 著作権表記
 ├── packages/
 │   ├── core/                  # 方法論ドキュメント / JSON Schema
-│   │   ├── docs/              # methodology / 各導入ガイド / workflow-diagram
+│   │   ├── docs/              # methodology / 各導入ガイド
 │   │   └── schema/
 │   └── stdd/                  # 導入 CLI（npm パッケージ `@careerchain/stdd`）
 ├── templates/                 # 参照用プロジェクトテンプレート
@@ -81,8 +81,7 @@ stdd/
 
 **方法論**
 
-- [`packages/core/docs/stdd-methodology.md`](packages/core/docs/stdd-methodology.md) — STDD 方法論（Spec の 2 階層構造・テスト戦略・開発フロー）
-- [`packages/core/docs/workflow-diagram.md`](packages/core/docs/workflow-diagram.md) — 開発フロー図
+- [`packages/core/docs/stdd-methodology.md`](packages/core/docs/stdd-methodology.md) — STDD 方法論（Spec 起点の一方向フロー・Spec の 2 階層構造・テスト戦略・開発フロー図）
 
 **開発・運用の参考**
 

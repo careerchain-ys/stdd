@@ -70,7 +70,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 
 ### step 3: common 階層の前方設計 ★
 
-- `docs/common/REQUIREMENTS.md`（サービス目的・登場アクター・アプリ構成）と `ARCHITECTURE.md`（システム概要：システム構成・レイヤ規約）を人間と起こす。データモデルは `TABLE_DEFINITION.md`、API 契約は `API_SPEC.md`（API がある場合）に分けて起こす。`ARCHITECTURE` / `TABLE_DEFINITION` / `API_SPEC` は技術 spec (tech_specs) の common 分（→ `stdd-methodology.md` §2）。step 1 のコンセプトを起点にする。
+- `docs/common/REQUIREMENTS.md`（サービス目的・登場アクター・アプリ構成）と `ARCHITECTURE.md`（システム概要：システム構成・レイヤ規約）を人間と起こす。データモデルは `TABLE_DEFINITION.md`、API 契約は `API_SPEC.md`（API がある場合）に分けて起こす。`ARCHITECTURE` / `TABLE_DEFINITION` / `API_SPEC` は技術 spec (tech_specs) の common 分（→ `stdd-methodology.md` §3）。step 1 のコンセプトを起点にする。
 - **前方設計ゆえ「実装が真実」は効かない**。確定し切らない部分は**仮説**として置き、**要確認マーカー**を添えてユーザーに是非を確認させる。テンプレートの章は省略せず仮説で埋めて網羅性を保ち、feature 開発で検証して更新する（過度に作り込まない）。
 
 ### step 4: 最初の feature
@@ -111,6 +111,5 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 
 - セッションで立ち上げを駆動する仕組み: `.claude/skills/starting-new-with-stdd/SKILL.md`
 - 既存プロジェクトへの導入: [`guide-for-existing-project.md`](./guide-for-existing-project.md)
-- 順行の通常フロー・テスト戦略: `stdd-methodology.md`（§4 テスト戦略 / §5 開発フロー）
-- 開発フロー図: `workflow-diagram.md`
+- 順行の通常フロー・テスト戦略: `stdd-methodology.md`（§4 テスト戦略 / §5 開発フロー・フロー図）
 - スタック別の骨組み手順: 使用テンプレートの README（例: `nextjs-supabase-starter`）/ 各プラグイン

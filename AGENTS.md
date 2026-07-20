@@ -16,8 +16,7 @@
 エージェントが最初に読むべき参考資料:
 
 - `README.md` — リポジトリの全体像
-- `packages/core/docs/stdd-methodology.md` — STDD 方法論
-- `packages/core/docs/workflow-diagram.md` — 開発フローの図
+- `packages/core/docs/stdd-methodology.md` — STDD 方法論（開発フロー図を含む）
 - `docs/plugin-separation-policy.md` — プラグイン分離方針
 
 ---
@@ -117,8 +116,7 @@ stdd 本体（ドキュメント・テンプレート）は監査スクリプト
 
 | 種別                  | パス                                            |
 | --------------------- | ----------------------------------------------- |
-| 方法論ドキュメント    | `packages/core/docs/stdd-methodology.md`        |
-| 開発フロー図          | `packages/core/docs/workflow-diagram.md`        |
+| 方法論ドキュメント（開発フロー図を含む） | `packages/core/docs/stdd-methodology.md` |
 | 要件テンプレート      | `.claude/skills/documenting-requirements/templates/`             |
 | 技術設計テンプレート  | `.claude/skills/documenting-tech-specs/templates/tech-design.md` |
 | PLAN テンプレート     | `.claude/skills/documenting-plans/templates/plan.md`             |

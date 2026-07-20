@@ -12,8 +12,7 @@ STDD (Spec and Test Driven Development) の **方法論ドキュメント**, **S
 ```
 packages/core/
 ├── docs/
-│   ├── stdd-methodology.md       # STDD とは / 開発フロー
-│   └── workflow-diagram.md       # 各フローを Mermaid で図示
+│   └── stdd-methodology.md       # STDD とは / 開発フロー（Mermaid 図を含む）
 ├── schema/
 │   └── .stdd.config.schema.json  # .stdd.config.yml の JSON Schema (Draft 2020-12)
 └── README.md                     # 本ファイル
@@ -27,10 +26,9 @@ packages/core/
 
 ## はじめての方は
 
-1. `docs/stdd-methodology.md` を読んで STDD の全体像を掴む
-2. `docs/workflow-diagram.md` でフローを視覚的に把握する
-3. 自プロジェクトに `.stdd.config.yml` を作成し、`schema/.stdd.config.schema.json` で IDE 補完 / 検証を有効化する
-4. `documenting-requirements`（要件）／ `documenting-tech-specs`（技術設計）スキルのテンプレート（`.claude/skills/documenting-requirements/templates/`・`.claude/skills/documenting-tech-specs/templates/`）を参照して spec を書き始める
+1. `docs/stdd-methodology.md` を読んで STDD の全体像とフロー図を掴む
+2. 自プロジェクトに `.stdd.config.yml` を作成し、`schema/.stdd.config.schema.json` で IDE 補完 / 検証を有効化する
+3. `documenting-requirements`（要件）／ `documenting-tech-specs`（技術設計）スキルのテンプレート（`.claude/skills/documenting-requirements/templates/`・`.claude/skills/documenting-tech-specs/templates/`）を参照して spec を書き始める
 
 ---
 
@@ -64,7 +62,7 @@ docs:
 `common_requirements` / `common_architecture` はプロジェクト全体を俯瞰する **common 階層** の spec
 (`REQUIREMENTS.md` の全体版と `TECH_DESIGN.md` の全体版 = `ARCHITECTURE.md`) を指す。任意項目であり、
 common 階層を使わないプロジェクトでは省略してよい。なお `ARCHITECTURE` / `TECH_DESIGN` / `TABLE_DEFINITION` / `API_SPEC` / `TEST_PLAN` / `DESIGN` など技術系の設計書は技術 spec (tech_specs) と総称する。詳細は
-[`docs/stdd-methodology.md`](docs/stdd-methodology.md) §2 を参照。
+[`docs/stdd-methodology.md`](docs/stdd-methodology.md) §3 を参照。
 
 このまま `apps/web/` に Next.js / Remix / SvelteKit 等を配置すれば動作する。
 複数アプリ構成 (例: `admin` と `web`) は `apps[]` に複数項目を追加する。

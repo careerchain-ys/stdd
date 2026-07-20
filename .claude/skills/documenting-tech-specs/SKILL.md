@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 
 # 技術 spec (tech_specs) — TECH_DESIGN / TEST_PLAN / common 技術階層の作成
 
-STDD（Spec and Test Driven Development）方法論に従って、技術系の設計書（総称 **技術 spec / tech_specs**）を作成・更新します。対象は feature の TECH_DESIGN.md・TEST_PLAN.md と、common 階層の ARCHITECTURE.md / TABLE_DEFINITION.md / API_SPEC.md / DESIGN.md（→ `stdd-methodology.md` §2）。
+STDD（Spec and Test Driven Development）方法論に従って、技術系の設計書（総称 **技術 spec / tech_specs**）を作成・更新します。対象は feature の TECH_DESIGN.md・TEST_PLAN.md と、common 階層の ARCHITECTURE.md / TABLE_DEFINITION.md / API_SPEC.md / DESIGN.md（→ `stdd-methodology.md` §3）。
 
 > **前提**: 技術設計は REQUIREMENTS.md（要件）が確定していることを前提とする。要件（業務・機能・非機能）の作成は [documenting-requirements Skill](../documenting-requirements/SKILL.md) を使う。**SSOT原則・要確認マーカーのSSoTも documenting-requirements にある**ため、本スキルでもそれに従う（後述「絶対ルール」参照）。
 

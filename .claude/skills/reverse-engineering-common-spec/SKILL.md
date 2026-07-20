@@ -18,7 +18,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 | `docs/common/TABLE_DEFINITION.md` | 全テーブル定義の SSoT（カード形式・ER図なし） |
 | `docs/common/API_SPEC.md` | API 契約の SSoT（OpenAPI 風 Markdown。API がある場合） |
 
-このうち `ARCHITECTURE.md` / `TABLE_DEFINITION.md` / `API_SPEC.md` は技術 spec (tech_specs) の common 分にあたる（→ `stdd-methodology.md` §2）。テンプレートは `../documenting-requirements/templates/requirements-common.md`（REQUIREMENTS）/ `../documenting-tech-specs/templates/architecture-common.md`（ARCHITECTURE。TABLE_DEFINITION / API_SPEC も同ディレクトリ）を参照する。
+このうち `ARCHITECTURE.md` / `TABLE_DEFINITION.md` / `API_SPEC.md` は技術 spec (tech_specs) の common 分にあたる（→ `stdd-methodology.md` §3）。テンプレートは `../documenting-requirements/templates/requirements-common.md`（REQUIREMENTS）/ `../documenting-tech-specs/templates/architecture-common.md`（ARCHITECTURE。TABLE_DEFINITION / API_SPEC も同ディレクトリ）を参照する。
 
 ## 位置づけ — 導入時に一度だけ
 
@@ -143,7 +143,7 @@ feature 階層と違い、確認する一次情報は **UI 文言ではなく構
 ## 参照ファイル
 
 - **common テンプレート**: `../documenting-requirements/templates/requirements-common.md`（REQUIREMENTS）/ `../documenting-tech-specs/templates/architecture-common.md`・`table-definition-common.md`・`api-spec-common.md`（技術階層）
-- **2 階層構造の解説**: `packages/core/docs/stdd-methodology.md` §2.0
+- **2 階層構造の解説**: `packages/core/docs/stdd-methodology.md` §3.1
 - **機能単位リバース**: [reverse-engineering-feature-spec skill](../reverse-engineering-feature-spec/SKILL.md)
 - **要件テンプレート**: [documenting-requirements skill](../documenting-requirements/SKILL.md)
 - **技術設計テンプレート**: [documenting-tech-specs skill](../documenting-tech-specs/SKILL.md)
