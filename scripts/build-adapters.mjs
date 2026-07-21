@@ -63,7 +63,32 @@ async function planCodexView() {
     outputs.push({ abs: path.join(agentsDst, rel.replace(/\.md$/, ".toml")), content: Buffer.from(toml), mode: 0o644 });
   }
 
+  // 2d: MCP → .codex/config.toml [mcp_servers.*]（Claude の .mcp.json と同一定義から）
+  const mcpJson = JSON.parse(await fs.readFile(path.join(repoRoot, "templates", "minimal", ".mcp.json"), "utf8"));
+  outputs.push({
+    abs: path.join(repoRoot, ".codex", "config.toml"),
+    content: Buffer.from(mcpJsonToCodexToml(mcpJson)),
+    mode: 0o644,
+  });
+
   return { outputs, managedDirs };
+}
+
+/** Claude の .mcp.json（{mcpServers:{name:{command,args,env,url}}}）を Codex config.toml の [mcp_servers.*] へ。 */
+function mcpJsonToCodexToml(mcpJson) {
+  const lines = ["# 生成物: templates/minimal/.mcp.json から build-adapters が生成。直接編集しない（編集は元定義へ）。", ""];
+  for (const [name, cfg] of Object.entries(mcpJson.mcpServers ?? {})) {
+    lines.push(`[mcp_servers.${name}]`);
+    if (cfg.command) lines.push(`command = "${escapeTomlBasic(cfg.command)}"`);
+    if (Array.isArray(cfg.args)) lines.push(`args = [${cfg.args.map((a) => `"${escapeTomlBasic(a)}"`).join(", ")}]`);
+    if (cfg.url) lines.push(`url = "${escapeTomlBasic(cfg.url)}"`);
+    if (cfg.env && typeof cfg.env === "object") {
+      lines.push(`[mcp_servers.${name}.env]`);
+      for (const [k, v] of Object.entries(cfg.env)) lines.push(`${k} = "${escapeTomlBasic(String(v))}"`);
+    }
+    lines.push("");
+  }
+  return lines.join("\n");
 }
 
 // ---- MD → Codex subagent TOML ----------------------------------------------
