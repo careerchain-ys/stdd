@@ -144,7 +144,7 @@ packages/core/            ← 単一 SSoT（エージェント非依存）
    `developer_instructions` を順に adopt」する縮退モードを併設するか要判断。
 2. skills 共有の最適化: 二重 install を基本としつつ、symlink `.agents/skills → .claude/skills` を
    Codex が辿れるか（辿れれば配布を一元化できる）を Phase 2 で検証する。
-3. AGENTS.md のドリフト是正: 既存 `AGENTS.md` に未実現パス参照（`packages/claude-code/` 等）があり、Phase 1 で整える。
+3. ドキュメントのパスドリフト是正（Phase 4 で対応済み）: `packages/claude-code/` 等の未実現パス参照を `plugin-separation-policy.md` / `packages/core/README.md` から除去し、`README.md` / `AGENTS.md` を Core+Adapter・dual-agent 前提に更新。
 4. 本改修自体の spec 化: stdd 流に、Phase 1 の前段で `documenting-requirements` / `documenting-tech-specs` により
    REQUIREMENTS / TECH_DESIGN を作成してから着手する。
 
@@ -274,6 +274,14 @@ Phase 1 の緑維持: core は `.claude/` の複製なので、生成器の出�
 
 残 follow-up: sync-assets の core 直接投影化 / `settings.json` の adapter 化 / symlink 重複排除 / pre-push フックの Codex 対応 / `config.toml` の TOML マージ（現状 create-if-absent）。
 
+### 8.7 Phase 4 進捗: ドキュメント整備（完了）
+
+- `README.md`（repo root）: 始め方・ディレクトリ構成・対応エージェント（現状の制約）を Core+Adapter / Claude+Codex / `--agent` 前提に更新。
+- `packages/stdd/README.md`: `--agent` オプション、Codex ビューの導入挙動（`.agents`/`.codex`/`AGENTS.md` 注入・`codex-manifest`）を追記。
+- `AGENTS.md`（repo root）: SSoT=`packages/core`、`build:adapters`/`check:adapters` を検証コマンド・主要ファイル表に追加、Core+Adapter 注記を追加。
+- パスドリフト是正（§6-3）: `packages/claude-code/` 等の未実現参照を `plugin-separation-policy.md` / `packages/core/README.md` から除去。`stdd-methodology.md` に Codex を明記。
+- CI: リポジトリに `.github/workflows` は無いため、`npm run check:adapters` を検証コマンドとして AGENTS.md に明文化（CI 新設は範囲外）。
+
 ## 9. 改訂履歴
 
 - 2026-07-21 初版（Claude / Codex 互換調査を踏まえた Core + Adapter 設計として作成）
@@ -284,3 +292,4 @@ Phase 1 の緑維持: core は `.claude/` の複製なので、生成器の出�
 - 2026-07-21 Phase 2d（MCP config.toml）完了。2c は Codex hooks 契約を docs で確認（出力は Claude と同一→アダプタ不要・入力のみ apply_patch 対応が必要）
 - 2026-07-21 Phase 2c（hooks: 共有 spec-first-check.sh に apply_patch 入力対応 + .codex/hooks.json）完了。フックテスト 18/18。Phase 2（Codex ビュー生成）完了
 - 2026-07-22 Phase 3（インストーラ: `stdd init --agent claude|codex|both`）完了。install 14/14・CLI e2e 検証。Claude/Codex 両対応が下流導入まで一貫
+- 2026-07-22 Phase 4（ドキュメント整備: README / AGENTS.md / methodology を Core+Adapter・Codex 対応へ、パスドリフト是正）完了
