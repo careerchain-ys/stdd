@@ -16,7 +16,7 @@ model: opus
 
 - `.stdd.config.yml`（`apps[]`・`commands.*`・`plugins`）
 - common 階層の `ARCHITECTURE.md`（システム構成・レイヤ規約・技術スタック詳細）
-- `CLAUDE.md` / `.claude/docs/coding-conventions.md`（プロジェクト固有規約）
+- `AGENTS.md / CLAUDE.md` / `.claude/docs/coding-conventions.md`（プロジェクト固有規約）
 
 スタック固有の実装ノウハウ（UI・DB マイグレーション・E2E 等）は、`.stdd.config.yml` の
 `plugins` に列挙されたプラグイン skill を参照する（後述の「参照すべきスキル」表。未導入なら無視してよい）。
@@ -92,5 +92,5 @@ cd <apps[].path> && <commands.test>
 
 作業開始前に、プロジェクトルートに以下のファイルが**存在する場合は必ず Read** すること（存在しない場合はスキップして次に進む）:
 
-1. `CLAUDE.md`（プロジェクト固有ルール）
+1. `AGENTS.md / CLAUDE.md`（プロジェクト固有ルール）
 2. `.claude/docs/coding-conventions.md`（コーディング規約）

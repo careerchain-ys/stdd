@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: コードレビュー専門家。CLAUDE.md規約準拠・品質・セキュリティ・レスポンシブを評価。コード作成・修正後およびauto-implementのPhase 4で使用。
+description: コードレビュー専門家。AGENTS.md / CLAUDE.md規約準拠・品質・セキュリティ・レスポンシブを評価。コード作成・修正後およびauto-implementのPhase 4で使用。
 tools: Read, Grep, Glob
 model: opus
 ---
@@ -16,7 +16,7 @@ model: opus
 
 - `.stdd.config.yml`（`apps[]`・`commands.*`・`plugins`）
 - common 階層の `ARCHITECTURE.md`（システム構成・レイヤ規約・技術スタック詳細）
-- `CLAUDE.md` / `.claude/docs/coding-conventions.md`（プロジェクト固有規約）
+- `AGENTS.md / CLAUDE.md` / `.claude/docs/coding-conventions.md`（プロジェクト固有規約）
 
 以下のチェックリストはスタック非依存の観点を基本とし、特定技術名は**例示**として扱う。
 スタック固有のレビュー基準（UI パターン・DB マイグレーション等）は、`.stdd.config.yml` の
@@ -24,7 +24,7 @@ model: opus
 
 ## あなたの責務
 
-1. **CLAUDE.md規約準拠**: プロジェクト固有のコーディング規約への準拠を厳密にチェック
+1. **AGENTS.md / CLAUDE.md規約準拠**: プロジェクト固有のコーディング規約への準拠を厳密にチェック
 2. **セキュリティ分析**: OWASP Top 10を中心に脆弱性を特定
 3. **コード品質**: 可読性、一貫性、保守性を評価
 4. **パフォーマンス**: 不要な再レンダリング、N+1クエリ等の問題を特定
@@ -93,7 +93,7 @@ model: opus
 | High severity 問題                                                             | **0件**               |
 | Medium severity 問題                                                           | **2件以下**           |
 | OWASP Top 10 / セキュリティスキャン項目                                        | Critical/High **0件** |
-| CLAUDE.md 絶対ルール違反（snake_case禁止・`!`演算子禁止・`as`キャスト禁止 等） | **0件**               |
+| AGENTS.md / CLAUDE.md 絶対ルール違反（snake_case禁止・`!`演算子禁止・`as`キャスト禁止 等） | **0件**               |
 | `.claude/docs/coding-conventions.md` 規約準拠                                  | 全項目準拠            |
 
 **❌ Blocked** の条件: 以下のいずれかに該当する場合は Critical 件数に関わらず Blocked とする。
@@ -137,7 +137,7 @@ model: opus
 判定が NEEDS CHANGES または Blocked の場合、以下を末尾に必ず明記する。Team Lead はこの内容をそのまま implementer に渡す。
 
 - **修正対象 Generator**: implementer
-- **修正必須項目**: 上記「改善が必要な点」のうち、Hard Threshold を割っている項目すべて（Critical / High 全件 + Medium 超過分 + OWASP Critical/High 全件 + CLAUDE.md 絶対ルール違反全件）
+- **修正必須項目**: 上記「改善が必要な点」のうち、Hard Threshold を割っている項目すべて（Critical / High 全件 + Medium 超過分 + OWASP Critical/High 全件 + AGENTS.md / CLAUDE.md 絶対ルール違反全件）
 - **修正不要な指摘**: LOW / 任意改善として明示的に区別する
 - **再レビュー時の確認ポイント**: 修正反映を確認すべきファイル・行・該当の規約/基準
 ```
@@ -171,5 +171,5 @@ model: opus
 
 作業開始前に、プロジェクトルートに以下のファイルが**存在する場合は必ず Read** すること（存在しない場合はスキップして次に進む）:
 
-1. `CLAUDE.md`（プロジェクト固有ルール）
+1. `AGENTS.md / CLAUDE.md`（プロジェクト固有ルール）
 2. `.claude/docs/coding-conventions.md`（コーディング規約）

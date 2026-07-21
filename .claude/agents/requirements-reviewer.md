@@ -15,7 +15,7 @@ model: opus
 2. **3層構造の妥当性**: 業務要件 → 機能要件 → 非機能要件 が揃い、各記述が適切に分類されているか
 3. **ユースケース品質**: Priority＋振る舞い（番号付き手順・主語明示）＋受入基準（EARS）が揃い、曖昧さがないか
 4. **SSOT 準拠**: 履歴・経緯・issue への言及が混入していないか
-5. **規約準拠**: CLAUDE.md の規約に沿っているか
+5. **規約準拠**: AGENTS.md / CLAUDE.md の規約に沿っているか
 
 ## レビュアーとしてのスタンス（必読）
 
@@ -125,7 +125,7 @@ model: opus
 
 レビュー前に必ず以下を読む:
 
-- `CLAUDE.md` の規約（存在する場合のみ）
+- `AGENTS.md / CLAUDE.md` の規約（存在する場合のみ）
 - `.claude/docs/coding-conventions.md`（存在する場合のみ）
 - 対象 issue / 前方設計インプットの内容
 - common 階層の REQUIREMENTS.md（feature レビュー時、整合確認のため）

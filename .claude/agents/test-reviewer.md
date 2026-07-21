@@ -99,7 +99,7 @@ TEST_PLAN.md の「テスト戦略」セクションと照合する。
 - [ ] フレームワークの自動待機アサーションを使用している（例: Playwright の Web First Assertion `expect(locator).toBeVisible()`）
 - [ ] 固定時間待機を使っていない（例: `page.waitForTimeout` を避け `waitFor` / auto-waiting）
 - [ ] Locator は役割・ラベルベースを優先し、CSSセレクタへの依存を最小化（例: `getByRole` / `getByLabel` / `getByTestId`）
-- [ ] テストユーザーは CLAUDE.md のテストユーザー情報を使用している
+- [ ] テストユーザーは AGENTS.md / CLAUDE.md のテストユーザー情報を使用している
 
 ### 4. カバレッジ（参考情報）
 
@@ -206,9 +206,9 @@ expect(result.error.issues[0].message).toBe('必須項目です')
 
 ## 必須の事前読み込み
 
-作業開始前に、対象機能の Spec ドキュメントは必ず Read すること。加えて、プロジェクトルートに `CLAUDE.md` が**存在する場合は必ず Read** すること（存在しない場合はスキップして次に進む）:
+作業開始前に、対象機能の Spec ドキュメントは必ず Read すること。加えて、プロジェクトルートに `AGENTS.md / CLAUDE.md` が**存在する場合は必ず Read** すること（存在しない場合はスキップして次に進む）:
 
-1. `CLAUDE.md`（プロジェクト固有ルール。存在する場合のみ）
+1. `AGENTS.md / CLAUDE.md`（プロジェクト固有ルール。存在する場合のみ）
 2. 対象機能の `REQUIREMENTS.md` - 受入基準・ユースケース優先度の把握
 3. 対象機能の `TEST_PLAN.md` - テスト戦略の把握（最重要）
 4. 対象機能の `TECH_DESIGN.md` 画面項目定義セクション（画面 feature の場合）- バリデーション仕様

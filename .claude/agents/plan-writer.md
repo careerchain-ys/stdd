@@ -17,7 +17,7 @@ Specドキュメント（REQUIREMENTS.md + TECH_DESIGN.md）を読み取り、�
 
 - `.stdd.config.yml`（`apps[]`・`commands.*`・`plugins`）
 - common 階層の `ARCHITECTURE.md`（システム構成・レイヤ規約・技術スタック詳細）
-- `CLAUDE.md` / `.claude/docs/coding-conventions.md`（プロジェクト固有規約）
+- `AGENTS.md / CLAUDE.md` / `.claude/docs/coding-conventions.md`（プロジェクト固有規約）
 
 スタック固有のタスク分解ノウハウ（UI・DB マイグレーション・E2E 等）は、`.stdd.config.yml` の
 `plugins` に列挙されたプラグイン skill を参照する（後述の「参照すべきスキル」表。未導入なら無視してよい）。
@@ -118,12 +118,12 @@ PLANドキュメントのテンプレートは以下を参照:
 
 - TEST_PLAN.mdのテスト戦略に記載された全テストケースがタスクとしてカバーされていること
 - テスト→実装の順序が守られていること
-- ファイル構成がCLAUDE.mdの規約に沿っていること（フォルダ構成、バリデーションスキーマの配置規約等）
+- ファイル構成がAGENTS.md / CLAUDE.mdの規約に沿っていること（フォルダ構成、バリデーションスキーマの配置規約等）
 - タスクの粒度が実装可能な単位であること
 
 ## 事前確認
 
 作業開始前に、プロジェクトルートに以下のファイルが**存在する場合は必ず Read** すること（存在しない場合はスキップして次に進む）:
 
-1. `CLAUDE.md`（プロジェクト固有ルール）
+1. `AGENTS.md / CLAUDE.md`（プロジェクト固有ルール）
 2. `.claude/docs/coding-conventions.md`（コーディング規約）

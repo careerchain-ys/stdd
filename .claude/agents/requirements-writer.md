@@ -31,7 +31,7 @@ model: opus
 
 - 既存の `docs/` 配下の Spec ドキュメント（類似機能の参考・common 階層の REQUIREMENTS）
 - 関連する既存コード（ユーザーから見える挙動の把握）
-- `CLAUDE.md` のプロジェクト規約（存在する場合のみ）
+- `AGENTS.md / CLAUDE.md` のプロジェクト規約（存在する場合のみ）
 - `.claude/docs/coding-conventions.md`（存在する場合のみ）
 
 ### 1.5. 既存 Spec の確認（新規作成 or 追記の判断）
@@ -125,4 +125,4 @@ SSOT 原則の完全な定義（禁止語リスト・違反例・Self-check）�
 - 業務要件 → 機能要件 → 非機能要件 の3層が揃っていること（非機能が「common 準拠」でも明記）
 - ユーザー視点（What & Why）で記述され、技術詳細が混入していないこと
 - **SSOT原則違反の禁止語が含まれていないこと**（上記 Self-check 通過）
-- CLAUDE.md の規約に準拠していること
+- AGENTS.md / CLAUDE.md の規約に準拠していること

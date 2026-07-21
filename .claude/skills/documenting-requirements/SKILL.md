@@ -259,7 +259,7 @@ REQUIREMENTS.md の作成・レビュー（人間レビュー含む）が完了�
 
 - **技術設計のみ**: TECH_DESIGN / TEST_PLAN / ARCHITECTURE / TABLE_DEFINITION / API_SPEC → documenting-tech-specs
 - **単純なバグ修正 / リファクタリング**: 要件（外部から見える挙動）が変わらない場合
-- **ドキュメント修正のみ**: README や CLAUDE.md の更新
+- **ドキュメント修正のみ**: README や AGENTS.md / CLAUDE.md の更新
 
 ## チェックリスト
 

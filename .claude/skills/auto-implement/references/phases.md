@@ -214,7 +214,7 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
 
 チェック項目:
 
-- `CLAUDE.md` のコーディング規約準拠（存在する場合のみ。snake_case禁止、!演算子禁止、asキャスト禁止等）
+- `AGENTS.md / CLAUDE.md` のコーディング規約準拠（存在する場合のみ。snake_case禁止、!演算子禁止、asキャスト禁止等）
 - セキュリティ（OWASP Top 10）
 - パフォーマンス
 - レスポンシブ対応
@@ -222,7 +222,7 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
 
 ### 判定と差し戻しループ
 
-Code Reviewer の **Hard Threshold**（Critical 0件 / High 0件 / Medium ≤2件 / OWASP Critical/High 0件 / `CLAUDE.md` 絶対ルール違反 0件（存在する場合のみ評価） / `.claude/docs/coding-conventions.md` 全項目準拠（存在する場合のみ評価））を1項目でも下回った場合は必ず NEEDS CHANGES 以下となる。
+Code Reviewer の **Hard Threshold**（Critical 0件 / High 0件 / Medium ≤2件 / OWASP Critical/High 0件 / `AGENTS.md / CLAUDE.md` 絶対ルール違反 0件（存在する場合のみ評価） / `.claude/docs/coding-conventions.md` 全項目準拠（存在する場合のみ評価））を1項目でも下回った場合は必ず NEEDS CHANGES 以下となる。
 
 - **✅ PASS**: 次の Phase に進む。
 - **⚠️ NEEDS CHANGES**: Code Reviewer 出力末尾の「Generator への差し戻し指示」をそのまま implementer に渡して修正させ、再度 Code Reviewer に依頼。**最大3回**ループ。
@@ -278,7 +278,7 @@ UI変更を伴う実装の場合、対象のSpecドキュメント（REQUIREMENT
 1. **UIキャプチャ**: Playwright MCPを使用して、変更が反映された画面のスクリーンショットを取得
    - REQUIREMENTS.mdの「Figmaデザイン」セクションに記載された各画面状態をキャプチャ
    - 変更の影響がある画面のみ対象（全画面を再キャプチャする必要はない）
-   - ログインが必要な場合はCLAUDE.mdのテストユーザー情報を使用
+   - ログインが必要な場合はAGENTS.md / CLAUDE.mdのテストユーザー情報を使用
 2. **Figmaファイル更新**: Figma MCPを使用して、キャプチャした画像でFigmaファイルの該当ノードを更新
    - REQUIREMENTS.mdに記載されたnode-idに対応するノードを更新
    - 新しい画面状態が追加された場合は、新しいノードとして追加

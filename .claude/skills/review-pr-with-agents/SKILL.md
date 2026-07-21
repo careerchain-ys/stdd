@@ -59,7 +59,7 @@ git worktree list
 devcontainer exec --workspace-folder <WORKTREE_PATH> --override-config <WORKTREE_PATH>/.devcontainer/devcontainer.override.json bash -c "<COMMAND>"
 ```
 
-**重要**: devcontainer コマンドは必ず `devcontainer exec` から始める（変数代入を先頭に置かない）。プロジェクトの CLAUDE.md / memory「devcontainerコマンドパターン」を参照。
+**重要**: devcontainer コマンドは必ず `devcontainer exec` から始める（変数代入を先頭に置かない）。プロジェクトの AGENTS.md / CLAUDE.md / memory「devcontainerコマンドパターン」を参照。
 
 ## 4. 2エージェントを並列起動
 
@@ -104,7 +104,7 @@ PR #<番号> (ブランチ `<headRef>`, worktree `<WORKTREE_PATH>`) のコード
 <git log --oneline の結果>
 
 ## レビュー観点
-1. CLAUDE.md 規約準拠（Domain層構造・命名・コメント方針・npm workspaces 依存ルール）
+1. AGENTS.md / CLAUDE.md 規約準拠（Domain層構造・命名・コメント方針・npm workspaces 依存ルール）
 2. 品質（YAGNI・Rule of Three・過剰設計の排除）
 3. セキュリティ（IDOR・XSS・SQLi・認可漏れ・URLパラメータ信頼）
 4. レスポンシブ / アクセシビリティ

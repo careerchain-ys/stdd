@@ -176,7 +176,7 @@ Team Lead（オーケストレーター）      ← このスキル自身
 
 ## 注意事項
 
-- Agent Teamsの実験的機能を使用（`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`）
+- 専門エージェントへの並列委譲（サブエージェント）機能を用いる（Claude Code: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` / Codex: `multi_agent`）
 - コスト管理のため、各Teammateは該当フェーズでのみ起動する
 - Worktreeベースの開発フローに従う
-- CLAUDE.mdのすべてのルールを遵守する
+- AGENTS.md / CLAUDE.mdのすべてのルールを遵守する

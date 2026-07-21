@@ -79,7 +79,7 @@
 
 ### 操作ルール
 
-CLAUDE.mdの「Playwright MCPでのブラウザ操作ルール」に従う:
+AGENTS.md / CLAUDE.mdの「Playwright MCPでのブラウザ操作ルール」に従う:
 
 ```
 1. ブラウザを開く

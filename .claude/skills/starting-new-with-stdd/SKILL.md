@@ -1,7 +1,7 @@
 ---
 name: starting-new-with-stdd
 description: |-
-  新規（コードがまだ無い）プロジェクトを STDD で立ち上げる作業を、Claude セッションで段階的に駆動する。立ち上げガイドに従い、アプリ骨組み生成→common 階層の前方設計→最初の feature→フォーマット策定→feature ループ→通常運用への移行までを、既存スキル（documenting-requirements / documenting-tech-specs / generating-wireframes / tailoring-spec-format / documenting-plans / auto-implement / verifying-consistency）を順に呼びながら進める。進捗は立ち上げPLANで保持し、セッションを跨いで再開できる。既に稼働しているコードへの導入は introducing-stdd を使う。
+  新規（コードがまだ無い）プロジェクトを STDD で立ち上げる作業を、エージェントのセッションで段階的に駆動する。立ち上げガイドに従い、アプリ骨組み生成→common 階層の前方設計→最初の feature→フォーマット策定→feature ループ→通常運用への移行までを、既存スキル（documenting-requirements / documenting-tech-specs / generating-wireframes / tailoring-spec-format / documenting-plans / auto-implement / verifying-consistency）を順に呼びながら進める。進捗は立ち上げPLANで保持し、セッションを跨いで再開できる。既に稼働しているコードへの導入は introducing-stdd を使う。
 when_to_use: |-
   新規（コードがまだ無い）プロジェクトの立ち上げを進める／再開するとき。「新規プロジェクトをstddで立ち上げる」「立ち上げの続き」「greenfield stdd」など、新規フローと確定している場合。新規/既存が未確定の最初の入口は setup-stdd（ルーター）が判定して本スキルへ委譲する。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
@@ -17,7 +17,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 ## 設計方針（重要）
 
-- **agent オーケストレーションはしない**。Claude がメインセッションで手順を進める軽量ドライバー。
+- **agent オーケストレーションはしない**。エージェントがメインセッションで手順を進める軽量ドライバー。
 - 立ち上げは判断主体のため、**人間を常にループに入れる**（アーキ判断・フォーマット策定・粒度は必ず確認）。
 - 状態は立ち上げPLAN（`docs/common/plans/stdd-bootstrap.md`）にのみ持つ。本スキルはステートレス。
 - 新規は**最初から順行**（Spec → Test → 実装）。`reverse-engineering-*`（遡行）は使わない。

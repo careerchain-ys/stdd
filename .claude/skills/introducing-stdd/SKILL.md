@@ -1,7 +1,7 @@
 ---
 name: introducing-stdd
 description: |-
-  既存（稼働中）プロジェクトへの STDD 導入を、Claude セッションで段階的に駆動する。導入ガイドに従い、共通spec生成→機能インベントリ→代表機能リバース→フォーマット策定→機能ループ→順行運用への移行までを、既存スキル（reverse-engineering-common-spec / reverse-engineering-feature-spec / auto-implement / verifying-consistency）を順に呼びながら進める。進捗は導入PLANで保持し、セッションを跨いで再開できる。単一機能のリバースのみなら reverse-engineering-feature-spec を直接使う。
+  既存（稼働中）プロジェクトへの STDD 導入を、エージェントのセッションで段階的に駆動する。導入ガイドに従い、共通spec生成→機能インベントリ→代表機能リバース→フォーマット策定→機能ループ→順行運用への移行までを、既存スキル（reverse-engineering-common-spec / reverse-engineering-feature-spec / auto-implement / verifying-consistency）を順に呼びながら進める。進捗は導入PLANで保持し、セッションを跨いで再開できる。単一機能のリバースのみなら reverse-engineering-feature-spec を直接使う。
 when_to_use: |-
   既存（稼働中）プロジェクトへの STDD 導入を進める／再開するとき。「既存プロジェクトにstddを入れる」「導入の続き」「導入ブートストラップ」など、既存フローと確定している場合。新規/既存が未確定の最初の入口は setup-stdd（ルーター）が判定して本スキルへ委譲する。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
@@ -17,7 +17,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 ## 設計方針（重要）
 
-- **agent オーケストレーションはしない**。Claude がメインセッションで手順を進める軽量ドライバー。
+- **agent オーケストレーションはしない**。エージェントがメインセッションで手順を進める軽量ドライバー。
 - 導入は一度きり・判断主体のため、**人間を常にループに入れる**（フォーマット策定・優先順・粒度は必ず確認）。
 - 状態は導入PLAN（`docs/common/plans/stdd-introduction.md`）にのみ持つ。本スキルはステートレス。
 

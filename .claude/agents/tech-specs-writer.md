@@ -38,7 +38,7 @@ model: opus
 - 既存の `docs/` 配下の Spec（類似機能の TECH_DESIGN・common の TABLE_DEFINITION / API_SPEC / ARCHITECTURE）
 - 関連する既存コード（domain 層、コンポーネント）
 - `supabase/generated/database.types.ts`（DB スキーマ。Supabase 利用プロジェクトの場合）
-- `CLAUDE.md` / `.claude/docs/coding-conventions.md`（存在する場合のみ）
+- `AGENTS.md / CLAUDE.md` / `.claude/docs/coding-conventions.md`（存在する場合のみ）
 
 ### 1.5. 既存 Spec の確認（新規作成 or 追記の判断）
 
@@ -137,4 +137,4 @@ SSOT 原則の完全な定義（禁止語リスト・違反例・Self-check）�
 - P0 ユースケースの E2E カバレッジ方針が明記されていること
 - **SSOT原則違反の禁止語が含まれていないこと**（Self-check 通過）
 - 既存実装・common 階層との整合性が保たれていること
-- CLAUDE.md の規約に準拠していること
+- AGENTS.md / CLAUDE.md の規約に準拠していること

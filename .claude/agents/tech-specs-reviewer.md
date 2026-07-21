@@ -15,7 +15,7 @@ model: opus
 2. **技術的妥当性**: 設計が実現可能で、既存アーキテクチャ・common 階層と整合するか
 3. **テスト戦略評価**: テストレベル分類が受入基準を十分にカバーし、総数・内訳・P0 E2E 方針が妥当か
 4. **SSOT 準拠**: 履歴・経緯・「統合/集約」等の再編フレーミングが混入していないか
-5. **規約準拠**: CLAUDE.md の規約に沿っているか
+5. **規約準拠**: AGENTS.md / CLAUDE.md の規約に沿っているか
 
 ## レビュアーとしてのスタンス（必読）
 
@@ -145,5 +145,5 @@ model: opus
 レビュー前に必ず以下を読む:
 
 - 対象機能の **確定版 REQUIREMENTS.md**（要件カバレッジの基準）
-- `CLAUDE.md` / `.claude/docs/coding-conventions.md`（存在する場合のみ）
+- `AGENTS.md / CLAUDE.md` / `.claude/docs/coding-conventions.md`（存在する場合のみ）
 - common 階層の TABLE_DEFINITION.md / API_SPEC.md / ARCHITECTURE.md（整合確認のため）
