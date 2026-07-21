@@ -251,15 +251,15 @@ Phase 1 の緑維持: core は `.claude/` の複製なので、生成器の出�
 - 2b `.codex/agents/*.toml` ← core/agents/*.md を変換。frontmatter `name`/`description` → 同名、body → `developer_instructions`（TOML リテラル複数行）、`tools` → `sandbox_mode`（write 系含む=workspace-write / それ以外=read-only）、`mcp__<server>__*` → `mcp_servers`。生成 9 本すべて tomllib で妥当パース＋必須フィールド充足。分布: read-only 4（reviewer 系）/ workspace-write 5。
 - 設計精緻化: `model: opus` は Codex のモデル ID ではないため TOML では出力しない（session 既定を継承。将来 `model_reasoning_effort` へのマッピングは検討事項）。
 
-### 8.5.2 完了: 2d MCP / 残: 2c hooks
+### 8.5.2 完了: 2c hooks / 2d MCP（Codex ビュー完成）
 
-- 2d（完了）MCP: `.codex/config.toml` に `[mcp_servers.playwright]` を生成（`templates/minimal/.mcp.json` から。tomllib で妥当検証）。generator が単一ファイルとして管理（`.codex/` 直下の他ファイルは掃除しない）。
-- 2c（残）hooks — 公式 docs で契約を確認した結果、当初想定より単純:
-  - Codex の hooks.json は Claude の settings.json とほぼ同一構造（`hooks.PreToolUse[].{matcher, hooks[].{type,command,timeout}}`）。matcher は `apply_patch|Edit|Write`。
-  - PreToolUse の stdout 契約は Claude と同一（block=`hookSpecificOutput.permissionDecision:"deny"` / 非ブロック注入=`additionalContext`）。→ 出力アダプタ不要。`spec-first-check.sh` の現行出力がそのまま Codex でも有効（§4.3 の想定を更新）。
-  - 唯一の実差分は入力: Codex は編集を `apply_patch` で行い `tool_input.command` にパッチ本文を載せる（`tool_input.file_path` は無い）。hook にパッチからのパス抽出（`*** (Add|Update|Delete) File:`）を fallback として追加する（Claude の file_path 経路は不変に保つ）。
-  - 生成物: `.codex/hooks.json`（matcher=`apply_patch|Edit|Write`、command=`.codex/hooks/spec-first-check.sh`）+ hook スクリプトを `.codex/hooks/` へコピー。留意: Codex は hook 実行前に trust 手順（`/hooks`）が要る／`.stdd.config.yml` が無いと no-op（自リポでは発火せず、downstream 用生成物）。
-- 方針変更: rule → `AGENTS.md` 非破壊マージは、既存の project-authored ファイルへの差込みのため**インストーラ（Phase 3）側**へ再配置する（dogfooding 生成器は自リポの AGENTS.md を触らない）。
+- 2d MCP（完了）: `.codex/config.toml` に `[mcp_servers.playwright]` を生成（`templates/minimal/.mcp.json` から。tomllib で妥当検証）。generator が単一ファイルとして管理（`.codex/` 直下の他ファイルは掃除しない）。
+- 2c hooks（完了）: 公式 docs 確認により当初想定より単純だった。
+  - Codex の hooks.json は Claude の settings.json とほぼ同一構造（`hooks.PreToolUse[].{matcher, hooks[].{type,command,timeout}}`）。PreToolUse の stdout 契約も Claude と同一（block=`hookSpecificOutput.permissionDecision:"deny"` / 注入=`additionalContext`）→ 出力アダプタ不要（§4.3 の想定を更新）。
+  - 唯一の実差分は入力: Codex は `apply_patch`（`tool_input.command` にパッチ本文、`file_path` 無し）。`spec-first-check.sh` の front-end にパッチからのパス抽出（`*** (Add|Update|Delete) File:`）を fallback 追加。Claude の file_path 経路は不変（分類・MODE ロジックも不変）。
+  - 生成物: `.codex/hooks.json`（matcher=`apply_patch|Edit|Write`）+ `.codex/hooks/spec-first-check.sh`（共有スクリプト実体）。
+  - 検証: フックテスト 18/18（既存 Claude 15 + Codex apply_patch 3）、hooks.json 妥当、install 9/9・`--check` 緑。留意: Codex は hook 実行前に trust 手順（`/hooks`）が要る／`.stdd.config.yml` 無しでは no-op（downstream 用生成物）。
+- Phase 2 完了: 単一 core SSoT から Codex ビュー（skills / agents / hooks / MCP）を生成し実機検証。残タスクは Phase 3 へ: rule → `AGENTS.md` 非破壊マージ（project-authored ファイルへの差込みのためインストーラ側）、pre-push フックの Codex 対応（任意）。
 
 ## 9. 改訂履歴
 
@@ -269,3 +269,4 @@ Phase 1 の緑維持: core は `.claude/` の複製なので、生成器の出�
 - 2026-07-21 Phase 1b（core 抽出 + 生成器 build-adapters）完了・回帰緑。SSoT を packages/core へ（案 X）
 - 2026-07-21 Phase 2a/2b（Codex ビュー: .agents/skills + .codex/agents TOML）完了・実機検証。build-adapters を両ビュー化
 - 2026-07-21 Phase 2d（MCP config.toml）完了。2c は Codex hooks 契約を docs で確認（出力は Claude と同一→アダプタ不要・入力のみ apply_patch 対応が必要）
+- 2026-07-21 Phase 2c（hooks: 共有 spec-first-check.sh に apply_patch 入力対応 + .codex/hooks.json）完了。フックテスト 18/18。Phase 2（Codex ビュー生成）完了

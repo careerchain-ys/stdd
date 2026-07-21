@@ -1,6 +1,6 @@
 #!/bin/bash
 # PreToolUse Hook: 実装ファイルの編集前に STDD の「Spec → テスト → 実装」順序を促す。
-# Edit / Write / MultiEdit にマッチさせて使う（settings.json で登録）。
+# 登録: Claude は Edit / Write / MultiEdit（settings.json）、Codex は apply_patch|Edit|Write（.codex/hooks.json）。
 #
 # 役割（Poka-Yoke）:
 #   ad-hoc な「この実装を直して」等の指示でスキルを介さず実装ファイルを編集しようと
@@ -13,24 +13,40 @@
 #   - workflow.enforce_spec_first  : off | warn(既定) | block
 #   - project.primary_branch       : block 判定でブランチ差分を比較する基準
 #
+# 入力（PreToolUse stdin JSON）:
+#   - Claude: tool_input.file_path（単一ファイル）
+#   - Codex : apply_patch は file_path を持たず tool_input.command にパッチ本文を載せる。
+#             パッチの "*** (Add|Update|Delete) File: <path>" から編集対象を抽出する（複数可）。
+# 出力（stdout JSON）は Claude / Codex 共通（hookSpecificOutput.permissionDecision / additionalContext）。
+#
 # 分類で Spec / テスト / docs / .claude / 設定・ロックファイルは免除（無言で許可）する。
 # 設定が無い / フックが失敗する場合はブロックせずスキップする（フェイルオープン）。
 # 詳細な記述規約は docs/config-driven-authoring.md を参照。
 
 hook_input=$(cat)
-FILE_RAW=$(printf '%s' "$hook_input" | jq -r '.tool_input.file_path // empty' 2>/dev/null)
-[ -z "$FILE_RAW" ] && exit 0
+
+# 編集対象ファイルを取得する（Claude=file_path / Codex=apply_patch のパッチ本文）。
+FILE_PATH=$(printf '%s' "$hook_input" | jq -r '.tool_input.file_path // empty' 2>/dev/null)
+if [ -n "$FILE_PATH" ]; then
+    FILES_RAW="$FILE_PATH"
+else
+    CMD=$(printf '%s' "$hook_input" | jq -r '.tool_input.command // empty' 2>/dev/null)
+    FILES_RAW=$(printf '%s\n' "$CMD" | sed -n -E 's/^\*\*\* (Add|Update|Delete) File: (.+)$/\2/p')
+fi
+[ -z "$FILES_RAW" ] && exit 0
 
 ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 CONFIG="$ROOT_DIR/.stdd.config.yml"
 [ -f "$CONFIG" ] || exit 0
 
-# 編集対象パスをリポジトリルート相対へ正規化
-case "$FILE_RAW" in
-    "$ROOT_DIR"/*) REL="${FILE_RAW#"$ROOT_DIR"/}" ;;
-    ./*)           REL="${FILE_RAW#./}" ;;
-    *)             REL="$FILE_RAW" ;;
-esac
+# 1 パスをリポジトリルート相対へ正規化
+normalize_rel() {
+    case "$1" in
+        "$ROOT_DIR"/*) printf '%s' "${1#"$ROOT_DIR"/}" ;;
+        ./*)           printf '%s' "${1#./}" ;;
+        *)             printf '%s' "$1" ;;
+    esac
+}
 
 # --- .stdd.config.yml パーサ（外部依存なし。pre-push-check.sh と同じ流儀） ---
 
@@ -143,11 +159,22 @@ EOF
     return 1
 }
 
-# Spec / テスト / 除外対象 / apps 外 はいずれも無言で許可
-is_spec "$REL" && exit 0
-is_test "$REL" && exit 0
-is_excluded "$REL" && exit 0
-in_apps "$REL" || exit 0
+# 編集対象のうち「apps 配下の実装ファイル（Spec/テスト/除外でない）」を 1 つ探す。
+# 該当が無ければ（Spec/テスト/除外/apps 外のみ）無言で許可する。
+REL=""
+while IFS= read -r cand; do
+    [ -z "$cand" ] && continue
+    rel=$(normalize_rel "$cand")
+    is_spec "$rel" && continue
+    is_test "$rel" && continue
+    is_excluded "$rel" && continue
+    in_apps "$rel" || continue
+    REL="$rel"
+    break
+done <<EOF
+$FILES_RAW
+EOF
+[ -z "$REL" ] && exit 0
 
 # --- 実装ファイル編集と判定。enforce_spec_first に従う ---
 

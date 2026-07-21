@@ -71,7 +71,45 @@ async function planCodexView() {
     mode: 0o644,
   });
 
+  // 2c: hooks → .codex/hooks/spec-first-check.sh（スクリプト実体）+ .codex/hooks.json（PreToolUse 配線）。
+  // spec-first-check.sh は Claude/Codex 共通（出力形状は同一、入力は apply_patch も解釈）。
+  const hookSrc = path.join(coreRoot, "hooks", "spec-first-check.sh");
+  const hooksDst = path.join(repoRoot, ".codex", "hooks");
+  managedDirs.push(hooksDst);
+  outputs.push({
+    abs: path.join(hooksDst, "spec-first-check.sh"),
+    content: await fs.readFile(hookSrc),
+    mode: await modeOf(hookSrc),
+  });
+  outputs.push({
+    abs: path.join(repoRoot, ".codex", "hooks.json"),
+    content: Buffer.from(codexHooksJson()),
+    mode: 0o644,
+  });
+
   return { outputs, managedDirs };
+}
+
+/** Codex の PreToolUse hooks.json（Claude settings.json とほぼ同一構造）。matcher は編集系ツール。 */
+function codexHooksJson() {
+  const obj = {
+    description: "STDD spec-first Poka-Yoke hook（packages/core から生成・直接編集しない）",
+    hooks: {
+      PreToolUse: [
+        {
+          matcher: "apply_patch|Edit|Write",
+          hooks: [
+            {
+              type: "command",
+              command: 'bash "$(git rev-parse --show-toplevel)/.codex/hooks/spec-first-check.sh"',
+              timeout: 30,
+            },
+          ],
+        },
+      ],
+    },
+  };
+  return JSON.stringify(obj, null, 2) + "\n";
 }
 
 /** Claude の .mcp.json（{mcpServers:{name:{command,args,env,url}}}）を Codex config.toml の [mcp_servers.*] へ。 */
