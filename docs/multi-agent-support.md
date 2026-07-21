@@ -186,7 +186,7 @@ spec-first ルールは Claude=`.claude/rules/*`、Codex=`AGENTS.md` で届け�
 - `codex mcp-server` サブコマンドが存在（Codex を MCP サーバとして起動可能）。
 - ライブのエージェント起動（skill 自動選択の実挙動観察）は未実施。クレジット消費・自律実行を伴うため、必要なら別途ユーザー承認のうえ `codex exec --sandbox read-only` で実施する。
 
-## 8. Phase 1 進捗
+## 8. 実装進捗（Phase 1–2）
 
 作業ブランチ: `worktree-codex-support-phase1`（worktree）。
 
@@ -241,9 +241,26 @@ Phase 1 の緑維持: core は `.claude/` の複製なので、生成器の出�
 - 検証: `--check` OK（core == `.claude`）、意図的破壊で `--check` が exit 1 → 再生成で復元、install/hook テスト緑（9/9・15/15）。
 - 以後の編集は `packages/core` へ。`.claude/` は生成物（案 X・committed）。CI で `check:adapters` を回しドリフトを防ぐ（CI 配線自体は follow-up）。
 
+### 8.5 Phase 2 進捗: Codex ビュー生成
+
+`build-adapters.mjs` を Claude/Codex 両ビュー生成へ再構成（outputs+managedDirs モデルで両ビューを一括 `--check`）。Claude ビューはバイト不変。
+
+### 8.5.1 完了・実機検証済み
+
+- 2a `.agents/skills/` ← core/skills をコピー（同一 `SKILL.md` 標準）。実機 Codex（`codex debug prompt-input`）が repo-root `.agents/skills` を discover することを確認（auto-implement / documenting-requirements 等がモデルプロンプトに出現）。
+- 2b `.codex/agents/*.toml` ← core/agents/*.md を変換。frontmatter `name`/`description` → 同名、body → `developer_instructions`（TOML リテラル複数行）、`tools` → `sandbox_mode`（write 系含む=workspace-write / それ以外=read-only）、`mcp__<server>__*` → `mcp_servers`。生成 9 本すべて tomllib で妥当パース＋必須フィールド充足。分布: read-only 4（reviewer 系）/ workspace-write 5。
+- 設計精緻化: `model: opus` は Codex のモデル ID ではないため TOML では出力しない（session 既定を継承。将来 `model_reasoning_effort` へのマッピングは検討事項）。
+
+### 8.5.2 残: 2c / 2d
+
+- 2c hooks: core の `spec-first-check.sh` に `STDD_HOOK_TARGET` 分岐を足し、Codex 形状（block=`{"continue":false,"systemMessage":…}` / warn=`systemMessage`）を出力。`.codex/hooks.json` を生成。※ Codex の hooks.json 正確なスキーマは実機/docs で確認してから配線する（未確定のまま生成しない）。
+- 2d MCP: `.codex/config.toml` に `[mcp_servers.playwright]` を生成（templates の `.mcp.json` から）。
+- 方針変更: rule → `AGENTS.md` 非破壊マージは、既存の project-authored ファイルへの差込みのため**インストーラ（Phase 3）側**へ再配置する（dogfooding 生成器は自リポの AGENTS.md を触らない）。
+
 ## 9. 改訂履歴
 
 - 2026-07-21 初版（Claude / Codex 互換調査を踏まえた Core + Adapter 設計として作成）
 - 2026-07-21 Phase 0 検証結果（§7）を追記。open question の #1（skills discover）を解決（両配置必須）
 - 2026-07-21 Phase 1a（中立化）完了・回帰緑を §8 に記録。1b の dogfooding 決定を提示
 - 2026-07-21 Phase 1b（core 抽出 + 生成器 build-adapters）完了・回帰緑。SSoT を packages/core へ（案 X）
+- 2026-07-21 Phase 2a/2b（Codex ビュー: .agents/skills + .codex/agents TOML）完了・実機検証。build-adapters を両ビュー化
