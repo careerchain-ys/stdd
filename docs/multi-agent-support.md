@@ -261,6 +261,19 @@ Phase 1 の緑維持: core は `.claude/` の複製なので、生成器の出�
   - 検証: フックテスト 18/18（既存 Claude 15 + Codex apply_patch 3）、hooks.json 妥当、install 9/9・`--check` 緑。留意: Codex は hook 実行前に trust 手順（`/hooks`）が要る／`.stdd.config.yml` 無しでは no-op（downstream 用生成物）。
 - Phase 2 完了: 単一 core SSoT から Codex ビュー（skills / agents / hooks / MCP）を生成し実機検証。残タスクは Phase 3 へ: rule → `AGENTS.md` 非破壊マージ（project-authored ファイルへの差込みのためインストーラ側）、pre-push フックの Codex 対応（任意）。
 
+### 8.6 Phase 3 進捗: インストーラ（`--agent claude|codex|both`）完了
+
+- sync-assets が Codex ビュー（`.agents` / `.codex`）も assets へ同梱（COPIES 5 件）。
+- install.ts: マージ中核を `mergeManagedTree` に汎用化（Claude 経路は挙動不変）。Codex 導入を追加:
+  - `.agents` / `.codex` を非破壊マージ（manifest = `.stdd/codex-manifest.json`、rel はルート基準 `.agents/…` / `.codex/…`）。
+  - `AGENTS.md` へ spec-first ルールをマーカーブロック（`STDD:BEGIN/END`）で非破壊注入（新規作成 / 既存保持 / 冪等）。
+  - `.codex/config.toml` は create-if-absent（既存は破壊しない）。
+  - `InstallOptions.agents`（既定 `["claude"]`）/ `InstallResult` に `codex` / `agentsMd` / `codexConfig` を追加。
+- cli.ts: `--agent claude|codex|both`（既定 both）+ 両ビューの結果表示 + Codex の `/hooks` trust 案内。
+- 検証: install テスト 14/14（既存 9 + Codex 5）。実機 CLI e2e で codex 単体（51 ファイル + AGENTS.md 注入）・both（Claude 52 + Codex 51）・再導入冪等を確認。
+
+残 follow-up: sync-assets の core 直接投影化 / `settings.json` の adapter 化 / symlink 重複排除 / pre-push フックの Codex 対応 / `config.toml` の TOML マージ（現状 create-if-absent）。
+
 ## 9. 改訂履歴
 
 - 2026-07-21 初版（Claude / Codex 互換調査を踏まえた Core + Adapter 設計として作成）
@@ -270,3 +283,4 @@ Phase 1 の緑維持: core は `.claude/` の複製なので、生成器の出�
 - 2026-07-21 Phase 2a/2b（Codex ビュー: .agents/skills + .codex/agents TOML）完了・実機検証。build-adapters を両ビュー化
 - 2026-07-21 Phase 2d（MCP config.toml）完了。2c は Codex hooks 契約を docs で確認（出力は Claude と同一→アダプタ不要・入力のみ apply_patch 対応が必要）
 - 2026-07-21 Phase 2c（hooks: 共有 spec-first-check.sh に apply_patch 入力対応 + .codex/hooks.json）完了。フックテスト 18/18。Phase 2（Codex ビュー生成）完了
+- 2026-07-22 Phase 3（インストーラ: `stdd init --agent claude|codex|both`）完了。install 14/14・CLI e2e 検証。Claude/Codex 両対応が下流導入まで一貫

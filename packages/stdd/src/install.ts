@@ -11,8 +11,11 @@ export class InstallError extends Error {
 
 export type FileAction = "created" | "overwritten" | "merged" | "kept" | "skipped";
 
-/** .claude/ 配下を非破壊マージした結果（相対パスのリスト）。 */
-export interface ClaudeMergeSummary {
+/** 導入対象のエージェント種別。 */
+export type AgentTarget = "claude" | "codex";
+
+/** ファイル単位で非破壊マージした結果（相対パスのリスト）。 */
+export interface MergeSummary {
   /** 新規作成した STDD ファイル。 */
   created: string[];
   /** 既存の（未編集）STDD ファイルを最新へ更新した。 */
@@ -25,6 +28,9 @@ export interface ClaudeMergeSummary {
   removed: string[];
 }
 
+/** 後方互換のためのエイリアス（従来 result.claude の型名）。 */
+export type ClaudeMergeSummary = MergeSummary;
+
 export interface InstallOptions {
   /** STDD を導入する対象ディレクトリ（通常は cwd）。 */
   targetDir: string;
@@ -36,28 +42,45 @@ export interface InstallOptions {
   overwriteClaude: boolean;
   /** manifest.json に記録する STDD パッケージの版数（省略時は "0.0.0"）。 */
   version?: string;
+  /** 導入するエージェントビュー（省略時は ["claude"]）。 */
+  agents?: AgentTarget[];
 }
 
 export interface InstallResult {
-  claude: ClaudeMergeSummary;
-  settings: FileAction;
+  /** Claude ビュー（.claude/）のマージ結果。agents に "claude" を含む場合のみ。 */
+  claude?: MergeSummary;
+  settings?: FileAction;
+  mcp?: FileAction;
+  /** Codex ビュー（.agents/ + .codex/）のマージ結果。agents に "codex" を含む場合のみ。 */
+  codex?: MergeSummary;
+  /** AGENTS.md への spec-first ルール注入結果（Codex）。 */
+  agentsMd?: FileAction;
+  /** .codex/config.toml（MCP）の配置結果（Codex）。 */
+  codexConfig?: FileAction;
   config: FileAction;
-  mcp: FileAction;
   docs: FileAction;
 }
 
 const CLAUDE_DIR = ".claude";
+const AGENTS_DIR = ".agents";
+const CODEX_DIR = ".codex";
 const SETTINGS_FILE = "settings.json";
-const MANIFEST_REL = path.join(".stdd", "manifest.json");
+const CLAUDE_MANIFEST_REL = path.join(".claude", ".stdd", "manifest.json");
+const CODEX_MANIFEST_REL = path.join(".stdd", "codex-manifest.json");
 const CONFIG_FILE = ".stdd.config.yml";
 const CONFIG_TEMPLATE = "stdd.config.yml.tpl";
 const MCP_FILE = ".mcp.json";
 const MCP_TEMPLATE = "mcp.json";
 const DOCS_DIR = "docs";
+const AGENTS_MD_FILE = "AGENTS.md";
+const CODEX_CONFIG_REL = path.join(".codex", "config.toml");
+const RULE_REL = path.join("rules", "stdd-spec-first.md");
+const AGENTS_MARK_BEGIN = "<!-- STDD:BEGIN spec-first -->";
+const AGENTS_MARK_END = "<!-- STDD:END spec-first -->";
 
 /** manifest.json に記録する 1 ファイル分のエントリ。 */
 interface ManifestEntry {
-  /** .claude/ からの相対パス（POSIX 区切り）。 */
+  /** 記録ベースからの相対パス（POSIX 区切り）。 */
   path: string;
   /** 導入時点のファイル内容の sha256。ユーザー編集検出に使う。 */
   sha256: string;
@@ -71,30 +94,56 @@ interface Manifest {
   files: ManifestEntry[];
 }
 
-/**
- * カレントプロジェクト（新規・既存いずれも）へ STDD 一式を導入する。
- * - .claude/（skill / agent / hook / rules）を **ファイル単位で非破壊マージ**して配置
- *   （ユーザーファイル・tailoring 済みファイルは保持。導入物は .claude/.stdd/manifest.json に記録）
- * - .claude/settings.json は **deep-merge**（ユーザー設定を残し STDD 設定を追記）
- * - .stdd.config.yml / .mcp.json を生成（既存なら維持）
- * - docs/ を用意
- */
-export async function install(opts: InstallOptions): Promise<InstallResult> {
-  const { targetDir, assetsRoot, projectName, overwriteClaude, version = "0.0.0" } = opts;
-
-  await assertAssets(assetsRoot);
-  await fs.mkdir(targetDir, { recursive: true });
-
-  const claude = await mergeClaude(assetsRoot, targetDir, overwriteClaude, version);
-  const settings = await mergeSettingsFile(assetsRoot, targetDir);
-  const config = await installConfig(assetsRoot, targetDir, projectName);
-  const mcp = await installMcp(assetsRoot, targetDir);
-  const docs = await ensureDocs(targetDir);
-
-  return { claude, settings, config, mcp, docs };
+/** 1 ファイル分のマージ指示。rel は manifest に記録する相対パス。 */
+interface FileSpec {
+  rel: string;
+  srcAbs: string;
+  dstAbs: string;
 }
 
-async function assertAssets(assetsRoot: string): Promise<void> {
+/**
+ * カレントプロジェクト（新規・既存いずれも）へ STDD 一式を導入する。
+ * - agents に応じて Claude ビュー（.claude/）と Codex ビュー（.agents/ + .codex/）を配置
+ * - いずれもファイル単位の非破壊マージ（ユーザーファイル・tailoring 済みは保持、manifest で由来管理）
+ * - .stdd.config.yml を生成し docs/ を用意（共通）
+ */
+export async function install(opts: InstallOptions): Promise<InstallResult> {
+  const {
+    targetDir,
+    assetsRoot,
+    projectName,
+    overwriteClaude,
+    version = "0.0.0",
+    agents = ["claude"],
+  } = opts;
+
+  await assertAssets(assetsRoot, agents);
+  await fs.mkdir(targetDir, { recursive: true });
+
+  const result: InstallResult = {
+    config: "skipped",
+    docs: "skipped",
+  };
+
+  if (agents.includes("claude")) {
+    result.claude = await mergeClaude(assetsRoot, targetDir, overwriteClaude, version);
+    result.settings = await mergeSettingsFile(assetsRoot, targetDir);
+    result.mcp = await installMcp(assetsRoot, targetDir);
+  }
+
+  if (agents.includes("codex")) {
+    result.codex = await mergeCodex(assetsRoot, targetDir, overwriteClaude, version);
+    result.agentsMd = await injectAgentsMd(assetsRoot, targetDir);
+    result.codexConfig = await installCodexConfig(assetsRoot, targetDir);
+  }
+
+  result.config = await installConfig(assetsRoot, targetDir, projectName);
+  result.docs = await ensureDocs(targetDir);
+
+  return result;
+}
+
+async function assertAssets(assetsRoot: string, agents: AgentTarget[]): Promise<void> {
   const claudeSrc = path.join(assetsRoot, CLAUDE_DIR);
   const tplSrc = path.join(assetsRoot, CONFIG_TEMPLATE);
   if (!(await isDir(claudeSrc))) {
@@ -109,6 +158,16 @@ async function assertAssets(assetsRoot: string): Promise<void> {
   if (!(await isFile(mcpSrc))) {
     throw new InstallError(`MCP 設定テンプレートが見つかりません: ${mcpSrc}`);
   }
+  if (agents.includes("codex")) {
+    if (
+      !(await isDir(path.join(assetsRoot, AGENTS_DIR))) ||
+      !(await isDir(path.join(assetsRoot, CODEX_DIR)))
+    ) {
+      throw new InstallError(
+        `Codex ビューの配布アセットが見つかりません: ${path.join(assetsRoot, AGENTS_DIR)} / ${path.join(assetsRoot, CODEX_DIR)}\n（'npm run build:adapters && npm run sync-assets' で生成されます）`,
+      );
+    }
+  }
 }
 
 /**
@@ -120,16 +179,80 @@ async function mergeClaude(
   targetDir: string,
   overwrite: boolean,
   version: string,
-): Promise<ClaudeMergeSummary> {
+): Promise<MergeSummary> {
   const src = path.join(assetsRoot, CLAUDE_DIR);
   const dst = path.join(targetDir, CLAUDE_DIR);
-
-  // 配布対象ファイル（settings.json は deep-merge 管理のため除外）
   const shipped = (await listFilesRel(src)).filter((rel) => rel !== SETTINGS_FILE);
-  const prev = await readManifest(dst);
-  const prevByPath = new Map(prev.files.map((f) => [f.path, f]));
+  const specs: FileSpec[] = shipped.map((rel) => ({
+    rel,
+    srcAbs: path.join(src, toNative(rel)),
+    dstAbs: path.join(dst, toNative(rel)),
+  }));
+  const manifestAbs = path.join(targetDir, CLAUDE_MANIFEST_REL);
+  return mergeManagedTree(specs, manifestAbs, (rel) => path.join(dst, toNative(rel)), dst, overwrite, version);
+}
 
-  const summary: ClaudeMergeSummary = {
+/**
+ * assets/.agents/ + assets/.codex/ を target へ非破壊マージする（Codex ビュー）。
+ * .codex/config.toml は「無ければ作成・あれば維持」のため別扱い（specs から除外）。
+ * manifest の相対パスは target ルート基準（".agents/…" / ".codex/…"）。
+ */
+async function mergeCodex(
+  assetsRoot: string,
+  targetDir: string,
+  overwrite: boolean,
+  version: string,
+): Promise<MergeSummary> {
+  const specs: FileSpec[] = [];
+
+  const agentsSrc = path.join(assetsRoot, AGENTS_DIR);
+  for (const rel of await listFilesRel(agentsSrc)) {
+    specs.push({
+      rel: `${AGENTS_DIR}/${rel}`,
+      srcAbs: path.join(agentsSrc, toNative(rel)),
+      dstAbs: path.join(targetDir, AGENTS_DIR, toNative(rel)),
+    });
+  }
+
+  const codexSrc = path.join(assetsRoot, CODEX_DIR);
+  for (const rel of await listFilesRel(codexSrc)) {
+    if (rel === "config.toml") continue; // create-if-absent（installCodexConfig）
+    specs.push({
+      rel: `${CODEX_DIR}/${rel}`,
+      srcAbs: path.join(codexSrc, toNative(rel)),
+      dstAbs: path.join(targetDir, CODEX_DIR, toNative(rel)),
+    });
+  }
+
+  const manifestAbs = path.join(targetDir, CODEX_MANIFEST_REL);
+  return mergeManagedTree(
+    specs,
+    manifestAbs,
+    (rel) => path.join(targetDir, toNative(rel)),
+    targetDir,
+    overwrite,
+    version,
+  );
+}
+
+/**
+ * FileSpec 群を非破壊マージし manifest を更新する（Claude / Codex 共通の中核）。
+ * - relToDstAbs: orphan 掃除で manifest の rel から実体パスを解決する
+ * - pruneRoot: orphan 削除後に空ディレクトリを遡って掃除する上限（含まず）
+ */
+async function mergeManagedTree(
+  specs: FileSpec[],
+  manifestAbs: string,
+  relToDstAbs: (rel: string) => string,
+  pruneRoot: string,
+  overwrite: boolean,
+  version: string,
+): Promise<MergeSummary> {
+  const prev = await readManifest(manifestAbs);
+  const prevByPath = new Map(prev.files.map((f) => [f.path, f]));
+  const shippedSet = new Set(specs.map((s) => s.rel));
+
+  const summary: MergeSummary = {
     created: [],
     updated: [],
     skippedConflict: [],
@@ -138,15 +261,12 @@ async function mergeClaude(
   };
   const nextFiles: ManifestEntry[] = [];
 
-  for (const rel of shipped) {
-    const srcAbs = path.join(src, toNative(rel));
-    const dstAbs = path.join(dst, toNative(rel));
+  for (const { rel, srcAbs, dstAbs } of specs) {
     const content = await fs.readFile(srcAbs);
     const newHash = sha256(content);
     const recorded = prevByPath.get(rel);
 
     if (!(await pathExists(dstAbs))) {
-      // 実体なし → 作成
       await writeFileEnsured(dstAbs, content);
       summary.created.push(rel);
       nextFiles.push({ path: rel, sha256: newHash, source: "stdd" });
@@ -157,46 +277,40 @@ async function mergeClaude(
     const currentHash = sha256(current);
 
     if (!recorded) {
-      // STDD 管理外のユーザーファイルが同じパスに存在 → 触らない
       summary.skippedConflict.push(rel);
       continue;
     }
     if (currentHash === newHash) {
-      // 既に最新（冪等）
       nextFiles.push({ path: rel, sha256: newHash, source: "stdd" });
       continue;
     }
     if (currentHash !== recorded.sha256 && !overwrite) {
-      // ユーザーが tailoring した STDD ファイル → 保持（manifest の記録は据え置き）
       summary.skippedModified.push(rel);
       nextFiles.push(recorded);
       continue;
     }
-    // 未編集（or --force）→ 最新へ更新
     await writeFileEnsured(dstAbs, content);
     summary.updated.push(rel);
     nextFiles.push({ path: rel, sha256: newHash, source: "stdd" });
   }
 
   // orphan: 旧 manifest にあり、今回配布されない STDD ファイル。未編集なら削除。
-  const shippedSet = new Set(shipped);
   for (const old of prev.files) {
     if (shippedSet.has(old.path)) continue;
-    const oldAbs = path.join(dst, toNative(old.path));
+    const oldAbs = relToDstAbs(old.path);
     if (!(await pathExists(oldAbs))) continue;
     const currentHash = sha256(await fs.readFile(oldAbs));
     if (currentHash === old.sha256 || overwrite) {
       await fs.rm(oldAbs, { force: true });
-      await pruneEmptyDirs(path.dirname(oldAbs), dst);
+      await pruneEmptyDirs(path.dirname(oldAbs), pruneRoot);
       summary.removed.push(old.path);
     } else {
-      // ユーザーが編集していたら残し、引き続き管理対象として記録
       summary.skippedModified.push(old.path);
       nextFiles.push(old);
     }
   }
 
-  await writeManifest(dst, nextFiles, version);
+  await writeManifest(manifestAbs, nextFiles, version);
   return summary;
 }
 
@@ -270,6 +384,55 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v);
 }
 
+/**
+ * spec-first ルールを downstream の AGENTS.md へ非破壊注入する（マーカー区切りブロック）。
+ * - AGENTS.md が無ければブロック付きで新規作成
+ * - マーカーがあれば既存ブロックを置換（冪等）、無ければ末尾に追記
+ */
+async function injectAgentsMd(assetsRoot: string, targetDir: string): Promise<FileAction> {
+  const ruleAbs = path.join(assetsRoot, CLAUDE_DIR, RULE_REL);
+  if (!(await isFile(ruleAbs))) return "skipped";
+  const rule = (await fs.readFile(ruleAbs, "utf8")).trim();
+  const block =
+    `${AGENTS_MARK_BEGIN}\n` +
+    `<!-- このブロックは STDD が管理します。編集は packages/core 側で行い、手動編集は次回 stdd init で上書きされます。 -->\n\n` +
+    `${rule}\n\n` +
+    `${AGENTS_MARK_END}`;
+
+  const dst = path.join(targetDir, AGENTS_MD_FILE);
+  if (!(await pathExists(dst))) {
+    await writeFileEnsured(dst, Buffer.from(`# AGENTS.md\n\n${block}\n`));
+    return "created";
+  }
+
+  const existing = await fs.readFile(dst, "utf8");
+  const b = existing.indexOf(AGENTS_MARK_BEGIN);
+  const e = existing.indexOf(AGENTS_MARK_END);
+  if (b !== -1 && e !== -1 && e > b) {
+    const next = existing.slice(0, b) + block + existing.slice(e + AGENTS_MARK_END.length);
+    if (next === existing) return "kept";
+    await fs.writeFile(dst, next);
+    return "merged";
+  }
+
+  const base = existing.endsWith("\n") ? existing : `${existing}\n`;
+  await fs.writeFile(dst, `${base}\n${block}\n`);
+  return "merged";
+}
+
+/**
+ * Codex の MCP 設定 .codex/config.toml を配置する。無ければ作成、既存は維持（破壊しない）。
+ * セキュリティ鍵ではなく mcp_servers のみのため project-local に置いてよい。
+ */
+async function installCodexConfig(assetsRoot: string, targetDir: string): Promise<FileAction> {
+  const srcAbs = path.join(assetsRoot, CODEX_DIR, "config.toml");
+  if (!(await isFile(srcAbs))) return "skipped";
+  const dst = path.join(targetDir, CODEX_CONFIG_REL);
+  if (await pathExists(dst)) return "kept";
+  await writeFileEnsured(dst, await fs.readFile(srcAbs));
+  return "created";
+}
+
 async function installConfig(
   assetsRoot: string,
   targetDir: string,
@@ -306,10 +469,9 @@ async function ensureDocs(targetDir: string): Promise<FileAction> {
 
 // ---- manifest --------------------------------------------------------------
 
-async function readManifest(claudeDir: string): Promise<Manifest> {
-  const p = path.join(claudeDir, MANIFEST_REL);
+async function readManifest(manifestAbs: string): Promise<Manifest> {
   try {
-    const parsed = JSON.parse(await fs.readFile(p, "utf8")) as Partial<Manifest>;
+    const parsed = JSON.parse(await fs.readFile(manifestAbs, "utf8")) as Partial<Manifest>;
     return {
       version: parsed.version ?? "0.0.0",
       installedAt: parsed.installedAt ?? "",
@@ -321,7 +483,7 @@ async function readManifest(claudeDir: string): Promise<Manifest> {
 }
 
 async function writeManifest(
-  claudeDir: string,
+  manifestAbs: string,
   files: ManifestEntry[],
   version: string,
 ): Promise<void> {
@@ -331,9 +493,8 @@ async function writeManifest(
     installedAt: new Date().toISOString(),
     files: sorted,
   };
-  const p = path.join(claudeDir, MANIFEST_REL);
-  await fs.mkdir(path.dirname(p), { recursive: true });
-  await fs.writeFile(p, `${JSON.stringify(manifest, null, 2)}\n`);
+  await fs.mkdir(path.dirname(manifestAbs), { recursive: true });
+  await fs.writeFile(manifestAbs, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
 function dedupeByPath(files: ManifestEntry[]): ManifestEntry[] {
@@ -349,10 +510,16 @@ function dedupeByPath(files: ManifestEntry[]): ManifestEntry[] {
 
 // ---- fs helpers ------------------------------------------------------------
 
-/** dir 配下の全ファイルを .claude からの相対パス（POSIX 区切り）で列挙する。 */
+/** dir 配下の全ファイルを dir からの相対パス（POSIX 区切り）で列挙する。dir が無ければ空配列。 */
 async function listFilesRel(dir: string, base = dir): Promise<string[]> {
   const out: string[] = [];
-  const entries = await fs.readdir(dir, { withFileTypes: true });
+  let entries;
+  try {
+    entries = await fs.readdir(dir, { withFileTypes: true });
+  } catch (err) {
+    if (isErrnoCode(err, "ENOENT")) return [];
+    throw err;
+  }
   for (const entry of entries) {
     const abs = path.join(dir, entry.name);
     if (entry.isDirectory()) {
