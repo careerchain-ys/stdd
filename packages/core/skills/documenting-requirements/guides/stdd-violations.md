@@ -106,7 +106,7 @@ test('利用規約リンクが別タブで開く', async ({ page }) => {
 2. ドキュメント確認:
    - docs/<app.id>/login/REQUIREMENTS.md を読む
    - docs/<app.id>/login/TECH_DESIGN.md を読む
-   - TECH_DESIGN.mdの「Journey別テスト戦略」セクションを確認
+   - TECH_DESIGN.mdの「ユースケース別テスト戦略」セクションを確認
 3. 実装:
    - TECH_DESIGN.mdに記載されたテストケースのみを実装
    - TECH_DESIGN.mdに記載されていないテストは作成しない
