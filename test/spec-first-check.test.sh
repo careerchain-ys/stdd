@@ -119,6 +119,16 @@ run_hook "$DBLK" "src/foo.ts"; assert_contains_exit0 "mode=block denies when no 
 ( cd "$DBLK" && mkdir -p docs/feature-x && echo "x" > docs/feature-x/REQUIREMENTS.md && git add docs/feature-x/REQUIREMENTS.md )
 run_hook "$DBLK" "src/foo.ts"; assert_silent_exit0 "mode=block allows when spec changed on branch" "$OUT"
 
+# 11-13. Codex apply_patch（file_path なし・tool_input.command のパッチから対象を抽出）
+OUT=$( cd "$D" && printf '%s' '{"tool_name":"apply_patch","tool_input":{"command":"*** Begin Patch\n*** Update File: src/foo.ts\n@@\n-old\n+new\n*** End Patch"}}' | bash "$HOOK" ); RC=$?
+assert_contains_exit0 "apply_patch impl emits additionalContext" "$OUT" "additionalContext"
+
+OUT=$( cd "$D" && printf '%s' '{"tool_name":"apply_patch","tool_input":{"command":"*** Begin Patch\n*** Update File: docs/feature-x/REQUIREMENTS.md\n@@\n-a\n+b\n*** End Patch"}}' | bash "$HOOK" ); RC=$?
+assert_silent_exit0 "apply_patch spec-only is silent" "$OUT"
+
+OUT=$( cd "$D" && printf '%s' '{"tool_name":"apply_patch","tool_input":{"command":"*** Begin Patch\n*** Add File: src/foo.test.ts\n+t\n*** End Patch"}}' | bash "$HOOK" ); RC=$?
+assert_silent_exit0 "apply_patch test-only is silent" "$OUT"
+
 # 後片付け
 rm -rf "$D" "$DNC" "$DOFF" "$DBLK"
 

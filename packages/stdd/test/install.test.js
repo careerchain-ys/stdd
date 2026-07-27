@@ -10,6 +10,7 @@ import path from "node:path";
 import { install, mergeSettings } from "../dist/install.js";
 
 const MANIFEST_REL = path.join(".claude", ".stdd", "manifest.json");
+const CODEX_MANIFEST_REL = path.join(".stdd", "codex-manifest.json");
 
 /** テスト用の最小 assetsRoot を作る（.claude/ + stdd.config.yml.tpl + mcp.json）。 */
 async function makeAssets() {
@@ -47,6 +48,22 @@ async function makeAssets() {
       2,
     ),
   );
+
+  // Codex ビューのアセット（.agents/ + .codex/）
+  await fs.mkdir(path.join(root, ".agents", "skills", "auto-implement"), { recursive: true });
+  await fs.writeFile(
+    path.join(root, ".agents", "skills", "auto-implement", "SKILL.md"),
+    "---\nname: auto-implement\n---\nbody\n",
+  );
+  await fs.mkdir(path.join(root, ".codex", "agents"), { recursive: true });
+  await fs.writeFile(
+    path.join(root, ".codex", "agents", "implementer.toml"),
+    'name = "implementer"\nsandbox_mode = "workspace-write"\n',
+  );
+  await fs.mkdir(path.join(root, ".codex", "hooks"), { recursive: true });
+  await fs.writeFile(path.join(root, ".codex", "hooks", "spec-first-check.sh"), "#!/bin/sh\n");
+  await fs.writeFile(path.join(root, ".codex", "hooks.json"), '{"hooks":{}}\n');
+  await fs.writeFile(path.join(root, ".codex", "config.toml"), '[mcp_servers.playwright]\ncommand = "npx"\n');
 
   await fs.writeFile(path.join(root, "stdd.config.yml.tpl"), 'project:\n  name: "{{project.name}}"\n');
   await fs.writeFile(path.join(root, "mcp.json"), "{}\n");
@@ -234,6 +251,109 @@ test("配布から外れた旧 STDD ファイル（orphan, 未編集）は削除
 
   assert.ok(!(await exists(orphanAbs)));
   assert.ok(result.claude.removed.includes(orphanRel));
+});
+
+test("Codex 導入: .agents/.codex/AGENTS.md/config.toml と codex-manifest を作る", async () => {
+  const assets = await makeAssets();
+  const target = await makeTarget();
+
+  const result = await install(baseOpts(target, assets, { agents: ["codex"] }));
+
+  assert.ok(await exists(path.join(target, ".agents", "skills", "auto-implement", "SKILL.md")));
+  assert.ok(await exists(path.join(target, ".codex", "agents", "implementer.toml")));
+  assert.ok(await exists(path.join(target, ".codex", "hooks.json")));
+  assert.ok(await exists(path.join(target, ".codex", "hooks", "spec-first-check.sh")));
+  assert.ok(await exists(path.join(target, ".codex", "config.toml")));
+  assert.ok(await exists(path.join(target, "AGENTS.md")));
+  assert.ok(await exists(path.join(target, CODEX_MANIFEST_REL)));
+
+  // codex-manifest はルート基準の rel を記録し、config.toml は含めない（create-if-absent 管理）
+  const manifest = JSON.parse(await read(path.join(target, CODEX_MANIFEST_REL)));
+  const paths = manifest.files.map((f) => f.path);
+  assert.ok(paths.includes(".agents/skills/auto-implement/SKILL.md"));
+  assert.ok(paths.includes(".codex/agents/implementer.toml"));
+  assert.ok(paths.includes(".codex/hooks.json"));
+  assert.ok(!paths.includes(".codex/config.toml"));
+
+  // AGENTS.md にマーカーブロックが注入される
+  const agentsMd = await read(path.join(target, "AGENTS.md"));
+  assert.match(agentsMd, /STDD:BEGIN spec-first/);
+  assert.match(agentsMd, /STDD:END spec-first/);
+
+  // Claude ビューは作らない
+  assert.equal(result.claude, undefined);
+  assert.ok(result.codex.created.length > 0);
+  assert.equal(result.agentsMd, "created");
+  assert.equal(result.codexConfig, "created");
+});
+
+test("AGENTS.md は既存を保持し spec-first ブロックのみ注入・再導入で冪等", async () => {
+  const assets = await makeAssets();
+  const target = await makeTarget();
+  await fs.writeFile(path.join(target, "AGENTS.md"), "# My Project\n\n既存の内容。\n");
+
+  const r1 = await install(baseOpts(target, assets, { agents: ["codex"] }));
+  assert.equal(r1.agentsMd, "merged");
+  const md1 = await read(path.join(target, "AGENTS.md"));
+  assert.match(md1, /既存の内容/);
+  assert.match(md1, /STDD:BEGIN spec-first/);
+
+  const r2 = await install(baseOpts(target, assets, { agents: ["codex"] }));
+  assert.equal(r2.agentsMd, "kept");
+  assert.equal(await read(path.join(target, "AGENTS.md")), md1);
+});
+
+test("AGENTS.md の注入ブロックは導入先に存在しないパスを案内しない", async () => {
+  const assets = await makeAssets();
+  const target = await makeTarget();
+
+  await install(baseOpts(target, assets, { agents: ["codex"] }));
+  const agentsMd = await read(path.join(target, "AGENTS.md"));
+
+  // packages/core は stdd 本体リポジトリの SSoT。導入先には存在しないため案内してはならない。
+  assert.ok(
+    !agentsMd.includes("packages/core"),
+    "注入ブロックが導入先に存在しない packages/core を案内している",
+  );
+  // 管理主体と再導入時の扱いは明示する。
+  assert.match(agentsMd, /STDD が管理します/);
+  assert.match(agentsMd, /stdd init/);
+});
+
+test("既存 .codex/config.toml は破壊しない（kept）", async () => {
+  const assets = await makeAssets();
+  const target = await makeTarget();
+  await fs.mkdir(path.join(target, ".codex"), { recursive: true });
+  await fs.writeFile(path.join(target, ".codex", "config.toml"), '[mcp_servers.custom]\ncommand = "x"\n');
+
+  const result = await install(baseOpts(target, assets, { agents: ["codex"] }));
+  assert.equal(result.codexConfig, "kept");
+  assert.match(await read(path.join(target, ".codex", "config.toml")), /mcp_servers\.custom/);
+});
+
+test("agents=both は Claude と Codex 両ビューを作る", async () => {
+  const assets = await makeAssets();
+  const target = await makeTarget();
+
+  const result = await install(baseOpts(target, assets, { agents: ["claude", "codex"] }));
+
+  assert.ok(result.claude);
+  assert.ok(result.codex);
+  assert.ok(await exists(path.join(target, MANIFEST_REL)));
+  assert.ok(await exists(path.join(target, CODEX_MANIFEST_REL)));
+  assert.ok(await exists(path.join(target, ".claude", "skills", "auto-implement", "SKILL.md")));
+  assert.ok(await exists(path.join(target, ".agents", "skills", "auto-implement", "SKILL.md")));
+});
+
+test("Codex 再導入は冪等（衝突/保持なし）", async () => {
+  const assets = await makeAssets();
+  const target = await makeTarget();
+
+  await install(baseOpts(target, assets, { agents: ["codex"] }));
+  const result = await install(baseOpts(target, assets, { agents: ["codex"] }));
+
+  assert.equal(result.codex.skippedConflict.length, 0);
+  assert.equal(result.codex.skippedModified.length, 0);
 });
 
 test("mergeSettings 単体: union と user-wins", () => {

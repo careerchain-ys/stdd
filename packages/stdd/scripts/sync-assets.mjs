@@ -11,8 +11,11 @@ const repoRoot = path.resolve(packageRoot, "..", "..");
 const assetsDir = path.join(packageRoot, "assets");
 
 // (source, destination) のペア。source はリポジトリ本体の正典。
+// .claude は Claude ビュー、.agents/.codex は Codex ビュー（いずれも build-adapters が core から生成した committed 生成物）。
 const COPIES = [
   { src: path.join(repoRoot, ".claude"), dst: path.join(assetsDir, ".claude") },
+  { src: path.join(repoRoot, ".agents"), dst: path.join(assetsDir, ".agents") },
+  { src: path.join(repoRoot, ".codex"), dst: path.join(assetsDir, ".codex") },
   {
     src: path.join(repoRoot, "templates", "minimal", ".stdd.config.yml.tpl"),
     dst: path.join(assetsDir, "stdd.config.yml.tpl"),

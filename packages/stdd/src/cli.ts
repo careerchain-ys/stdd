@@ -8,7 +8,8 @@ import {
   install,
   InstallError,
   type FileAction,
-  type ClaudeMergeSummary,
+  type MergeSummary,
+  type AgentTarget,
 } from "./install.js";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -19,6 +20,7 @@ interface InitFlags {
   force: boolean;
   yes: boolean;
   name: string | undefined;
+  agents: AgentTarget[];
 }
 
 function readVersion(): string {
@@ -38,6 +40,7 @@ function printHelp(): void {
     npx @careerchain/stdd init [options]    現在のディレクトリに STDD を導入する（新規・既存どちらも可）
 
   options:
+    --agent <claude|codex|both>  導入するエージェントビュー（既定: both）
     --name <name>   .stdd.config.yml の project.name（既定: ディレクトリ名）
     --force         tailoring 済み（編集された）STDD ファイルも最新へ上書きする
     --yes, -y       対話プロンプトをスキップし既定値で進める
@@ -45,20 +48,37 @@ function printHelp(): void {
     --version, -v   バージョンを表示
 
   導入後の流れ:
-    1. claude を起動
+    1. claude または codex を起動
     2. 「STDD を導入して」と伝える
        → 新規 / 既存を自動判定し、適切なスキルが起動します
 `);
 }
 
+function parseAgents(value: string | undefined): AgentTarget[] {
+  switch ((value ?? "both").toLowerCase()) {
+    case "claude":
+      return ["claude"];
+    case "codex":
+      return ["codex"];
+    case "both":
+    case "all":
+      return ["claude", "codex"];
+    default:
+      console.warn(`  注意: 未知の --agent 値 "${value}"。both として扱います。`);
+      return ["claude", "codex"];
+  }
+}
+
 function parseInitFlags(args: string[]): InitFlags {
-  const flags: InitFlags = { force: false, yes: false, name: undefined };
+  const flags: InitFlags = { force: false, yes: false, name: undefined, agents: ["claude", "codex"] };
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === "--force") flags.force = true;
     else if (arg === "--yes" || arg === "-y") flags.yes = true;
     else if (arg === "--name") flags.name = args[++i];
     else if (arg.startsWith("--name=")) flags.name = arg.slice("--name=".length);
+    else if (arg === "--agent") flags.agents = parseAgents(args[++i]);
+    else if (arg.startsWith("--agent=")) flags.agents = parseAgents(arg.slice("--agent=".length));
     else console.warn(`  注意: 未対応のオプションを無視します: ${arg}`);
   }
   return flags;
@@ -79,7 +99,11 @@ const ACTION_LABEL: Record<FileAction, string> = {
   skipped: "スキップ（既存を保持）",
 };
 
-function claudeSummaryLabel(c: ClaudeMergeSummary): string {
+function actionLabel(a: FileAction | undefined): string {
+  return a ? ACTION_LABEL[a] : "-";
+}
+
+function summaryLabel(c: MergeSummary): string {
   const parts: string[] = [];
   if (c.created.length) parts.push(`新規 ${c.created.length}`);
   if (c.updated.length) parts.push(`更新 ${c.updated.length}`);
@@ -87,6 +111,20 @@ function claudeSummaryLabel(c: ClaudeMergeSummary): string {
   if (c.skippedConflict.length) parts.push(`衝突回避 ${c.skippedConflict.length}`);
   if (c.skippedModified.length) parts.push(`保持 ${c.skippedModified.length}`);
   return parts.length ? parts.join(" / ") : "変更なし";
+}
+
+/** skippedConflict / skippedModified を、パス接頭辞付きで警告表示する。 */
+function printSkips(c: MergeSummary, prefix: string): void {
+  if (c.skippedConflict.length > 0) {
+    console.log("");
+    console.log("  ⚠ 既存ファイルと衝突したため STDD 版を入れていません（手動確認を推奨）:");
+    c.skippedConflict.forEach((p) => console.log(`      - ${prefix}${p}`));
+  }
+  if (c.skippedModified.length > 0) {
+    console.log("");
+    console.log("  ℹ 編集済み（tailoring）の STDD ファイルは保持しました（最新化は --force）:");
+    c.skippedModified.forEach((p) => console.log(`      - ${prefix}${p}`));
+  }
 }
 
 async function runInit(args: string[]): Promise<void> {
@@ -97,15 +135,23 @@ async function runInit(args: string[]): Promise<void> {
   console.log("");
   console.log(`  stdd v${VERSION}  現在のディレクトリに STDD を導入します`);
   console.log(`  対象: ${cwd}`);
+  console.log(`  エージェント: ${flags.agents.join(" + ")}`);
   console.log("");
 
-  // .claude/ はファイル単位で非破壊マージするため、既存があっても全削除はしない。
+  // .claude/ 等はファイル単位で非破壊マージするため、既存があっても全削除はしない。
   // --force は「tailoring 済み（ユーザー編集）STDD ファイルも最新へ上書きする」意味に限定。
   const overwriteClaude = flags.force;
 
   let result;
   try {
-    result = await install({ targetDir: cwd, assetsRoot, projectName, overwriteClaude, version: VERSION });
+    result = await install({
+      targetDir: cwd,
+      assetsRoot,
+      projectName,
+      overwriteClaude,
+      version: VERSION,
+      agents: flags.agents,
+    });
   } catch (err) {
     if (err instanceof InstallError) {
       console.error(`\n  エラー: ${err.message}\n`);
@@ -114,33 +160,35 @@ async function runInit(args: string[]): Promise<void> {
     throw err;
   }
 
-  const c = result.claude;
   console.log("");
   console.log("  ✔ STDD を導入しました");
-  console.log(
-    `    .claude/           : ${claudeSummaryLabel(c)}  # 由来は .claude/.stdd/manifest.json`,
-  );
-  console.log(`    .claude/settings.json : ${ACTION_LABEL[result.settings]}`);
-  console.log(`    .stdd.config.yml   : ${ACTION_LABEL[result.config]}`);
-  console.log(`    .mcp.json          : ${ACTION_LABEL[result.mcp]}  # Playwright MCP（ブラウザ動作確認）`);
-  console.log(`    docs/              : ${ACTION_LABEL[result.docs]}`);
-  if (c.skippedConflict.length > 0) {
-    console.log("");
-    console.log("  ⚠ 既存ファイルと衝突したため STDD 版を入れていません（手動確認を推奨）:");
-    c.skippedConflict.forEach((p) => console.log(`      - .claude/${p}`));
+  if (result.claude) {
+    console.log(`    .claude/ (Claude)       : ${summaryLabel(result.claude)}  # 由来 .claude/.stdd/manifest.json`);
+    console.log(`    .claude/settings.json   : ${actionLabel(result.settings)}`);
+    console.log(`    .mcp.json               : ${actionLabel(result.mcp)}  # Playwright MCP`);
   }
-  if (c.skippedModified.length > 0) {
-    console.log("");
-    console.log("  ℹ 編集済み（tailoring）の STDD ファイルは保持しました（最新化は --force）:");
-    c.skippedModified.forEach((p) => console.log(`      - .claude/${p}`));
+  if (result.codex) {
+    console.log(`    .agents/ + .codex/ (Codex) : ${summaryLabel(result.codex)}  # 由来 .stdd/codex-manifest.json`);
+    console.log(`    AGENTS.md               : ${actionLabel(result.agentsMd)}  # spec-first ルール注入`);
+    console.log(`    .codex/config.toml      : ${actionLabel(result.codexConfig)}  # Playwright MCP`);
   }
+  console.log(`    .stdd.config.yml        : ${actionLabel(result.config)}`);
+  console.log(`    docs/                   : ${actionLabel(result.docs)}`);
+
+  if (result.claude) printSkips(result.claude, ".claude/");
+  if (result.codex) printSkips(result.codex, "");
+
   console.log("");
   console.log("  次の手順:");
   const steps: string[] = [];
   if (result.config === "created") {
     steps.push(".stdd.config.yml の apps[].path / commands.* を実環境に合わせて調整");
   }
-  steps.push("claude を起動");
+  if (result.claude) steps.push("claude を起動");
+  if (result.codex) {
+    steps.push("codex を起動");
+    steps.push("Codex で spec-first フックを有効化: /hooks で .codex/hooks.json を trust する");
+  }
   steps.push("「STDD を導入して」と伝える  # 新規/既存を自動判定して進めます");
   steps.forEach((s, i) => console.log(`    ${i + 1}. ${s}`));
   console.log("");
