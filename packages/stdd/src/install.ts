@@ -395,7 +395,7 @@ async function injectAgentsMd(assetsRoot: string, targetDir: string): Promise<Fi
   const rule = (await fs.readFile(ruleAbs, "utf8")).trim();
   const block =
     `${AGENTS_MARK_BEGIN}\n` +
-    `<!-- このブロックは STDD が管理します。編集は packages/core 側で行い、手動編集は次回 stdd init で上書きされます。 -->\n\n` +
+    `<!-- このブロックは STDD が管理します。手動編集は次回 stdd init で上書きされます。 -->\n\n` +
     `${rule}\n\n` +
     `${AGENTS_MARK_END}`;
 

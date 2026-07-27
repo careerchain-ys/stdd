@@ -303,6 +303,23 @@ test("AGENTS.md は既存を保持し spec-first ブロックのみ注入・再�
   assert.equal(await read(path.join(target, "AGENTS.md")), md1);
 });
 
+test("AGENTS.md の注入ブロックは導入先に存在しないパスを案内しない", async () => {
+  const assets = await makeAssets();
+  const target = await makeTarget();
+
+  await install(baseOpts(target, assets, { agents: ["codex"] }));
+  const agentsMd = await read(path.join(target, "AGENTS.md"));
+
+  // packages/core は stdd 本体リポジトリの SSoT。導入先には存在しないため案内してはならない。
+  assert.ok(
+    !agentsMd.includes("packages/core"),
+    "注入ブロックが導入先に存在しない packages/core を案内している",
+  );
+  // 管理主体と再導入時の扱いは明示する。
+  assert.match(agentsMd, /STDD が管理します/);
+  assert.match(agentsMd, /stdd init/);
+});
+
 test("既存 .codex/config.toml は破壊しない（kept）", async () => {
   const assets = await makeAssets();
   const target = await makeTarget();

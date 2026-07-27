@@ -282,6 +282,38 @@ Phase 1 の緑維持: core は `.claude/` の複製なので、生成器の出�
 - パスドリフト是正（§6-3）: `packages/claude-code/` 等の未実現参照を `plugin-separation-policy.md` / `packages/core/README.md` から除去。`stdd-methodology.md` に Codex を明記。
 - CI: リポジトリに `.github/workflows` は無いため、`npm run check:adapters` を検証コマンドとして AGENTS.md に明文化（CI 新設は範囲外）。
 
+### 8.8 既知の制約: 導入先には SSoT が無い（Phase 5 で解消予定）
+
+Phase 1–4 で SSoT 化されたのは **stdd 本体リポジトリのみ**。導入先が受け取るのは生成済みビューだけで、
+`packages/core` も `build-adapters.mjs` も配布されない（`sync-assets` の COPIES = `.claude` / `.agents` / `.codex` / config tpl / mcp.json）。
+
+そのため `--agent both` の導入先には同一内容の重複が残る:
+
+- `.claude/skills/`（40 ファイル）と `.agents/skills/`（40 ファイル）: バイト一致の重複
+- `.claude/agents/*.md`（9）と `.codex/agents/*.toml`（9）: 変換後の別フォーマット
+- `.claude/hooks/spec-first-check.sh` と `.codex/hooks/spec-first-check.sh`: 同一実体の重複
+
+導入先のエージェントが片方のビューを tailoring しても他方は取り残され、「core → 各ビュー」フローを
+導入先の `AGENTS.md` に書いても再生成対象が存在しないため徹底できない。
+
+Phase 4 で発覚した関連の不具合（本 PR 内で修正済み）: `AGENTS.md` へ注入するブロックの管理コメントが
+導入先に存在しない `packages/core` を編集先として案内していた。導入先の実態に合わせて当該参照を除去し、
+回帰テスト（注入ブロックが `packages/core` を含まないこと）を追加した。
+
+**Phase 5 方針（決定済み・別 PR）**: 導入先にも中立 SSoT を配布し、再生成コマンドを提供する。
+
+```
+導入先/
+  .stdd/core/{skills,agents,hooks,rules}  ← authored SSoT（配布）
+  .claude/{skills,agents,hooks}           ← 生成物
+  .agents/skills  .codex/{agents,hooks}   ← 生成物
+```
+
+- `build-adapters` 相当を CLI に載せ `stdd sync` として提供（導入先で core → 各ビューを再生成）。
+- 注入ブロックの編集先案内を `.stdd/core` + `stdd sync` に更新する（本 PR では既存パスの誤案内除去に留める）。
+- 代替案として「`.claude/` を導入先 SSoT にする」も検討したが、`--agent codex` 単体導入では `.claude/` が
+  存在せず agent TOML の生成元も無いためフローが成立しない。中立 core の配布を採る。
+
 ## 9. 改訂履歴
 
 - 2026-07-21 初版（Claude / Codex 互換調査を踏まえた Core + Adapter 設計として作成）
@@ -293,3 +325,4 @@ Phase 1 の緑維持: core は `.claude/` の複製なので、生成器の出�
 - 2026-07-21 Phase 2c（hooks: 共有 spec-first-check.sh に apply_patch 入力対応 + .codex/hooks.json）完了。フックテスト 18/18。Phase 2（Codex ビュー生成）完了
 - 2026-07-22 Phase 3（インストーラ: `stdd init --agent claude|codex|both`）完了。install 14/14・CLI e2e 検証。Claude/Codex 両対応が下流導入まで一貫
 - 2026-07-22 Phase 4（ドキュメント整備: README / AGENTS.md / methodology を Core+Adapter・Codex 対応へ、パスドリフト是正）完了
+- 2026-07-27 §8.8 追記: 導入先に SSoT が無い制約を明文化。AGENTS.md 注入ブロックの `packages/core` 誤案内を修正（install 15/15）。Phase 5 方針（`.stdd/core` 配布 + `stdd sync`）を決定
