@@ -30,6 +30,7 @@ developer_instructions = '''
 TEST_PLAN.md の「テスト戦略」セクションと照合する。
 
 - [ ] TEST_PLAN.mdに記載された**ユースケース別テスト戦略**と、実際に作成されたテストのレベル（E2E / Integration / Unit）分類が一致しているか
+- [ ] 各テストのタイトルに**対象ID タグ**（`[UC-<feature>-NN]` / `[FL-<feature>-NN]`）が付与され、TEST_PLAN の対象ID と一致しているか（トレーサビリティ監査で「テスト実装漏れ」「孤児テスト」が出ないこと。`bash .claude/hooks/trace-audit.sh` で確認可）
 - [ ] テスト総数・内訳がTEST_PLAN.mdの計画と大きく乖離していないか（過不足の検出）
 - [ ] REQUIREMENTS.mdの**P0（Critical path）ユースケースがすべてE2Eまたは同等レベルでカバー**されているか
 - [ ] REQUIREMENTS.mdの受入基準がいずれかのテストで検証されているか（網羅性）

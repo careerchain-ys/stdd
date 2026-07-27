@@ -23,14 +23,16 @@
 
 ## 1. ユースケース別テスト戦略
 
-REQUIREMENTS §2.1 の**全ユースケースを 1 行ずつ**列挙する（ユースケース名は REQUIREMENTS と同名・Priority も引く）。
+REQUIREMENTS §2.1 の**全ユースケースを 1 行ずつ**列挙する（**対象ID は REQUIREMENTS §2.1 の `**ID**:` 行と一致**・ユースケース名も同名・Priority も引く）。
 **振る舞い（手順）→ E2E の骨格**、**受入基準（EARS）→ Unit / Integration** で担保するのが基本対応。
 
-| ユースケース（REQUIREMENTS §2.1） | Priority | E2E | Integration | Unit | 根拠 |
-| --- | --- | --- | --- | --- | --- |
-| [ユースケース名] | P0 | ✅ | ✅ | ✅ | Critical path・ビジネス直結・複数システム統合 |
-| [ユースケース名] | P1 | ⚠️ 検討 | ✅ | ✅ | 頻度高い・Integration 必須・E2E はコストで判断 |
-| [ユースケース名] | P2 | ❌ | ⚠️ | ✅ | 低頻度・Unit で十分 |
+| 対象ID | ユースケース（REQUIREMENTS §2.1） | Priority | E2E | Integration | Unit | 根拠 |
+| --- | --- | --- | --- | --- | --- | --- |
+| UC-<feature>-01 | [ユースケース名] | P0 | ✅ | ✅ | ✅ | Critical path・ビジネス直結・複数システム統合 |
+| UC-<feature>-02 | [ユースケース名] | P1 | ⚠️ 検討 | ✅ | ✅ | 頻度高い・Integration 必須・E2E はコストで判断 |
+| UC-<feature>-03 | [ユースケース名] | P2 | ❌ | ⚠️ | ✅ | 低頻度・Unit で十分 |
+
+> **テストコードへの ID タグ付け（必須）**: 各テストのタイトルに対象ID をブラケットで含める（例: `describe('[UC-<feature>-01] …')`）。フレームワーク非依存で grep 可・テストレポートにも表示され、トレーサビリティ監査の「テストリンク」になる。計画（✅）した ID を持つテストが存在しないと「テスト実装漏れ」として検知される。
 
 > 受入基準（EARS）の主要条件（例外・境界・データ制約）は、対応する Unit / Integration の根拠列に検証観点として落とす。
 
@@ -38,15 +40,16 @@ REQUIREMENTS §2.1 の**全ユースケースを 1 行ずつ**列挙する（ユ
 
 > TECH_DESIGN §4.2「その他処理フロー」がある場合のみ。各処理フローを 1 行ずつ列挙する（無ければ本章を削除）。
 
-| 処理フロー（TECH_DESIGN §4.2） | E2E | Integration | Unit | 根拠 |
-| --- | --- | --- | --- | --- |
-| [処理フロー名] | ❌ | ✅ | ✅ | バッチ / 内部ロジック・境界値は Unit で網羅 |
+| 対象ID | 処理フロー（TECH_DESIGN §4.2） | E2E | Integration | Unit | 根拠 |
+| --- | --- | --- | --- | --- | --- |
+| FL-<feature>-01 | [処理フロー名] | ❌ | ✅ | ✅ | バッチ / 内部ロジック・境界値は Unit で網羅 |
 ````
 
 ## 記述基準
 
-- **ユースケース名は REQUIREMENTS §2.1 と一致させ、全ユースケースを漏れなく 1 行ずつ記載する**（REQUIREMENTS ↔ TEST_PLAN を 1:1 で追跡可能にする）。Priority も REQUIREMENTS から引く。
-- **TECH_DESIGN §4.2 その他処理フローがある場合、§2 に全フローを 1 行ずつ記載する**（TECH_DESIGN ロジック設計 ↔ TEST_PLAN も 1:1 で追跡可能にする）。
+- **対象ID・ユースケース名は REQUIREMENTS §2.1 と一致させ、全ユースケースを漏れなく 1 行ずつ記載する**（ID で REQUIREMENTS ↔ TEST_PLAN を 1:1 で機械追跡できるようにする）。Priority も REQUIREMENTS から引く。
+- **TECH_DESIGN §4.2 その他処理フローがある場合、§2 に全フロー（対象ID `FL-<feature>-NN`）を 1 行ずつ記載する**（TECH_DESIGN ロジック設計 ↔ TEST_PLAN も ID で 1:1 追跡可能にする）。
+- **テストコードには対象ID をタイトルにタグ付けする**（`[UC-<feature>-NN]` / `[FL-<feature>-NN]`）。計画とテスト実体を ID で突合し、抜け漏れ・孤児テストを機械検知する。
 - **振る舞い（手順）→ E2E、受入基準（EARS）→ Unit / Integration** の役割で対応づける。
 - テストレベルの選択は「✅ 実施 / ⚠️ 検討 / ❌ 不要」で示し、根拠列を空にしない。
 - ロジック設計の検証観点（集計式・境界値）は対応する Unit / Integration の根拠に紐づける。

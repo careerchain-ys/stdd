@@ -94,7 +94,7 @@ feature 階層の役割は次のとおり。
 
 ### 3.2 要件 spec (REQUIREMENTS.md)
 
-「何を・なぜ作るか」をユーザー視点で記述する。解決する問題・対象ユーザー・ビジネス目標、Priority (P0 / P1 / P2) 付きの User Journey、UI / UX、成功基準など。
+「何を・なぜ作るか」をユーザー視点で記述する。解決する問題・対象ユーザー・ビジネス目標、Priority (P0 / P1 / P2) 付きのユースケース、UI / UX、成功基準など。
 
 読者: ステークホルダー、PM、デザイナー、エンジニア
 
@@ -115,7 +115,7 @@ feature 階層の役割は次のとおり。
 
 ## 4. テスト戦略
 
-STDD においては、テストは仕様の実行可能な証明であり、どのユースケースをどのテストレベルで担保するかを実装時ではなく Spec の段階で決める。REQUIREMENTS.md の User Journey に付けた Priority (P0 / P1 / P2) がテスト構成を決定し、その対応づけを TEST_PLAN.md に記録する。
+STDD においては、テストは仕様の実行可能な証明であり、どのユースケースをどのテストレベルで担保するかを実装時ではなく Spec の段階で決める。REQUIREMENTS.md のユースケースに付けた Priority (P0 / P1 / P2) がテスト構成を決定し、その対応づけを TEST_PLAN.md に記録する。
 
 ### 4.1 テストレベル
 
@@ -136,12 +136,12 @@ STDD においては、テストは仕様の実行可能な証明であり、ど
 ### 4.3 「E2E は P0 のみ」の原則
 
 - E2E は実行コストもメンテナンスコストも高い
-- すべての Journey を E2E で網羅すると、テストが壊れやすくなり、CI が長時間化する
+- すべてのユースケースを E2E で網羅すると、テストが壊れやすくなり、CI が長時間化する
 - P0 のフローのみ E2E で守り、それ以外は Integration / Unit に役割を譲る
 
-### 4.4 エラーケースも Journey として記述する
+### 4.4 エラーケースもユースケースとして記述する
 
-- エラーは「その他」ではなく、正規の User Journey として REQUIREMENTS.md に書く
+- エラーは「その他」ではなく、正規のユースケースとして REQUIREMENTS.md に書く
 - こうすることで、エラー時の挙動（メッセージ・回復導線）が暗黙仕様にならず、テストにマッピングできる
 
 ---
@@ -153,7 +153,7 @@ STDD においては、テストは仕様の実行可能な証明であり、ど
 ```mermaid
 flowchart TD
     Start([新機能の着手])
-    Req[REQUIREMENTS.md 作成<br/>User Journey + Priority]
+    Req[REQUIREMENTS.md 作成<br/>ユースケース + Priority]
     WF[ワイヤーフレーム生成<br/>HTML / 低忠実度]
     StakeholderReview{ステークホルダー<br/>レビュー}
     Tech[TECH_DESIGN.md + TEST_PLAN.md 作成<br/>技術設計 + Test Strategy]
@@ -199,7 +199,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start([既存機能の変更着手])
-    Req[REQUIREMENTS.md 更新<br/>Journey 追加 / 変更 + Priority]
+    Req[REQUIREMENTS.md 更新<br/>ユースケース追加 / 変更 + Priority]
     StakeholderReview{ステークホルダー<br/>レビュー}
     Tech[TECH_DESIGN.md / TEST_PLAN.md 更新<br/>テーブル・API 変更は common にも反映]
     ArchReview{アーキテクト<br/>レビュー}
@@ -228,7 +228,7 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    Spec[Spec の該当 Journey] --> Write[テストを書く]
+    Spec[Spec の該当ユースケース] --> Write[テストを書く]
     Write --> Run1{テスト実行}
     Run1 -- FAIL を確認 --> Impl[実装を書く]
     Run1 -- PASS してしまう --> Fix[テスト修正<br/>アサーション強化]
@@ -256,14 +256,86 @@ Spec が「常に最新の仕様」を保持するのに対し、PLAN は「1 �
 
 ---
 
-## 6. ベストプラクティス
+## 6. トレーサビリティ（ID による Spec⇄テスト⇄実装の担保）
 
-- 仕様レビューを最優先する。実装前に Spec を凍結し、後工程の手戻りを最小化する
-- セッション開始時にスコープを確認する。大きな機能は複数の PLAN に分割する
+STDD は Spec → テスト → 実装の一方向フロー（→ 2）で整合性を保つが、「どの要件が・どの設計で実現され・どこでテストされ・どこに実装されたか」を**機械的に**辿れなければ、抜け漏れ（テストの無い要件、要件に紐づかないテスト等）は人手のレビューに頼るしかない。ユースケース**名の一致**でリンクする方式はリネームで静かに切れる。
+
+そこで STDD は、追跡単位に**安定 ID** を振り、その ID を技術設計・テスト・実装へ貫通させることで、対応関係と抜け漏れを機械判定できるようにする。
+
+### 6.1 ID 体系
+
+安定な追跡単位は **ユースケース**（REQUIREMENTS ↔ TEST_PLAN を 1:1 で追う単位）。ID は名前と分離し、リネームしても不変に保つ。
+
+| 種別 | ID 形式 | 例 | 由来 |
+| --- | --- | --- | --- |
+| ユースケース | `UC-<feature>-NN` | `UC-applies-01` | REQUIREMENTS §2.1 の各ユースケース |
+| その他処理フロー | `FL-<feature>-NN` | `FL-applies-01` | TECH_DESIGN §4.2 のその他処理フロー |
+| 受入基準（任意粒度） | `AC-<feature>-NN-k` | `AC-applies-01-2` | 既定は UC 粒度。AC 粒度の追跡は任意 |
+
+**ID は見出しの名前には含めない**（見出しは日本語の説明テキストのみ）。ユースケースの ID は見出し直下の `**ID**:` 行に Priority と併記し、その他処理フローの ID はフロー見出し直下の `**ID**:` 行に置く。
+
+### 6.2 トレーサビリティ・チェーン（ID の貫通）
+
+1. **REQUIREMENTS §2.1** — 各ユースケース見出しの直下に ID を書く: `**ID**: UC-applies-01 ／ **Priority**: P0`
+2. **TECH_DESIGN §1.1** 対応ユースケース表に **要件ID 列**を持たせる（設計リンク）。§4.2 の各フローに `**ID**: FL-...` を付与
+3. **TEST_PLAN §1 / §2** の表に **対象ID 列**（UC / FL）を持たせる（テスト計画リンク）
+4. **テストコード** — タイトルに ID を含める（**必須**）: `describe('[UC-applies-01] ...')`。フレームワーク非依存で grep 可・テストレポートにも表示される
+5. **実装** — 任意で注釈コメント `@stdd UC-applies-01` を付し、実装位置を特定できるようにする
+
+```mermaid
+flowchart LR
+    REQ["REQUIREMENTS §2.1<br/>**ID**: UC-applies-01"]
+    TD["TECH_DESIGN §1.1/§4<br/>要件ID: UC-applies-01"]
+    TP["TEST_PLAN §1<br/>対象ID: UC-applies-01"]
+    TEST["テスト<br/>describe('[UC-applies-01] …')"]
+    IMPL["実装<br/>// @stdd UC-applies-01"]
+    REQ --> TD --> TP --> TEST --> IMPL
+    IMPL -. "逆引き（影響範囲）" .-> REQ
+```
+
+### 6.3 双方向トレース
+
+ID は全レイヤで共有されるため、監査は中核データ構造として**双方向インデックス** `ID → { requirements, design, tests[], impl[] }` を構築し、そこから 2 方向の検知を導く。
+
+- **順方向（抜け漏れ検知）** — 要件起点で設計・テスト・実装が揃っているかを検査する。検知する抜け漏れ:
+  - 設計漏れ: REQUIREMENTS の UC が TECH_DESIGN §1.1 で参照されていない
+  - テスト計画漏れ: UC / FL が TEST_PLAN に無い
+  - テスト実装漏れ: TEST_PLAN で計画（✅）なのに、その ID を持つテストが存在しない
+  - 実装未注釈 / 実装漏れ: UC に `@stdd` 注釈がどこにも無い（注釈は任意なので既定は警告。`require_impl_annotation: true` で抜け漏れに昇格）
+  - 孤児テスト / 孤児注釈: 実在しない ID を参照するテスト・注釈
+  - ID 重複 / 形式不正
+- **逆方向（影響範囲精査）** — **テスト / 実装起点**の改修に対し、変更ファイルが持つ ID を抽出して、その ID にぶら下がる全リンク先（対応要件・技術設計箇所・同じ ID を共有する他テスト / 他実装）を列挙する。「このテスト改修は `UC-applies-01` に紐づき、その要件は REQUIREMENTS §2.1 / TECH_DESIGN §4.1 で規定され、他に N 個のテスト・M 個の実装が同じ ID を共有する」と機械的に提示できる。
+
+### 6.4 spec-first 原則との補完関係
+
+STDD は「テスト・実装の改修も必ず Spec 起点で行う」ことをルール（`rules/stdd-spec-first.md`）とフック（`spec-first-check.sh`）で促してきた。ID 逆引きはこれを**機械的に補完**する。
+
+- 従来のフックは「その変更で Spec を触ったか」を促すだけだった。
+- ID 逆引きにより、テスト / 実装の改修が**どの要件 ID に紐づくか**まで辿れる。
+- どの要件 ID にも解決しないテスト / 実装変更は **追跡不能変更**として検知され、spec-first 逸脱（Spec を起点にしていない改修）の機械的な裏付けになる。
+
+### 6.5 監査と強制レベル
+
+トレーサビリティ監査は **`verifying-consistency` スキル**（対話的・順方向 + 逆方向）と、その共通スキャナである **`hooks/trace-audit.sh`**（依存なしの POSIX shell・pre-push / CI から呼べる）で実行する。挙動は `.stdd.config.yml` の `traceability` で設定する。
+
+- `traceability.enabled` — トレーサビリティ監査の有効化
+- `traceability.enforce` — `off` / `warn`（既定・レポートのみ）/ `block`（抜け漏れで pre-push・CI を失敗させる）
+- `traceability.patterns` — テストタグ・実装注釈の正規表現（プロジェクトのテストフレームワークに合わせて調整可能）
+- `traceability.scan` — テスト / 実装のスキャン対象 glob
+
+`enforce` は spec-first フックの `workflow.enforce_spec_first` と同じ流儀で、導入初期は `warn`、成熟後に `block` へ引き上げる運用を推奨する。
 
 ---
 
-## 7. 関連ドキュメント
+## 7. ベストプラクティス
+
+- 仕様レビューを最優先する。実装前に Spec を凍結し、後工程の手戻りを最小化する
+- セッション開始時にスコープを確認する。大きな機能は複数の PLAN に分割する
+- 要件・テスト・実装に ID を貫通させ、抜け漏れと影響範囲を機械的に検知できる状態を保つ（→ 6）
+
+---
+
+## 8. 関連ドキュメント
 
 - `guide-for-existing-project.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
 - `guide-for-new-project.md` — 新規プロジェクトの STDD 立ち上げ手順（最初から順行）

@@ -36,6 +36,7 @@ REQUIREMENTS.md（要件）が確定している前提で:
    ```
 
    - テスト戦略（REQUIREMENTS のユースケース＋ TECH_DESIGN のロジック設計を E2E/Integration/Unit にマッピング）
+   - **トレーサビリティ ID を貫通**: TECH_DESIGN §1.1 対応表に要件ID（`UC-<feature>-NN`）列、§4.2 その他処理フローに `FL-<feature>-NN`、TEST_PLAN に対象ID 列を持たせ、REQUIREMENTS §2.1 の `**ID**:` 行と一致させる（抜け漏れは `bash .claude/hooks/trace-audit.sh` で機械検知）
    - [テンプレート](templates/test-plan.md) を参照
 
 > 横断要素（テーブル定義・API 仕様）は common 階層に集約する。新規テーブル / API が生じたら common の

@@ -72,6 +72,25 @@ PRIMARY_BRANCH=${PRIMARY_BRANCH:-main}
 TEST_CMD=$(strip_quotes "$(yaml_scalar commands test)")
 BUILD_CMD=$(strip_quotes "$(yaml_scalar commands build)")
 
+# --- トレーサビリティ監査ゲート（設定駆動） ---
+# trace-audit.sh 自身が traceability.enforce を解釈する:
+#   off / warn → 抜け漏れがあっても exit 0（ブロックしない）
+#   block      → 抜け漏れがあれば非ゼロ終了（push を中止）
+# 監査は commands.test の有無と独立に動くため、テストスキップより前に実行する。
+TRACE_AUDIT="$ROOT_DIR/.claude/hooks/trace-audit.sh"
+if [ -f "$TRACE_AUDIT" ]; then
+    TRACE_OUT=$(bash "$TRACE_AUDIT" --root "$ROOT_DIR" 2>&1)
+    TRACE_RC=$?
+    if [ "$TRACE_RC" -ne 0 ]; then
+        echo "=========================================="
+        echo "✗ トレーサビリティ監査で抜け漏れを検知しました（traceability.enforce=block）"
+        echo "=========================================="
+        echo "$TRACE_OUT"
+        echo "push を中止します。抜け漏れを解消するか、enforce を warn に下げてください。"
+        exit 2
+    fi
+fi
+
 if [ -z "$TEST_CMD" ]; then
     echo "Pre-push check: commands.test が未定義のためスキップします"
     exit 0
