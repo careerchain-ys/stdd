@@ -30,7 +30,42 @@ git diff origin/<primary_branch>...HEAD --name-only
 - **テスト**: `*.test.ts`, `*.test.tsx`, `e2e/tests/**/*.spec.ts`
 - **実装**: `app/`, `components/`, `lib/`, `actions/`, `domain/` 配下のファイル
 
-## 2. 整合性チェック項目
+## 2. ID ベース・トレーサビリティ監査（機械的・最優先）
+
+名前一致ではなく**安定 ID**（`UC-<feature>-NN` / `FL-<feature>-NN`）で 要件 → 技術設計 → テスト → 実装 を突合する。
+検知は共通スキャナ `.claude/hooks/trace-audit.sh`（依存なし・pre-push / CI と同一ロジック）に委ね、
+結果を解釈して報告する。設定は `.stdd.config.yml` の `traceability`（`enforce` / `patterns` / `scan` 等）。
+
+### 2A. 順方向（抜け漏れ検知）
+
+```bash
+bash .claude/hooks/trace-audit.sh
+```
+
+- トレーサビリティ行列（ID × 設計 / テスト計画 / テスト / 実装）と抜け漏れ一覧を出力する。
+- 検知する抜け漏れ: 設計漏れ / テスト計画漏れ / テスト実装漏れ / 実装漏れ（`require_impl_annotation` 時）/ 孤児参照 / ID 重複。
+- `traceability.enforce=block` のとき、抜け漏れがあれば非ゼロ終了する（それを NG 判定に用いる）。
+
+### 2B. 逆方向（テスト/実装起点の改修 → 影響範囲）
+
+このセッション / ブランチの変更ファイル（§1 で取得済み）を渡し、テスト・実装起点の改修が**どの要件に波及するか**、
+および**追跡不能変更**（どの ID にも紐づかないテスト / 実装変更 ＝ spec-first 逸脱の疑い）を検知する。
+
+```bash
+# <primary_branch> は .stdd.config.yml の project.primary_branch
+CHANGED=$(git diff --name-only origin/<primary_branch>...HEAD)
+bash .claude/hooks/trace-audit.sh --changed $CHANGED
+
+# 特定 ID の全リンク先を辿るとき
+bash .claude/hooks/trace-audit.sh --impact UC-<feature>-01
+```
+
+- 各変更が紐づく ID と、その ID の全リンク先（対応要件・技術設計箇所・他テスト / 他実装）を列挙する。
+- ID に解決しないテスト / 実装変更は **追跡不能変更**として報告し、spec-first（Spec 起点）に立ち返るよう促す。
+
+> トレーサビリティ監査で検知した抜け漏れ・追跡不能変更は、§4 の出力にトレーサビリティ行列・影響範囲サマリとして必ず載せる。以降の §3 は ID では機械化しきれない内容（設計判断の反映・モック整合など）を人/AI が補完的に確認する。
+
+## 3. 整合性チェック項目（補完・人/AI による確認）
 
 ### A. REQUIREMENTS.md ⇔ 実装
 
@@ -55,7 +90,7 @@ git diff origin/<primary_branch>...HEAD --name-only
 - [ ] テストが実装を正しく検証しているか（実装の変更でテストが壊れていないか）
 - [ ] テストのモック設定が実装の実際の動作と一致しているか
 
-## 3. 出力形式
+## 4. 出力形式
 
 以下の形式で結果を報告:
 
@@ -64,9 +99,20 @@ git diff origin/<primary_branch>...HEAD --name-only
 
 ### 対象機能: [機能名]
 
+### トレーサビリティ行列（trace-audit.sh 順方向）
+| ID | 種別 | 設計 | テスト計画 | テスト | 実装 |
+|----|------|:---:|:---:|:---:|:---:|
+| UC-<feature>-01 | UC | ✅ | ✅ | ✅ | ✅ |
+
+### 影響範囲（trace-audit.sh 逆方向 / テスト・実装起点の変更がある場合）
+- 変更 → 紐づく ID → 波及する要件・設計・他テスト/他実装
+- 追跡不能変更（ID に紐づかないテスト/実装）: [あれば列挙]
+
 ### チェック結果サマリ
 | 項目 | 状態 | 備考 |
 |------|------|------|
+| トレーサビリティ（ID 抜け漏れ） | OK / WARN / NG | trace-audit.sh の抜け漏れ件数 |
+| 追跡不能変更 | OK / WARN / NG | ID に紐づかないテスト/実装変更 |
 | REQUIREMENTS.md ⇔ 実装 | OK / WARN / NG | |
 | TECH_DESIGN.md ⇔ 実装 | OK / WARN / NG | |
 | TECH_DESIGN.md ⇔ テスト | OK / WARN / NG | |
@@ -82,8 +128,9 @@ git diff origin/<primary_branch>...HEAD --name-only
 - [改善提案があれば記載]
 ```
 
-## 4. 注意事項
+## 5. 注意事項
 
+- `traceability.enabled=false` / 設定が無い場合は trace-audit.sh がスキップする旨を報告し、§3 の補完チェックのみ行う
 - Specドキュメントが存在しない場合は、その旨を報告
 - 軽微な不整合（コメントの差異など）は WARN として報告
 - 重大な不整合（機能の欠落、テスト漏れなど）は NG として報告

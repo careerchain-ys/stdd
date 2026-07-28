@@ -11,11 +11,11 @@
 
 ## 実装スコープ
 
-**対象**: REQUIREMENTS.md / TECH_DESIGN.md のどの範囲を実装するか
+**対象**: REQUIREMENTS.md / TECH_DESIGN.md のどの範囲を実装するか。**対象ユースケースを ID で列挙する**（例: `UC-<feature>-01`, `UC-<feature>-03`, `FL-<feature>-01`）。
 
-- [ ] P0: Critical Paths（全て / 一部を指定）
-- [ ] P1: Important（全て / 一部を指定）
-- [ ] P2: Nice to Have（全て / 一部を指定）
+- [ ] P0: Critical Paths（対象ID を列挙）
+- [ ] P1: Important（対象ID を列挙）
+- [ ] P2: Nice to Have（対象ID を列挙）
 
 **除外**: 今回のセッションでは実装しないもの
 
@@ -30,6 +30,8 @@
 
 ### 2. テスト作成（Red状態）
 
+> 各テストのタイトルに対象ID をタグ付けする（例: `describe('[UC-<feature>-01] …')`）。トレーサビリティ監査の「テストリンク」になる。
+
 **Unit Test**:
 - [ ] `lib/validation/<schema>/index.test.ts` - バリデーションテスト（N件）
 
@@ -40,6 +42,8 @@
 - [ ] `e2e/tests/<app>/<feature>.spec.ts` - E2Eテスト（N件）
 
 ### 3. 実装（Green状態）
+
+> 実装ファイルには任意で `@stdd <対象ID>` 注釈コメントを付し、実装位置を特定できるようにする（`traceability.require_impl_annotation: true` の場合は必須）。
 
 **Unit testに対応する実装**:
 - [ ] `lib/validation/<schema>/index.ts` - バリデーションスキーマ
@@ -57,6 +61,7 @@
 - [ ] Integration test 通過確認
 - [ ] E2E test 通過確認
 - [ ] `commands.typecheck`（`.stdd.config.yml`）型チェック通過
+- [ ] トレーサビリティ監査（`.claude/hooks/trace-audit.sh`）で対象ID の抜け漏れなし
 
 ---
 

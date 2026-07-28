@@ -45,6 +45,23 @@ workflow:
   devcontainer:
     enabled: false
 
+# ID ベースのトレーサビリティ監査（要件⇄設計⇄テスト⇄実装を UC/FL の ID で機械追跡）。
+traceability:
+  enabled: true
+  enforce: "warn"              # off | warn | block（抜け漏れで pre-push を止めるなら block）
+  require_impl_annotation: false
+  scan:
+    tests:
+      - "**/*.test.ts"
+      - "**/*.test.tsx"
+      - "e2e/**/*.spec.ts"
+    impl:
+      - "app/**"
+      - "components/**"
+      - "lib/**"
+      - "actions/**"
+      - "domain/**"
+
 # nextjs-supabase / playwright プラグインを有効化（CLI が各 skills を .claude/skills/ に展開済み）
 plugins:
   - "nextjs-supabase"

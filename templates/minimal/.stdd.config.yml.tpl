@@ -39,4 +39,17 @@ workflow:
   devcontainer:
     enabled: false
 
+# ID ベースのトレーサビリティ監査（要件⇄設計⇄テスト⇄実装を UC/FL の ID で機械追跡）。
+# scan.tests / scan.impl を採用 stack に合わせて調整して有効化する。
+# traceability:
+#   enabled: true
+#   enforce: "warn"            # off | warn | block（抜け漏れで pre-push を止めるなら block）
+#   require_impl_annotation: false
+#   scan:
+#     tests:
+#       - "**/*.test.*"
+#       - "e2e/**/*.spec.*"
+#     impl:
+#       - "src/**"
+
 plugins: []

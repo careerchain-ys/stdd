@@ -69,6 +69,7 @@ developer_instructions = '''
 
 - [ ] 概要（機能固有アーキテクチャ・Mermaid 図）＋ 1.1 対応ユースケース表が含まれている
 - [ ] REQUIREMENTS の全ユースケースが §1.1 対応表に載り、設計（§3/§4）に紐づいている（設計漏れなし）
+- [ ] §1.1 対応表に **要件ID 列**があり、`UC-<feature>-NN` が REQUIREMENTS §2.1 の `**ID**:` 行と一致している。§4.2 その他処理フローに `FL-<feature>-NN` が付与されている
 - [ ] 主要な設計判断に「選択」と「理由」が明記されている（任意）
 - [ ] ロジック設計（集計式/変換/ドメインルール/トランザクション境界）が手順・擬似コードで記述されている
 - [ ] データ構造は common `TABLE_DEFINITION.md`、API は common `API_SPEC.md` を参照し、feature で再定義していない
@@ -85,8 +86,8 @@ developer_instructions = '''
 
 ### TEST_PLAN.md
 
-- [ ] REQUIREMENTS §2.1 の全ユースケースが 1 行ずつ載っている（名前一致・漏れなし）
-- [ ] TECH_DESIGN §4.2 その他処理フローがある場合、全フローが載っている
+- [ ] REQUIREMENTS §2.1 の全ユースケースが 1 行ずつ載っている（**対象ID `UC-<feature>-NN` 一致**・漏れなし）
+- [ ] TECH_DESIGN §4.2 その他処理フローがある場合、全フローが載っている（**対象ID `FL-<feature>-NN` 一致**）
 - [ ] 振る舞い（手順）→E2E、受入基準（EARS）→Unit/Integration の対応で組まれ、各選択に根拠がある
 - [ ] テスト総数と内訳（Unit/Integration/E2E）が明記されている
 - [ ] P0 ユースケースの E2E カバレッジ方針が明記され、REQUIREMENTS の Priority と対応している

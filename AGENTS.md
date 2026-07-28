@@ -53,6 +53,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 | `.stdd.config.yml` の妥当性検証 | YAML を JSON に変換してから `ajv-cli validate` で検証する。詳細手順は [`packages/core/README.md`](packages/core/README.md) の「JSON Schema のローカル検証」セクション（`js-yaml` を介した変換例を含む）を参照 |
 | プラグインメタデータの構文検証 | `for f in plugins/*/plugin.json; do python3 -m json.tool "$f" > /dev/null && echo "OK $f"; done` |
 | 禁止語監査                    | リポジトリの公開状態に応じて、旧名称・固有名詞が残っていないかを `grep -rI` で確認                                          |
+| トレーサビリティ監査スクリプトの検証 | `bash test/trace-audit.test.sh`（`packages/core/hooks/trace-audit.sh` の順方向 gap 検知・逆方向影響範囲の振る舞いテスト）        |
 | 生成物のドリフト検査          | `npm run check:adapters`（`.claude/` `.agents/` `.codex/` が `packages/core/` と一致するか検査）                          |
 
 > **Core + Adapter**: skill / agent / hook / spec-first ルールの SSoT は `packages/core/{skills,agents,hooks,rules}` です。`scripts/build-adapters.mjs`（`npm run build:adapters`）がこれを各エージェントのネイティブ形式へ生成します — Claude ビュー `.claude/`、Codex ビュー `.agents/skills`・`.codex/`（agents は TOML、hooks は `.codex/hooks.json` + 共有スクリプト）。生成物は committed です。**編集は必ず `packages/core/` 側で行い**、`.claude/` 等の生成物を直接編集しないでください（`npm run check:adapters` がドリフトを検出します）。下流への導入は `stdd init --agent claude|codex|both` が担います。

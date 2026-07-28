@@ -196,7 +196,7 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
    cd e2e && npm run test
    ```
 
-3. **整合性チェック**: `verifying-consistency` skill と同等のチェックを実施
+3. **整合性チェック**: `verifying-consistency` skill と同等のチェックを実施。特に **ID ベース・トレーサビリティ監査**（`bash .claude/hooks/trace-audit.sh`）で要件⇄設計⇄テスト⇄実装の抜け漏れを機械検知し、テスト/実装起点の変更は `--changed` で影響範囲・追跡不能変更を確認する（`traceability.enforce=block` なら抜け漏れは修正必須）
 
 4. **コード品質チェック**: `simplify` skill と同等のレビューを実施
 

@@ -13,7 +13,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 
 ⚠️ **UI実装を開始する前に、必ず以下の仕様書を確認すること**:
 
-1. **REQUIREMENTS.md** - 画面の目的・ユーザージャーニーを理解
+1. **REQUIREMENTS.md** - 画面の目的・ユースケースを理解
 2. **TECH_DESIGN.md** - 技術設計・型定義、および「画面項目定義」セクション（画面 feature は必須・非画面 feature は省略）の項目詳細・バリデーションルール・表示形式
 
 TECH_DESIGN.md の画面項目定義セクションがある場合:
@@ -421,7 +421,7 @@ onInteractOutside={(e) => {
 ### 実装開始前
 
 ```
-□ REQUIREMENTS.md で画面の目的・ユーザージャーニーを確認
+□ REQUIREMENTS.md で画面の目的・ユースケースを確認
 □ TECH_DESIGN.md の画面項目定義セクションを確認（画面 feature は必須・非画面 feature は省略）
 □ TECH_DESIGN.md で型定義・API設計を確認
 ```

@@ -16,7 +16,7 @@
   デフォルト例: docs/common/REQUIREMENTS.md
 
 含めない:
-  - 機能単位のユーザージャーニー詳細 (→ 各 feature の REQUIREMENTS.md)
+  - 機能単位のユースケース詳細 (→ 各 feature の REQUIREMENTS.md)
   - システム構成・データモデル等の技術設計 (→ ./ARCHITECTURE.md)
   - 実装の進捗・履歴・変更経緯 (SSoT として常に最新の要件のみ保持する)
 
