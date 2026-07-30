@@ -111,7 +111,7 @@ npx -y ajv-cli validate \
 
 ## このパッケージに含めないもの
 
-- 特定の skill / agent ファイル (Handlebars テンプレ展開後のもの) → `packages/claude-code/` 等の上位パッケージで提供
+- 各エージェント向けの生成物（`.claude/` `.agents/` `.codex/`）→ `scripts/build-adapters.mjs` が `packages/core/{skills,agents,hooks,rules}` から生成し、リポジトリルートに committed（本パッケージには含めない）
 - プラグイン (`@stdd/plugin-nextjs-supabase`, `@stdd/plugin-playwright`, `@stdd/plugin-worktree`)
 - 設定駆動化レンダラ (`packages/shared-rendering/`)
 - **テストファイル配置の宣言** (`e2e/tests/...`, `<app>/components/*.test.tsx` 等は現状テンプレ内に直接記述)。schema に `tests.layout` を導入するかは Phase 1-B で再評価する

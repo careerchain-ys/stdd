@@ -4,7 +4,7 @@
 
 ## 1. 基本方針
 
-stdd OSS の core（`packages/core/` および `packages/claude-code/skills/` 等）に置く skill は、
+stdd OSS の core（`packages/core/{skills,agents,hooks,rules}`。各エージェントビューはここから生成）に置く skill は、
 **特定の技術スタックや実行環境に依存しない汎用ロジック**に限定する。
 500 行規模の固有ノウハウを `.stdd.config.yml` に設定として持たせると config が破綻するため、
 技術スタック固有・実行環境固有のノウハウは**プラグイン化**して分離する。

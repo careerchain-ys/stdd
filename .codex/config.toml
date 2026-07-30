@@ -1,0 +1,5 @@
+# 生成物: templates/minimal/.mcp.json から build-adapters が生成。直接編集しない（編集は元定義へ）。
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@latest", "--headless"]

@@ -16,20 +16,20 @@ npx @careerchain/stdd init   # 既存・新規どちらのプロジェクトに�
 
 ## STDD の始め方
 
-**新規・既存のどちらでも手順は同じ**です。STDD を導入して Claude Code に「導入して」と伝えるだけ。
+**新規・既存のどちらでも手順は同じ**です。STDD を導入して Claude Code または Codex に「導入して」と伝えるだけ。
 新規 / 既存の判定はルータースキル (`setup-stdd`) が自動で行い、適切な駆動スキルへ振り分けます。
 
 ```bash
 cd my-project                 # 既存プロジェクト、または新規の空ディレクトリ
-npx @careerchain/stdd init    # ① STDD 一式を現在のディレクトリに導入
-claude                        # ② Claude Code を起動
+npx @careerchain/stdd init    # ① STDD 一式を導入（既定で Claude/Codex 両対応。--agent claude|codex|both）
+claude                        # ② Claude Code（または codex）を起動
 # ③ 「STDD を導入して」と伝える
 ```
 
 3 ステップの内訳:
 
-1. **`npx @careerchain/stdd init`** — `.claude/`（skill / agent / hook）・`.stdd.config.yml`・`docs/` を**現在のディレクトリ**に配置します。`.claude/` はファイル単位で**非破壊マージ**（既存の Claude 設定やユーザー自作 skill を汚染しない／`settings.json` は deep-merge）。導入物は `.claude/.stdd/manifest.json` と各ファイルの `source: stdd` マーカーで STDD 由来と判別できます。
-2. **`claude`** — Claude Code を起動します。
+1. **`npx @careerchain/stdd init`** — 選んだエージェントのビューと `.stdd.config.yml`・`docs/` を**現在のディレクトリ**に配置します（`--agent claude|codex|both`、既定 both）。Claude ビューは `.claude/`（skill / agent / hook / settings）、Codex ビューは `.agents/skills`・`.codex/`（agents / hooks / config）と `AGENTS.md`（spec-first ルール注入）。いずれもファイル単位で**非破壊マージ**（既存設定やユーザー自作ファイルを汚染しない／`settings.json` は deep-merge・`AGENTS.md` はマーカーブロックのみ更新）。導入物は manifest（`.claude/.stdd/manifest.json` / `.stdd/codex-manifest.json`）で STDD 由来と判別できます。
+2. **`claude`（または `codex`）** — AI コーディングエージェントを起動します。
 3. **「STDD を導入して」** — `setup-stdd` ルーターがコードの有無を調べ、確認のうえ次へ委譲します。
 
 | 判定 | 委譲先スキル | 駆動するフロー | 手順ガイド |
@@ -51,10 +51,12 @@ stdd/
 ├── LICENSE                    # Apache License 2.0
 ├── NOTICE                     # 著作権表記
 ├── packages/
-│   ├── core/                  # 方法論ドキュメント / JSON Schema
-│   │   ├── docs/              # methodology / 各導入ガイド
-│   │   └── schema/
+│   ├── core/                  # SSoT（エージェント非依存）— 各ビューの生成元
+│   │   ├── docs/  schema/     # 方法論 / 導入ガイド / JSON Schema
+│   │   └── skills/ agents/ hooks/ rules/  # skill / agent / hook / spec-first ルール
 │   └── stdd/                  # 導入 CLI（npm パッケージ `@careerchain/stdd`）
+├── scripts/
+│   └── build-adapters.mjs     # core → 各エージェントビュー生成器（--check でドリフト検査）
 ├── templates/                 # 参照用プロジェクトテンプレート
 │   ├── minimal/               # 最小構成テンプレート
 │   └── nextjs-supabase-starter/ # Next.js + Supabase スターター（プラグイン同梱）
@@ -62,13 +64,13 @@ stdd/
 │   ├── nextjs-supabase/       # Next.js + Supabase 向け skill
 │   ├── playwright/            # Playwright E2E 向け skill
 │   └── worktree/              # git worktree + devcontainer 向け skill
-├── .claude/                   # Claude Code 用ファイル群
-│   ├── agents/                # エージェント定義
-│   └── skills/                # core skill 群（spec / PLAN テンプレート同梱）
-└── docs/                      # 方針・オーサリング規約ドキュメント
+├── .claude/                   # Claude ビュー（core から生成・committed）: agents / skills / hooks / rules
+├── .agents/skills/            # Codex ビュー: skills（同一 SKILL.md 標準・生成）
+├── .codex/                    # Codex ビュー: agents(TOML) / hooks / config（生成）
+└── docs/                      # 方針・オーサリング規約・設計メモ
 ```
 
-各プラグインディレクトリには `plugin.json`（プラグインメタデータ）と `skills/` が含まれます。プラグインの分離方針は [`docs/plugin-separation-policy.md`](docs/plugin-separation-policy.md) を参照してください。
+`.claude/` ・ `.agents/` ・ `.codex/` は `packages/core/` から `scripts/build-adapters.mjs` が生成する committed 生成物です（編集は core 側で行い、`npm run check:adapters` でドリフトを検査）。各プラグインディレクトリには `plugin.json`（プラグインメタデータ）と `skills/` が含まれます。プラグインの分離方針は [`docs/plugin-separation-policy.md`](docs/plugin-separation-policy.md) を参照してください。
 
 ---
 
@@ -96,7 +98,7 @@ stdd/
 ## 現状の制約
 
 - **対象は「ブラウザで操作する Web アプリ」に限定**しています。方法論・テンプレート自体は技術スタック非依存で、任意の Web フレームワーク（Next.js / Rails / Django / Laravel など）で立ち上げられますが、QA フローのブラウザ動作確認（Playwright MCP）やワイヤーフレーム / UI キャプチャが**ブラウザ UI を前提**とするため、ネイティブモバイルアプリ（React Native 等）や UI を持たない CLI / バックエンド専用サービスは現状の主対象外です。
-- 公式に対応している AI エージェントは **Claude Code** のみです（`.claude/agents/` および `.claude/skills/` 配下のファイルがそのまま動作）。他エージェントは agents.md 標準に準拠した `AGENTS.md` を提供しているため随時対応を検討中です。
+- 公式に対応している AI エージェントは **Claude Code** と **OpenAI Codex** です。単一の SSoT（`packages/core`）から各エージェントのネイティブ形式（Claude=`.claude/`、Codex=`.agents/skills`・`.codex/`・`AGENTS.md`）を生成します。`npx @careerchain/stdd init --agent claude|codex|both`（既定 both）で選択できます。他エージェントも agents.md 標準の `AGENTS.md` を提供しているため随時対応を検討中です。
 
 ---
 

@@ -8,6 +8,8 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present"
+    "build:adapters": "node scripts/build-adapters.mjs",
+    "check:adapters": "node scripts/build-adapters.mjs --check",
+    "build": "npm run build:adapters && npm run build --workspaces --if-present"
   }
 }

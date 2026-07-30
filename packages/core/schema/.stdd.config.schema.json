@@ -229,6 +229,88 @@
         }
       }
     },
+    "traceability": {
+      "type": "object",
+      "description": "ID-based traceability configuration. Assigns stable IDs to requirements (use cases / flows) and threads them through tech design, tests, and implementation so that the requirement -> design -> test -> implementation chain and its gaps can be detected mechanically (by the verifying-consistency skill and the trace-audit.sh scanner). Optional; when omitted, traceability auditing is skipped.",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether ID-based traceability auditing is active. When false, the audit and enforcement are skipped."
+        },
+        "enforce": {
+          "type": "string",
+          "enum": ["off", "warn", "block"],
+          "default": "warn",
+          "description": "Enforcement level for traceability gaps, mirroring workflow.enforce_spec_first. 'off': never fail. 'warn' (default): report gaps without failing. 'block': the pre-push hook (and CI) fail when gaps are found. Recommended to start at 'warn' and raise to 'block' once the project is mature."
+        },
+        "id_prefixes": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "ID prefixes for each traceable unit. Defaults: use_case=UC, flow=FL, acceptance=AC.",
+          "properties": {
+            "use_case": {
+              "type": "string",
+              "minLength": 1,
+              "default": "UC",
+              "description": "Prefix for use-case IDs (REQUIREMENTS §2.1). Example produces 'UC-<feature>-NN'."
+            },
+            "flow": {
+              "type": "string",
+              "minLength": 1,
+              "default": "FL",
+              "description": "Prefix for other-process-flow IDs (TECH_DESIGN §4.2). Example produces 'FL-<feature>-NN'."
+            },
+            "acceptance": {
+              "type": "string",
+              "minLength": 1,
+              "default": "AC",
+              "description": "Prefix for optional acceptance-criterion IDs. Example produces 'AC-<feature>-NN-k'. Only used when tracing at acceptance-criterion granularity."
+            }
+          }
+        },
+        "patterns": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Regular expressions describing how tests and implementation reference IDs. Adjust to match the project's test framework and annotation convention. Capture group 1 must isolate the ID.",
+          "properties": {
+            "test_tag": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Regex matching an ID reference inside a test title. Default convention wraps the ID in brackets. Example: '\\\\[((UC|FL)-[a-z0-9]+-[0-9]+)\\\\]'."
+            },
+            "impl_annotation": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Regex matching an ID annotation inside implementation source. Default convention uses an '@stdd <ID>' marker comment. Example: '@stdd\\\\s+((UC|FL)-[a-z0-9]+-[0-9]+)'."
+            }
+          }
+        },
+        "scan": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Glob patterns (relative to repo root) that the scanner walks to collect test tags and implementation annotations.",
+          "properties": {
+            "tests": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "description": "Globs for test files. Example: ['**/*.test.ts', '**/*.spec.ts', 'e2e/**/*.spec.ts']."
+            },
+            "impl": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "description": "Globs for implementation source. Example: ['app/**', 'components/**', 'lib/**', 'actions/**', 'domain/**']."
+            }
+          }
+        },
+        "require_impl_annotation": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, a use case with no '@stdd' implementation annotation is reported as a gap (blocking under enforce='block') rather than a warning. When false (default), missing implementation annotations are warnings only, since implementation coverage is otherwise established transitively through tagged tests."
+        }
+      }
+    },
     "plugins": {
       "type": "array",
       "description": "Plugins loaded in addition to core skills/agents. Each entry may be a short string id or an object with options.",
