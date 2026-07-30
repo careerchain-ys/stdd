@@ -27,11 +27,14 @@ const COPIES = [
 ];
 
 // .claude 配下でプロジェクトに持ち込まない開発専用ファイル
+// worktrees: エージェントが作る git worktree（リポジトリ丸ごとの複製）。除外しないと
+// tarball と導入先に無関係なリポジトリ複製が丸ごと混入する。
 const EXCLUDE_NAMES = new Set([
   ".gitignore",
   "settings.local.json",
   "session-logs",
   "scheduled_tasks.lock",
+  "worktrees",
 ]);
 
 async function copyRecursive(src, dst) {

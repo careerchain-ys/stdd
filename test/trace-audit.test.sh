@@ -24,6 +24,9 @@ assert_contains()     { printf '%s' "$OUT" | grep -qF "$2" && ok "$1" || ng "$1"
 assert_not_contains() { printf '%s' "$OUT" | grep -qF "$2" && ng "$1" || ok "$1"; }
 assert_rc()           { [ "$RC" -eq "$2" ] && ok "$1" || ng "$1 (want rc=$2)"; }
 
+# in-place sed（BSD sed の `-i` は接尾辞必須のため GNU/BSD 両対応の一時ファイル方式）
+sed_i() { local script="$1" file="$2"; sed "$script" "$file" > "$file.tmp" && mv "$file.tmp" "$file"; }
+
 # 最小 .stdd.config.yml（traceability 付き）を書く。$2=enforce $3=require_impl_annotation
 mkbase() {
     local dir="$1" enforce="${2:-warn}" reqimpl="${3:-false}"
@@ -78,7 +81,7 @@ run "$D"; assert_rc "no config -> skip" 0; assert_contains "no config message" "
 rm -rf "$D"
 
 # 2. enabled=false → スキップ
-D=$(mktemp -d); mkbase "$D" warn; sed -i 's/enabled: true/enabled: false/' "$D/.stdd.config.yml"
+D=$(mktemp -d); mkbase "$D" warn; sed_i 's/enabled: true/enabled: false/' "$D/.stdd.config.yml"
 run "$D"; assert_rc "enabled=false -> skip" 0; assert_contains "disabled message" "enabled=false"
 rm -rf "$D"
 
@@ -124,7 +127,7 @@ rm -rf "$D"
 D=$(mktemp -d); mkbase "$D" warn
 printf '#### 未設計 [UC-applies-05]\n' > "$D/docs/web/applies/REQUIREMENTS.md"
 run "$D"; assert_rc "warn does not block" 0
-sed -i 's/enforce: "warn"/enforce: "block"/' "$D/.stdd.config.yml"
+sed_i 's/enforce: "warn"/enforce: "block"/' "$D/.stdd.config.yml"
 run "$D"; assert_rc "block blocks on gap" 2
 rm -rf "$D"
 
@@ -135,7 +138,7 @@ printf '| UC-applies-06 | P0 | §4.1 |\n' > "$D/docs/web/applies/TECH_DESIGN.md"
 printf '| UC-applies-06 | ✅ |\n' > "$D/docs/web/applies/TEST_PLAN.md"
 printf "describe('[UC-applies-06]', () => {})\n" > "$D/e2e/a.spec.ts"
 run "$D"; assert_contains "missing impl is warning by default" "[実装未注釈] UC-applies-06"
-sed -i 's/require_impl_annotation: false/require_impl_annotation: true/' "$D/.stdd.config.yml"
+sed_i 's/require_impl_annotation: false/require_impl_annotation: true/' "$D/.stdd.config.yml"
 run "$D"; assert_contains "require_impl_annotation promotes to gap" "[実装漏れ] UC-applies-06"
 rm -rf "$D"
 
@@ -158,7 +161,7 @@ run "$D" --changed app/untracked.ts
 assert_contains "changed untracked flagged" "追跡不能変更"
 assert_contains "changed untracked names file" "app/untracked.ts"
 # block では追跡不能変更で exit 2
-sed -i 's/enforce: "warn"/enforce: "block"/' "$D/.stdd.config.yml"
+sed_i 's/enforce: "warn"/enforce: "block"/' "$D/.stdd.config.yml"
 run "$D" --changed app/untracked.ts; assert_rc "changed untracked blocks under block" 2
 rm -rf "$D"
 
