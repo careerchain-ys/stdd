@@ -124,20 +124,43 @@ IMPL_GLOBS=$(block_list impl)
 # ---------------------------------------------------------------------------
 # ファイル収集
 # ---------------------------------------------------------------------------
-shopt -s nullglob globstar 2>/dev/null
+shopt -s nullglob 2>/dev/null
+
+# ルート配下の全ファイル（ROOT 相対）。dot ディレクトリ / node_modules は除外。
+ALL_FILES=$(cd "$ROOT" && find . -type f \
+    -not -path '*/node_modules/*' -not -path '*/.*' 2>/dev/null | sed 's#^\./##')
+
+# glob → 正規表現。`**/` は 0 個以上のディレクトリ、`**` は任意、`*` は / を跨がない。
+# bash の globstar (4.0+) には依存しない — macOS 既定の bash 3.2 では未対応のため。
+glob_to_regex() {
+    local g="$1" out="" n=${#g} i=0 c
+    while [ "$i" -lt "$n" ]; do
+        c=${g:$i:1}
+        case "$c" in
+            '*')
+                if [ "${g:$i:3}" = "**/" ]; then out="$out(.*/)?"; i=$((i+3)); continue; fi
+                if [ "${g:$i:2}" = "**" ];  then out="$out.*";     i=$((i+2)); continue; fi
+                out="$out[^/]*" ;;
+            '?') out="$out[^/]" ;;
+            '.'|'+'|'^'|'$'|'('|')'|'['|']'|'{'|'}'|'|'|'\\') out="$out\\$c" ;;
+            *) out="$out$c" ;;
+        esac
+        i=$((i+1))
+    done
+    printf '%s' "$out"
+}
 
 # glob 群 → リポジトリルート相対のファイル一覧（重複除去）
 expand_globs() {
-    local globs="$1" out=() g f
-    cd "$ROOT" || return 0
+    local globs="$1" g re pats=""
     while IFS= read -r g; do
         [ -z "$g" ] && continue
         g=$(strip_quotes "$g")
-        for f in $g; do
-            [ -f "$f" ] && out+=("$f")
-        done
+        re=$(glob_to_regex "$g")
+        pats="$pats${pats:+|}^$re\$"
     done <<< "$globs"
-    printf '%s\n' "${out[@]}" | LC_ALL=C sort -u
+    [ -z "$pats" ] && return 0
+    printf '%s\n' "$ALL_FILES" | grep -E "$pats" | LC_ALL=C sort -u
 }
 
 TEST_FILES=$(expand_globs "$TEST_GLOBS")
@@ -219,6 +242,7 @@ if [ "$MODE" = "impact" ]; then
     echo "トレーサビリティ影響範囲（--impact）"
     echo "=========================================="
     BLOCKING=0
+    [ "${#ARGS[@]}" -eq 0 ] && { echo ""; echo "ID が指定されていません"; exit 0; }
     for id in "${ARGS[@]}"; do
         echo ""
         echo "▶ $id"
@@ -244,6 +268,7 @@ if [ "$MODE" = "changed" ]; then
     is_in_set() { printf '%s\n' "$2" | grep -qxF "$1"; }
     UNTRACKED=()
     IMPACT_IDS=""
+    [ "${#ARGS[@]}" -eq 0 ] && { echo ""; echo "変更ファイルが指定されていません"; exit 0; }
     for raw in "${ARGS[@]}"; do
         f=${raw#./}
         ids=$(grep -F "	$f:" "$RECORDS" 2>/dev/null | cut -f1 | LC_ALL=C sort -u)
@@ -385,7 +410,7 @@ BLOCKING=$(printf '%s\n' "$REPORT" | sed -n 's/^__BLOCKING__ //p')
 BLOCKING=${BLOCKING:-0}
 
 echo "=========================================="
-echo "トレーサビリティ監査（enforce=$ENFORCE）"
+echo "トレーサビリティ監査（enforce=${ENFORCE}）"
 echo "=========================================="
 printf '%s\n' "$REPORT" | grep -v '^__BLOCKING__'
 
