@@ -31,7 +31,7 @@ git clone https://github.com/careerchain-ys/stdd.git
 cd stdd
 
 # 2. JSON Schema 検証ツールを取得（ローカル検証で使用、任意）
-npx -y ajv-cli compile -s packages/core/schema/.stdd.config.schema.json
+npx -y ajv-cli@5 compile --spec=draft2020 -s packages/core/schema/.stdd.config.schema.json
 
 # 3. プラグイン構造を確認
 ls plugins/
@@ -49,7 +49,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 
 | 目的                          | コマンド                                                                       |
 | ----------------------------- | ------------------------------------------------------------------------------ |
-| JSON Schema の構文検証        | `npx -y ajv-cli compile -s packages/core/schema/.stdd.config.schema.json`      |
+| JSON Schema の構文検証        | `npx -y ajv-cli@5 compile --spec=draft2020 -s packages/core/schema/.stdd.config.schema.json`      |
 | `.stdd.config.yml` の妥当性検証 | YAML を JSON に変換してから `ajv-cli validate` で検証する。詳細手順は [`packages/core/README.md`](packages/core/README.md) の「JSON Schema のローカル検証」セクション（`js-yaml` を介した変換例を含む）を参照 |
 | プラグインメタデータの構文検証 | `for f in plugins/*/plugin.json; do python3 -m json.tool "$f" > /dev/null && echo "OK $f"; done` |
 | 禁止語監査                    | リポジトリの公開状態に応じて、旧名称・固有名詞が残っていないかを `grep -rI` で確認                                          |

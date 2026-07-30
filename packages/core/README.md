@@ -95,14 +95,14 @@ common 階層を使わないプロジェクトでは省略してよい。なお 
 `ajv-cli` でスキーマ自体の構文を検証できる:
 
 ```bash
-npx -y ajv-cli compile -s packages/core/schema/.stdd.config.schema.json
+npx -y ajv-cli@5 compile --spec=draft2020 -s packages/core/schema/.stdd.config.schema.json
 ```
 
 任意の `.stdd.config.yml` を検証する場合は YAML を JSON に変換した上で `validate` する:
 
 ```bash
 npx -y js-yaml my-project/.stdd.config.yml > /tmp/stdd.json
-npx -y ajv-cli validate \
+npx -y ajv-cli@5 validate --spec=draft2020 \
   -s packages/core/schema/.stdd.config.schema.json \
   -d /tmp/stdd.json
 ```
