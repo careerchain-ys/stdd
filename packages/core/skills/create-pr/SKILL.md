@@ -60,7 +60,17 @@ git diff origin/<primary_branch>...HEAD
 
 ### Description テンプレート
 
+緊急モードのブランチ（`choosing-work-mode` で宣言したもの。`work-mode.sh status` で確かめられる）では、本文の**冒頭**に
+「## 緊急モード」の節を置く。§5 の `pr-telemetry.sh` がこの見出しを確かめる。通常モードでは節ごと削除する。
+
 ```markdown
+## 緊急モード
+
+- 理由: [work-mode.sh status に出る宣言の理由]
+- 省いた工程: [例: コードレビュー、Spec の reviewer、Red の確認]
+- 不合格のまま残した検査: [例: commands.test の失敗 2 件、トレーサビリティ監査の抜け漏れ。無ければ「なし」]
+- 後追いが要るもの: [未レビューの範囲、不合格の解消、Figma の更新など]
+
 ## 概要
 
 [変更の目的・背景を1-2文で説明]
@@ -119,7 +129,13 @@ bash <skill_dir>/scripts/pr-telemetry.sh post --review-rounds <N>
 # レビューをしなかった PR は理由の区分を申告する
 #   typo_format_only / link_fix_only / regenerate_only / user_waived
 bash <skill_dir>/scripts/pr-telemetry.sh post --exempt <区分>
+
+# 緊急モードのブランチは、レビューをしたかどうかに関わらずこの区分で投稿する（回数はそのまま記録される）
+bash <skill_dir>/scripts/pr-telemetry.sh post --exempt emergency
 ```
+
+- 緊急モードのブランチで `--exempt emergency` を付けないと `post` は止まる。宣言していないブランチでは使えない。
+  `--exempt emergency` のときは、PR 本文に「## 緊急モード」の節が無いと止まる。
 
 - `post` は投稿のあとに PR を読み直し、head の SHA と一致する記録が載っているかを確かめる（`verify`）。
   **ここで失敗したら PR 作成は完了していない**。原因（未 push、投稿の失敗）を直してから再実行する。

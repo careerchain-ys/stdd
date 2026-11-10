@@ -71,4 +71,11 @@ feedback:
 telemetry:
   enabled: true
 
+# 緊急モード（packages/core/docs/work-modes-and-limits.md）。ユーザーが「緊急モード」と明示したときだけ入り、
+# 分業・レビューの回数・品質ゲートの合格を必須にしない（Spec → テスト → 実装の順序は守る）。
+# 値はすべて既定値なので、変えないなら省略してよい。
+emergency_mode:
+  enabled: true
+  request_ttl_minutes: 120    # ユーザーの申し出を宣言に使える時間（分）
+
 plugins: []

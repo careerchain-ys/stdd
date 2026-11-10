@@ -72,6 +72,17 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/work-mode-prompt.sh",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

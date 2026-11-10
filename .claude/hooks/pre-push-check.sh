@@ -9,6 +9,10 @@
 #   - commands.build         : 各アプリで実行するビルドコマンド（任意）
 #   - project.primary_branch : upstream 未設定時の比較先ブランチ
 #
+# 緊急モードのブランチ（skill choosing-work-mode で宣言したもの）では、テスト・ビルド・
+# トレーサビリティ監査を実行したうえで、失敗しても push を止めずに警告だけを出す。
+# 宣言の確認は choosing-work-mode/scripts/work-mode.sh active に任せる。
+#
 # 設定が無い / 必須キーが欠ける場合は push をブロックせずスキップする。
 # 詳細な記述規約は docs/config-driven-authoring.md を参照。
 
@@ -72,6 +76,14 @@ PRIMARY_BRANCH=${PRIMARY_BRANCH:-main}
 TEST_CMD=$(strip_quotes "$(yaml_scalar commands test)")
 BUILD_CMD=$(strip_quotes "$(yaml_scalar commands build)")
 
+# --- 作業モード（緊急モードなら品質ゲートを警告にとどめる） ---
+WORK_MODE="$ROOT_DIR/.claude/skills/choosing-work-mode/scripts/work-mode.sh"
+EMERGENCY=0
+if [ -f "$WORK_MODE" ] && bash "$WORK_MODE" --root "$ROOT_DIR" active >/dev/null 2>&1; then
+    EMERGENCY=1
+    echo "Pre-push check: 緊急モードのブランチです。検査の失敗は警告にとどめ、push は止めません"
+fi
+
 # --- トレーサビリティ監査ゲート（設定駆動） ---
 # trace-audit.sh 自身が traceability.enforce を解釈する:
 #   off / warn → 抜け漏れがあっても exit 0（ブロックしない）
@@ -81,7 +93,11 @@ TRACE_AUDIT="$ROOT_DIR/.claude/hooks/trace-audit.sh"
 if [ -f "$TRACE_AUDIT" ]; then
     TRACE_OUT=$(bash "$TRACE_AUDIT" --root "$ROOT_DIR" 2>&1)
     TRACE_RC=$?
-    if [ "$TRACE_RC" -ne 0 ]; then
+    if [ "$TRACE_RC" -ne 0 ] && [ "$EMERGENCY" -eq 1 ]; then
+        echo "⚠ トレーサビリティ監査で抜け漏れを検知しました（緊急モードのため push は続けます）"
+        echo "$TRACE_OUT"
+        echo "  PR 本文の「緊急モード」節に、赤のまま残した検査として書いてください"
+    elif [ "$TRACE_RC" -ne 0 ]; then
         echo "=========================================="
         echo "✗ トレーサビリティ監査で抜け漏れを検知しました（traceability.enforce=block）"
         echo "=========================================="
@@ -168,7 +184,12 @@ if [ "$ANY" -eq 0 ]; then
     exit 0
 fi
 
-if [ "$FAILED" -eq 1 ]; then
+if [ "$FAILED" -eq 1 ] && [ "$EMERGENCY" -eq 1 ]; then
+    echo "⚠ テストまたはビルドが失敗しました（緊急モードのため push は続けます）"
+    echo "  PR 本文の「緊急モード」節に、赤のまま残した検査として書いてください"
+    echo "=========================================="
+    exit 0
+elif [ "$FAILED" -eq 1 ]; then
     echo "✗ テストまたはビルドが失敗しました。push を中止します。"
     echo "=========================================="
     exit 2

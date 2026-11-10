@@ -71,16 +71,19 @@ async function planCodexView() {
     mode: 0o644,
   });
 
-  // 2c: hooks → .codex/hooks/spec-first-check.sh（スクリプト実体）+ .codex/hooks.json（PreToolUse 配線）。
-  // spec-first-check.sh は Claude/Codex 共通（出力形状は同一、入力は apply_patch も解釈）。
-  const hookSrc = path.join(coreRoot, "hooks", "spec-first-check.sh");
+  // 2c: hooks → .codex/hooks/<script>（スクリプト実体）+ .codex/hooks.json（配線）。
+  // spec-first-check.sh（PreToolUse）は Claude/Codex 共通（出力形状は同一、入力は apply_patch も解釈）。
+  // work-mode-prompt.sh（UserPromptSubmit）は入力の prompt を読み、標準出力を文脈として返す（両者で同じ契約）。
   const hooksDst = path.join(repoRoot, ".codex", "hooks");
   managedDirs.push(hooksDst);
-  outputs.push({
-    abs: path.join(hooksDst, "spec-first-check.sh"),
-    content: await fs.readFile(hookSrc),
-    mode: await modeOf(hookSrc),
-  });
+  for (const name of CODEX_HOOK_SCRIPTS) {
+    const hookSrc = path.join(coreRoot, "hooks", name);
+    outputs.push({
+      abs: path.join(hooksDst, name),
+      content: await fs.readFile(hookSrc),
+      mode: await modeOf(hookSrc),
+    });
+  }
   outputs.push({
     abs: path.join(repoRoot, ".codex", "hooks.json"),
     content: Buffer.from(codexHooksJson()),
@@ -90,10 +93,13 @@ async function planCodexView() {
   return { outputs, managedDirs };
 }
 
-/** Codex の PreToolUse hooks.json（Claude settings.json とほぼ同一構造）。matcher は編集系ツール。 */
+/** Codex 側に配線する hook スクリプト（packages/core/hooks 配下）。pre-push-check.sh は Claude 専用のため含めない。 */
+const CODEX_HOOK_SCRIPTS = ["spec-first-check.sh", "work-mode-prompt.sh"];
+
+/** Codex の hooks.json（Claude settings.json とほぼ同一構造）。PreToolUse の matcher は編集系ツール。UserPromptSubmit は matcher を使わない。 */
 function codexHooksJson() {
   const obj = {
-    description: "STDD spec-first Poka-Yoke hook（packages/core から生成・直接編集しない）",
+    description: "STDD hooks（spec-first の促し・緊急モードの申し出の記録。packages/core から生成・直接編集しない）",
     hooks: {
       PreToolUse: [
         {
@@ -103,6 +109,17 @@ function codexHooksJson() {
               type: "command",
               command: 'bash "$(git rev-parse --show-toplevel)/.codex/hooks/spec-first-check.sh"',
               timeout: 30,
+            },
+          ],
+        },
+      ],
+      UserPromptSubmit: [
+        {
+          hooks: [
+            {
+              type: "command",
+              command: 'bash "$(git rev-parse --show-toplevel)/.codex/hooks/work-mode-prompt.sh"',
+              timeout: 10,
             },
           ],
         },

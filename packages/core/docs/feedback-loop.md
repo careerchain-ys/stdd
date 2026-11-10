@@ -94,7 +94,7 @@ CI の権限の都合などで拾い直しだけが動かないと、閉じた�
 | `duration_min.lead_time` | 最初の記録か最初のコミットから、投稿までの分 | 工程の記録と git |
 | `duration_min.steps` | 工程（`spec` / `plan` / `test` / `implement` / `qa` / `review`）ごとの分 | 工程の記録（`pr-telemetry.sh mark`） |
 | `review.rounds` | レビューの回数 | 工程の記録、または申告 |
-| `review.exempt` | レビューをしなかった理由の区分（`typo_format_only` / `link_fix_only` / `regenerate_only` / `user_waived`） | 申告 |
+| `review.exempt` | レビューをしなかった理由の区分（`typo_format_only` / `link_fix_only` / `regenerate_only` / `user_waived`）。緊急モードの PR は、レビューの有無に関わらず `emergency`（[`work-modes-and-limits.md`](work-modes-and-limits.md)） | 申告 |
 | `feedback` | 棚卸しの結果（起票数・再発コメント数・上限で起票しなかった数） | `dev-feedback.sh` の記録 |
 
 設計の考え方:

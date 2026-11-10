@@ -1,5 +1,5 @@
 {
-  "description": "STDD spec-first Poka-Yoke hook（packages/core から生成・直接編集しない）",
+  "description": "STDD hooks（spec-first の促し・緊急モードの申し出の記録。packages/core から生成・直接編集しない）",
   "hooks": {
     "PreToolUse": [
       {
@@ -9,6 +9,17 @@
             "type": "command",
             "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/spec-first-check.sh\"",
             "timeout": 30
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/work-mode-prompt.sh\"",
+            "timeout": 10
           }
         ]
       }
