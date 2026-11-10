@@ -76,14 +76,6 @@ bash <skill_dir>/scripts/work-mode.sh --root <作業ツリー> status
 - **工程テレメトリを投稿する**（`create-pr` §5）。レビューをしたかどうかに関わらず `--exempt emergency` で投稿する。
   緊急モードのブランチでは、`pr-telemetry.sh` がこの区分と PR 本文の節を確かめる。集計では緊急モードの PR を
   レビュー回数の統計から外して数える。
-- **負債を記録する**（`create-pr`）。PR を作ったら、触れた機能ごとに負債 issue へ積む。解消は
-  [`settling-emergency-debt`](../settling-emergency-debt/SKILL.md) が行う。
-
-```bash
-# 機能キーは .stdd.config.yml の docs.layout の feature_path（複数はカンマ区切り。common 階層だけなら common）
-bash <skills_dir>/settling-emergency-debt/scripts/emergency-debt.sh record --feature <feature_path> --note "<後追いが要るもの>"
-```
-
 - **ほかのフックは変わらない。** spec-first のフック（`spec-first-check.sh`）は緊急モードでも同じように動く。
 
 ## 5. 解除
@@ -93,4 +85,3 @@ bash <skill_dir>/scripts/work-mode.sh --root <作業ツリー> clear
 ```
 
 宣言はブランチに閉じるので、**新しいブランチは通常モードから始まる**。同じブランチで通常の工程に戻すときだけ `clear` する。
-解除しても、すでに作った PR の負債は消えない（負債の解消は `settling-emergency-debt`）。

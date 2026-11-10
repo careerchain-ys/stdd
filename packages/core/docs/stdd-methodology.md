@@ -333,7 +333,7 @@ STDD は「テスト・実装の改修も必ず Spec 起点で行う」ことを
 - セッション開始時にスコープを確認する。大きな機能は複数の PLAN に分割する
 - 要件・テスト・実装に ID を貫通させ、抜け漏れと影響範囲を機械的に検知できる状態を保つ（→ 6）
 - 開発プロセス自体の課題を作業のたびに集め、定期的に効果を測って改善する（→ 8）
-- 局面に応じて適用の強さを選ぶ。速さが必要なときはユーザーが明示して緊急モードを使い、緩めた分は負債として解消する（→ 9）
+- 局面に応じて適用の強さを選ぶ。速さが必要なときはユーザーが明示して緊急モードを使い、あとで通常の工程で見直す（→ 9）
 
 ---
 
@@ -354,8 +354,7 @@ Spec・テスト・実装の一貫性を保つ仕組みも、使ううちに足�
 STDD は既定で品質を優先しており、そのぶん開発の速度は落ちる。障害対応のように速さを優先すべき場面のために、
 **緊急モード**を用意する。緊急モードはユーザーが着手時に明示したときだけ入り（AI が自分の判断で切り替えることはしない）、
 専門エージェントによる分業・レビューの回数・品質ゲートの合格を必須にしない。Spec → テスト → 実装の順序は守り、
-PR 本文に緊急モードで作ったことを明記し、緩めた分は機能ごとの負債として記録して、あとで解消する
-（`choosing-work-mode` / `settling-emergency-debt`）。
+PR 本文に緊急モードで作ったことを明記する（`choosing-work-mode`）。
 
 あわせて、要件が頻繁に変わる段階やゼロから作る段階のように、STDD をそのまま当てると負担が大きい局面と、その判断の目安を
 書く。詳細は [`work-modes-and-limits.md`](work-modes-and-limits.md) を参照。
@@ -367,7 +366,7 @@ PR 本文に緊急モードで作ったことを明記し、緩めた分は機�
 - `guide-for-existing-project.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
 - `guide-for-new-project.md` — 新規プロジェクトの STDD 立ち上げ手順（最初から順行）
 - `feedback-loop.md` — フィードバックの収集と改善のループ（課題の起票・工程テレメトリ・定期の効果測定）
-- `work-modes-and-limits.md` — 作業モードと適用限界（緊急モード・負債の解消・STDD が向かない局面と判断の目安）
+- `work-modes-and-limits.md` — 作業モードと適用限界（緊急モード・STDD が向かない局面と判断の目安）
 - `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
 - `.claude/skills/documenting-tech-specs/templates/` — 技術 spec テンプレ（feature: `tech-design.md` / `test-plan.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
 - `.claude/skills/documenting-plans/templates/plan.md` — 実装計画テンプレ

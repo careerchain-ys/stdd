@@ -391,7 +391,7 @@
     },
     "emergency_mode": {
       "type": "object",
-      "description": "Emergency work mode (choosing-work-mode skill). Only the user can enter it: the UserPromptSubmit hook hooks/work-mode-prompt.sh records the user's explicit mention, and skills/choosing-work-mode/scripts/work-mode.sh refuses to declare without that record. On an emergency branch, delegation to specialist agents, review rounds, and passing quality gates are not required (Spec -> Test -> Implementation order is kept); the debt is recorded per feature as GitHub issues (settling-emergency-debt skill). Optional; every key has a default. See packages/core/docs/work-modes-and-limits.md.",
+      "description": "Emergency work mode (choosing-work-mode skill). Only the user can enter it: the UserPromptSubmit hook hooks/work-mode-prompt.sh records the user's explicit mention, and skills/choosing-work-mode/scripts/work-mode.sh refuses to declare without that record. On an emergency branch, delegation to specialist agents, review rounds, and passing quality gates are not required (Spec -> Test -> Implementation order is kept), and the PR body must state that it was made in emergency mode. Optional; every key has a default. See packages/core/docs/work-modes-and-limits.md.",
       "additionalProperties": false,
       "properties": {
         "enabled": {
@@ -404,12 +404,6 @@
           "minimum": 1,
           "default": 120,
           "description": "How long (minutes) the user's recorded mention of emergency mode stays valid for one declaration."
-        },
-        "debt_label": {
-          "type": "string",
-          "minLength": 1,
-          "default": "emergency-debt",
-          "description": "Label of the per-feature debt issues that collect PRs made in emergency mode. Open issues with this label mean 'not yet settled'."
         }
       }
     },

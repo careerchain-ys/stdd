@@ -144,18 +144,7 @@ bash <skill_dir>/scripts/pr-telemetry.sh post --exempt emergency
 - PR を作ったあとにコミットを積んだり、追加のレビューをしたりしたら、もう一度 `post` する（追記のみ。前のコメントは消さない）。
 - 免除の出典（誰の指示か）はコメントに入れない。必要なら PR の本文に書く。
 
-## 6. 緊急モードの負債を記録する
-
-緊急モードのブランチでは、PR を作成したあとで、触れた機能ごとに負債を記録する（通常モードでは省く）。
-機能キーは `.stdd.config.yml` の `docs.layout` の `feature_path`（複数はカンマ区切り。common 階層だけなら `common`）。
-
-```bash
-bash <skills_dir>/settling-emergency-debt/scripts/emergency-debt.sh record --feature <feature_path> --note "<後追いが要るもの>"
-```
-
-記録できなかった場合（`gh` が使えない等）は PR の作成を取り消さず、理由をユーザーに伝える。
-
-## 7. 完了
+## 6. 完了
 
 作成したPRのURLを表示する。
 

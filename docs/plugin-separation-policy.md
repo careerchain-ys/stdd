@@ -97,7 +97,6 @@ git worktree + devcontainer を用いたマルチ環境並列開発向けのプ�
 15. `recording-dev-feedback` — 開発フィードバックの起票（GitHub issue と `gh` を前提にするが、技術スタックには依存しない。`feedback.enabled` で無効化できる）
 16. `measuring-dev-process` — 工程テレメトリと開発フィードバックの集計・効果測定（同上）
 17. `choosing-work-mode` — 作業モード（通常 / 緊急）の選択・宣言・解除（git だけを使う。`emergency_mode.enabled` で無効化できる）
-18. `settling-emergency-debt` — 緊急モードの負債の解消（GitHub issue と `gh` を前提にする。同上）
 
 これらの skill 内に含まれる下流プロジェクト固有値（`user_app` / `admin_app` / `develop` 等のサンプル値）は、
 Phase 1 で Handlebars 変数（`{{apps[].path}}` / `{{project.primary_branch}}` 等）に置換する。
