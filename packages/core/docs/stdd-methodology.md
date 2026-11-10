@@ -357,9 +357,8 @@ STDD は既定で品質を優先しており、そのぶん開発の速度は落
 PR 本文に緊急モードで作ったことを明記し、緩めた分は機能ごとの負債として記録して、あとで解消する
 （`choosing-work-mode` / `settling-emergency-debt`）。
 
-あわせて、要件が頻繁に変わる段階やゼロから作る段階のように、STDD をそのまま当てると負担が大きい局面と、その判断の目安、
-まだ答えの出ていない問い（文書を人が読み切れない、ハーネスを作った本人以外が使う場合、非機能要件）を書く。詳細は
-[`work-modes-and-limits.md`](work-modes-and-limits.md) を参照。
+あわせて、要件が頻繁に変わる段階やゼロから作る段階のように、STDD をそのまま当てると負担が大きい局面と、その判断の目安を
+書く。詳細は [`work-modes-and-limits.md`](work-modes-and-limits.md) を参照。
 
 ---
 
@@ -368,7 +367,7 @@ PR 本文に緊急モードで作ったことを明記し、緩めた分は機�
 - `guide-for-existing-project.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
 - `guide-for-new-project.md` — 新規プロジェクトの STDD 立ち上げ手順（最初から順行）
 - `feedback-loop.md` — フィードバックの収集と改善のループ（課題の起票・工程テレメトリ・定期の効果測定）
-- `work-modes-and-limits.md` — 作業モードと適用限界（緊急モード・負債の解消・STDD が向かない局面・未解決の問い）
+- `work-modes-and-limits.md` — 作業モードと適用限界（緊急モード・負債の解消・STDD が向かない局面と判断の目安）
 - `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
 - `.claude/skills/documenting-tech-specs/templates/` — 技術 spec テンプレ（feature: `tech-design.md` / `test-plan.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
 - `.claude/skills/documenting-plans/templates/plan.md` — 実装計画テンプレ
