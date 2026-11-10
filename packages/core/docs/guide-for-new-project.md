@@ -52,6 +52,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 
 - `npx @careerchain/stdd init` で導入済みなら `.stdd.config.yml`・`.claude/`・`docs/` が揃っている。点検のみ。
 - 単一アプリか複数アプリかで `docs.layout` のパス規約が変わる。common 階層は既定で有効（`docs.layout.common_requirements` / `common_architecture`）。
+- 開発フィードバックの起票と工程テレメトリは、GitHub を使うなら導入直後から使える（`.stdd.config.yml` の `feedback` / `telemetry` は既定値で動く）。最初の起票の前に `recording-dev-feedback` がラベルを作る（`dev-feedback.sh setup`）。仕組みは `feedback-loop.md`。
 
 ### step 1: プロダクトコンセプトのヒアリング ★
 
@@ -112,4 +113,5 @@ STDD の定常運用は **Spec → Test → 実装** の一方向。新規プロ
 - セッションで立ち上げを駆動する仕組み: `.claude/skills/starting-new-with-stdd/SKILL.md`
 - 既存プロジェクトへの導入: [`guide-for-existing-project.md`](./guide-for-existing-project.md)
 - 順行の通常フロー・テスト戦略: `stdd-methodology.md`（§4 テスト戦略 / §5 開発フロー・フロー図）
+- フィードバックの収集と改善のループ: [`feedback-loop.md`](./feedback-loop.md)
 - スタック別の骨組み手順: 使用テンプレートの README（例: `nextjs-supabase-starter`）/ 各プラグイン

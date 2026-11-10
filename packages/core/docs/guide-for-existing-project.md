@@ -56,6 +56,7 @@ STDD の定常運用は **Spec → Test → 実装** の一方向（順行）。
 - 単一アプリか複数アプリかで `docs.layout` のパス規約が変わる。
 - common 階層を使うなら `docs.layout.common_requirements` / `common_architecture` を設定。
 - 具体的な対話手順（点検 → 草案 → 確認 → 書き込み → schema 検証）は `introducing-stdd` スキルの「step 0: 対話的セットアップ」を参照。
+- 開発フィードバックの起票と工程テレメトリは、GitHub を使うなら導入直後から使える（`.stdd.config.yml` の `feedback` / `telemetry` は既定値で動く）。最初の起票の前に `recording-dev-feedback` がラベルを作る（`dev-feedback.sh setup`）。仕組みは `feedback-loop.md`。
 
 ### step 1: common spec のリバース
 
@@ -116,5 +117,6 @@ step 1・2 の実物を見ながら、このプロジェクト固有の spec フ
 - セッションで導入を駆動する仕組み: `.claude/skills/introducing-stdd/SKILL.md`
 - 2 階層構造と方法論: `stdd-methodology.md` §3.1
 - 開発フロー図: `stdd-methodology.md` §5
+- フィードバックの収集と改善のループ: `feedback-loop.md`
 - common 階層のリバース: `.claude/skills/reverse-engineering-common-spec/SKILL.md`
 - 機能単位のリバース: `.claude/skills/reverse-engineering-feature-spec/SKILL.md`

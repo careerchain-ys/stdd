@@ -20,6 +20,29 @@ Spec 工程はエージェント同士のレビューだけで自動承認せず
 - ユーザーから修正指示が出た場合は、対象 Generator（requirements-writer / tech-specs-writer）に修正を依頼し、エージェントレビュー → 人間ゲートを再度通す。
 - ユーザーの指示で人間ゲートをスキップする運用（完全自動）も可能だが、**既定は停止して確認**とする。
 
+## 工程の記録（工程テレメトリ）
+
+PR 作成後に投稿する工程テレメトリ（`create-pr` §5）の所要時間とレビュー回数は、Team Lead が各 Phase の
+開始と終了で付ける記録から集計する。`.stdd.config.yml` の `telemetry.enabled` が `false` なら省く。
+
+```bash
+# <create-pr> は create-pr skill のディレクトリ
+bash <create-pr>/scripts/pr-telemetry.sh mark <step> start   # Phase に入るとき
+bash <create-pr>/scripts/pr-telemetry.sh mark <step> end     # Phase を出るとき
+```
+
+| Phase | step |
+| --- | --- |
+| 1a 要件作成 / 1b 技術設計（人間レビューゲートの待ち時間を含む） | `spec` |
+| 1.5 PLAN 作成 | `plan` |
+| 2 実装のうちテスト作成（Red の確認まで）と 2.5 テストレビュー | `test` |
+| 2 実装のうち実装（Green） | `implement` |
+| 3 QA | `qa` |
+| 4 コードレビュー（**差し戻しの 1 往復ごとに start / end を付ける**。往復の数がレビュー回数になる） | `review` |
+
+- 記録は作業ツリーの外に書かれ、コミットには入らない。記録に失敗しても作業は止めない。
+- 記録の無い Phase は「測れない」として集計から外れる（0 分とは扱われない）。
+
 ## Phase 1a: 要件作成（`full`, `spec-only`のみ）
 
 要件（What & Why）を確定させるフェーズ。技術設計（Phase 1b）には進まず、まず REQUIREMENTS.md を完成・承認させる。
@@ -290,12 +313,27 @@ UI変更を伴う実装の場合、対象のSpecドキュメント（REQUIREMENT
 - 完了報告の備考欄にスキップ理由を記載する
 - Figma更新の失敗はPR作成をブロックしない
 
+## Phase 4.8: フィードバックの棚卸し（全モード）
+
+**レビューを終えたあと、PR を作る前に** `recording-dev-feedback` skill を実行し、この作業中に生じたプロセス上の課題
+（ユーザーからの訂正、繰り返した手戻り、その場しのぎの判断、検査で拾えたはずの欠陥）を起票する。
+`.stdd.config.yml` の `feedback.enabled` が `false` なら省く。
+
+- 各エージェントの完了報告に書かれた「気づき」もここで拾う。エージェントには起票させない。
+- 起票は 1 PR あたりの上限（既定 5 件）まで。上限で起票しなかった件数も `triage --skipped` で記録する（0 件でも実行する）。
+- 対象機能の Spec の誤りや実装のバグは起票せず、この PR の中で直す。
+- 起票の失敗（`gh` が使えない等）は PR 作成をブロックしない。完了報告の備考に理由を書く。
+
 ## Phase 5: PR作成（全モード）
 
 すべてのコミットをpushし、`create-pr` skill と同等のフローでPRを作成する。
 
 PRのdescriptionには以下を含める:
 
-- 対応issue番号（`Closes #<issue番号>`）。**GitHub issue 起点のときのみ**。issue 以外の入力では、代わりに対象タスクのサマリを記載する。
+- 対応issue番号（`Closes #<issue番号>`）。**GitHub issue 起点のときのみ**。issue 以外の入力では、代わりに対象タスクのサマリを記載する。Phase 4.8 で起票した issue には `Closes` を付けない。
 - 実行モード
 - 各フェーズの実行結果サマリ
+- 備考に、Phase 4.8 の `triage` が出力した「開発フィードバック: …」の 1 行
+
+PR を作成したら、`create-pr` §5 のとおり工程テレメトリを投稿する。`quick` / `spec-only` モードのようにコードレビューを
+行わなかった場合は、レビュー回数が 0 になるので、理由の区分を `--exempt` で申告する（ユーザーがモードを承認した場合は `user_waived`）。

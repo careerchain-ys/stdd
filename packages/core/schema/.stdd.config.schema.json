@@ -311,6 +311,84 @@
         }
       }
     },
+    "feedback": {
+      "type": "object",
+      "description": "Development-feedback loop: process issues found during a work unit are filed as GitHub issues before the PR is created (recording-dev-feedback skill) and periodically aggregated (measuring-dev-process skill). Read by the bundled script skills/recording-dev-feedback/scripts/dev-feedback.sh. Optional; every key has a default. See packages/core/docs/feedback-loop.md.",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether the feedback triage step runs before PR creation. When false, the skills skip filing and the scripts exit without doing anything."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "GitHub label names. Change them to match the project's language or naming; the scripts and skills read them from here.",
+          "properties": {
+            "base": {
+              "type": "string",
+              "minLength": 1,
+              "default": "dev-feedback",
+              "description": "Label that distinguishes feedback issues from ordinary work issues. Open issues with this label mean 'not yet reflected'."
+            },
+            "priority_high": {
+              "type": "string",
+              "minLength": 1,
+              "default": "priority:high",
+              "description": "Priority label: reflect before starting the next work unit."
+            },
+            "priority_medium": {
+              "type": "string",
+              "minLength": 1,
+              "default": "priority:medium",
+              "description": "Priority label: reflect before more features are added. Subject to the stale rule (stale_days)."
+            },
+            "category_prefix": {
+              "type": "string",
+              "default": "category:",
+              "description": "Prefix for category labels. The category keys themselves (spec-format, skill, agent, automation, flow, coding-rules, other) are fixed by the feedback rules."
+            }
+          }
+        },
+        "max_issues_per_pr": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 5,
+          "description": "Upper bound of feedback issues filed from one work unit (one PR). Recurrence comments on existing issues are not counted."
+        },
+        "stale_days": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 14,
+          "description": "A medium-priority open issue with no activity for this many days becomes a candidate for closing as 'not planned'. Applied by a person at measurement time, never on a schedule."
+        },
+        "recurrence_to_high": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 2,
+          "description": "Number of recurrence comments (lines starting with '再発 —') from repository members at which a medium-priority issue is raised to high."
+        },
+        "registry": {
+          "type": "string",
+          "minLength": 1,
+          "default": "docs/process/improvement-registry.md",
+          "description": "Path of the improvement registry (measurement history, measures and their verdicts, rulings, rejected ideas, known instrument issues). Created from the measuring-dev-process template on first use."
+        }
+      }
+    },
+    "telemetry": {
+      "type": "object",
+      "description": "Per-PR process telemetry posted as a PR comment right after PR creation (create-pr skill, script skills/create-pr/scripts/pr-telemetry.sh). Holds only review-process-independent fields: size, durations, review rounds / exemption, and feedback triage counts. Optional.",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether create-pr posts the telemetry comment. When false, step recording and posting are skipped."
+        }
+      }
+    },
     "plugins": {
       "type": "array",
       "description": "Plugins loaded in addition to core skills/agents. Each entry may be a short string id or an object with options.",

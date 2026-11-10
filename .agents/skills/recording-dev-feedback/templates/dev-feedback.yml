@@ -1,0 +1,86 @@
+# 開発フィードバックの起票フォーム（GitHub の issue フォーム）。
+#
+# 人が Web から起票するための入口。使う場合は `.github/ISSUE_TEMPLATE/dev-feedback.yml` に置く
+# （stdd init は .github を配らないので、必要なプロジェクトだけが置く）。
+# AI エージェントはフォームを使わず `dev-feedback.sh file` で起票する。
+#
+# フォームの `labels:` は固定値しか付けられないので、優先度と分類のラベルは付かない。
+# 起票後に優先度・分類のラベルを付けるか、`dev-feedback.sh audit` の一覧で付け忘れを確認する。
+# ラベル名を `.stdd.config.yml` の `feedback.labels` で変えた場合は、下の `labels:` も合わせる。
+name: 開発フィードバック
+description: 開発中に生じたプロセス上の課題を起票する（対象機能の仕様の誤り・実装のバグは対象外）
+labels: ["dev-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **起票するのは「次の作業や別の機能でも同じことが起きる」ものだけです。**
+        対象機能の仕様の誤りは Spec を、実装のバグは当該 PR を直してください。
+
+        同じ事象が既に起票されていないか、先に `dev-feedback` ラベルで検索してください。
+        あれば新しく立てず、その issue に次の形式でコメントしてください（行頭から書きます）。
+
+        `再発 — YYYY-MM-DD（ブランチ ／ PR）: 一言`
+
+        「いつ直しても損失が変わらない」ものは起票しません。送信せずに閉じてください。
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 優先度
+      description: 「後回しにしたときの損失が、時間とともに増えるか」で決めます（作業量では決めません）
+      options:
+        - 高（次の作業単位に入る前に。後から直すコストが大きく跳ね上がる）
+        - 中（機能が増える前に。損失が機能の数に比例して増える）
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: category
+    attributes:
+      label: 分類
+      description: 反映先の種類。当てはまるものをすべて選びます
+      options:
+        - label: spec-format（テンプレート・ドキュメント規約）
+        - label: skill
+        - label: agent
+        - label: automation（フック・検査スクリプト・CI）
+        - label: flow（開発フロー）
+        - label: coding-rules（コーディング規約）
+        - label: other（反映先が決まらない）
+
+  - type: input
+    id: source
+    attributes:
+      label: 発生源
+      description: 分かるものだけ（ブランチ ／ PR 番号）
+
+  - type: input
+    id: target
+    attributes:
+      label: 反映先候補
+      description: 直すファイルのパス。決まらないときは「未定」
+
+  - type: textarea
+    id: phenomenon
+    attributes:
+      label: 現象
+      description: 何が起きたか。再現できる具体（ファイル、agent 名、実際のやり取り）で書きます
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: なぜ問題か
+      description: 放置すると、次に何が起きるか
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 提案
+      description: 反映先に何を足す・直すか。文面の方向まで書きます
+    validations:
+      required: true

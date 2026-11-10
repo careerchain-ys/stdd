@@ -52,4 +52,23 @@ workflow:
 #     impl:
 #       - "src/**"
 
+# 開発時のフィードバックの収集と集計（packages/core/docs/feedback-loop.md）。
+# PR を作る前にプロセス上の課題を GitHub issue に起票し（recording-dev-feedback）、
+# PR ごとに工程テレメトリを PR コメントへ投稿する（create-pr）。gh コマンドが必要。
+# 値はすべて既定値なので、変えないなら省略してよい。
+feedback:
+  enabled: true
+  labels:
+    base: "dev-feedback"
+    priority_high: "priority:high"
+    priority_medium: "priority:medium"
+    category_prefix: "category:"
+  max_issues_per_pr: 5        # 1 PR から起票してよい件数の上限
+  stale_days: 14              # この日数動きのない priority:medium は見送りの候補
+  recurrence_to_high: 2       # 再発コメントがこの数に達したら priority:high へ上げる
+  registry: "docs/process/improvement-registry.md"
+
+telemetry:
+  enabled: true
+
 plugins: []
