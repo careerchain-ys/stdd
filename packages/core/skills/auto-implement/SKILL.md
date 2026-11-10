@@ -122,6 +122,7 @@ Team Lead（オーケストレーター）      ← このスキル自身
 - 全フェーズの完了後にPRを作成し、ユーザーに報告する
 
 各フェーズの詳細な手順は [references/phases.md](references/phases.md) を参照。
+各 Phase の開始と終了では工程の記録（`pr-telemetry.sh mark`）を付ける（phases.md「工程の記録」）。
 モードに応じて以下のフェーズを順次実行する:
 
 | Phase      | 名称                          | full | spec-only | impl-only | quick |
@@ -135,6 +136,7 @@ Team Lead（オーケストレーター）      ← このスキル自身
 | Phase 4   | コードレビュー         | ✓    |           | ✓         |       |
 | Phase 4.3 | ペネトレーションテスト | ✓    |           | ✓         |       |
 | Phase 4.5 | Figma更新              | ✓    |           | ✓         |       |
+| Phase 4.8 | フィードバックの棚卸し | ✓    | ✓         | ✓         | ✓     |
 | Phase 5   | PR作成                 | ✓    | ✓         | ✓         | ✓     |
 
 ## Step 6: 完了報告
@@ -166,7 +168,9 @@ Team Lead（オーケストレーター）      ← このスキル自身
 | コードレビュー | OK / SKIP | |
 | ペネトレーションテスト | OK / SKIP | |
 | Figma更新 | OK / SKIP | |
+| フィードバックの棚卸し | OK / SKIP | 起票・再発・上限で起票しなかった件数 |
 | PR作成 | OK | |
+| 工程テレメトリ | OK / SKIP | |
 ```
 
 ## エラーハンドリング

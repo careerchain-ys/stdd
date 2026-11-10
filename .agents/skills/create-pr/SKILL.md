@@ -47,6 +47,7 @@ git diff origin/<primary_branch>...HEAD
 
 - PR descriptionの末尾に `Closes #123` を追記してissueを自動クローズする
 - 複数ある場合は `Closes #123, Closes #456` のように列挙する
+- **`Closes` を付けるのは、この PR が実際に解決・反映する issue だけ**。`recording-dev-feedback` がこの作業中に起票した issue（備考に並べる番号）には付けない（この PR では反映されないので、マージで閉じてはいけない）
 
 ## 4. PRの作成
 
@@ -84,7 +85,9 @@ git diff origin/<primary_branch>...HEAD
 
 ## 備考
 
-[レビュアーへの補足事項があれば記載。なければセクションごと削除]
+[レビュアーへの補足事項があれば記載]
+[recording-dev-feedback の triage が出力した「開発フィードバック: …」の 1 行（棚卸しをした場合）]
+[どちらもなければセクションごと削除]
 
 Closes #[issue番号]
 ```
@@ -98,7 +101,34 @@ bodyは一時ファイル経由で渡す（ヒアドキュメントは避ける�
 gh pr create --base <primary_branch> --title "タイトル" --body-file /tmp/pr-body.md
 ```
 
-## 5. 完了
+## 5. 工程テレメトリを投稿する
+
+**PR を作成した直後に、工程テレメトリを PR コメントとして投稿する。** レビューを省いた PR でも投稿する
+（投稿されない PR が偏ると、集計の結論が歪む）。`.stdd.config.yml` の `telemetry.enabled` が `false` なら省く。
+仕組みと項目の意味は `packages/core/docs/feedback-loop.md` を参照。
+
+同梱の `scripts/pr-telemetry.sh`（この skill のディレクトリからの相対パス）を使う。手で書かない。
+
+```bash
+# レビューを通した PR（工程の記録 mark review start/end があれば回数は自動で数える）
+bash <skill_dir>/scripts/pr-telemetry.sh post
+
+# 記録は無いが、レビューを N 回行った PR
+bash <skill_dir>/scripts/pr-telemetry.sh post --review-rounds <N>
+
+# レビューをしなかった PR は理由の区分を申告する
+#   typo_format_only / link_fix_only / regenerate_only / user_waived
+bash <skill_dir>/scripts/pr-telemetry.sh post --exempt <区分>
+```
+
+- `post` は投稿のあとに PR を読み直し、head の SHA と一致する記録が載っているかを確かめる（`verify`）。
+  **ここで失敗したら PR 作成は完了していない**。原因（未 push、投稿の失敗）を直してから再実行する。
+- レビューの記録も免除の申告も無いと `post` は止まる。どちらかを明示する。
+- フィードバックの棚卸し（`recording-dev-feedback`）の記録が無いと警告が出る。棚卸しをしていなければ、ここで行ってから投稿し直す。
+- PR を作ったあとにコミットを積んだり、追加のレビューをしたりしたら、もう一度 `post` する（追記のみ。前のコメントは消さない）。
+- 免除の出典（誰の指示か）はコメントに入れない。必要なら PR の本文に書く。
+
+## 6. 完了
 
 作成したPRのURLを表示する。
 

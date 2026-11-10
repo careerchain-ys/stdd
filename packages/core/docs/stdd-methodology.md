@@ -332,13 +332,27 @@ STDD は「テスト・実装の改修も必ず Spec 起点で行う」ことを
 - 仕様レビューを最優先する。実装前に Spec を凍結し、後工程の手戻りを最小化する
 - セッション開始時にスコープを確認する。大きな機能は複数の PLAN に分割する
 - 要件・テスト・実装に ID を貫通させ、抜け漏れと影響範囲を機械的に検知できる状態を保つ（→ 6）
+- 開発プロセス自体の課題を作業のたびに集め、定期的に効果を測って改善する（→ 8）
 
 ---
 
-## 8. 関連ドキュメント
+## 8. フィードバックの収集と改善のループ
+
+Spec・テスト・実装の一貫性を保つ仕組みも、使ううちに足りない指示や繰り返す手戻りが見えてくる。STDD は、
+作業単位（1 PR）ごとにプロセス上の課題を GitHub issue として起票し（`recording-dev-feedback`）、PR ごとに
+工程テレメトリ（規模・所要時間・レビューの回数・棚卸しの結果）を PR コメントとして投稿する（`create-pr`）。
+これらを定期的に集計し、前回の改善が効いたかを判定してから次の改善を決める（`measuring-dev-process`）。
+
+起票よりも反映のほうがボトルネックになるため、起票の上限と見送りの規則を一緒に置く。詳細は
+[`feedback-loop.md`](feedback-loop.md) を参照。
+
+---
+
+## 9. 関連ドキュメント
 
 - `guide-for-existing-project.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
 - `guide-for-new-project.md` — 新規プロジェクトの STDD 立ち上げ手順（最初から順行）
+- `feedback-loop.md` — フィードバックの収集と改善のループ（課題の起票・工程テレメトリ・定期の効果測定）
 - `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
 - `.claude/skills/documenting-tech-specs/templates/` — 技術 spec テンプレ（feature: `tech-design.md` / `test-plan.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
 - `.claude/skills/documenting-plans/templates/plan.md` — 実装計画テンプレ

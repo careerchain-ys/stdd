@@ -150,6 +150,21 @@ Critical / Major / Minor で分類し、ファイル:行で指摘。マージ可
 
 Critical / Major が残っている場合は「マージ前に対処が必要」と明確に伝え、Minor のみであれば「マージ可能（後続対応可）」の判断を明示する。判断はユーザーの最終決定に委ねるが、推奨は伝える。
 
+## 6. 工程の記録（工程テレメトリ）
+
+`.stdd.config.yml` の `telemetry.enabled` が `false` でなければ、このレビューも工程テレメトリに含める。
+4 の起動の直前と 5 の報告の直後に記録を付け、指摘を直して push したあとに投稿し直す（追記のみ）。
+
+```bash
+# <create-pr> は create-pr skill のディレクトリ。PR のブランチの作業ツリーで実行する
+bash <create-pr>/scripts/pr-telemetry.sh mark review start
+bash <create-pr>/scripts/pr-telemetry.sh mark review end
+bash <create-pr>/scripts/pr-telemetry.sh post
+```
+
+- 作業ツリーの外で動かす場合（他人の PR を見るだけなど）は記録しない。
+- このレビューで見つかった**プロセス上の課題**（レビューの観点の漏れ、繰り返す種類の欠陥）は、`recording-dev-feedback` で起票する候補になる。
+
 ## 注意事項
 
 - **独自の判定ロジックは書かない**: 本スキルは `qa-engineer` / `code-reviewer` エージェントへのラッパーであり、評価は各エージェントに委ねる

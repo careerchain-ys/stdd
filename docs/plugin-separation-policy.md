@@ -94,6 +94,8 @@ git worktree + devcontainer を用いたマルチ環境並列開発向けのプ�
 12. `review-pr-with-agents`
 13. `kaizen`
 14. `software-architecture`
+15. `recording-dev-feedback` — 開発フィードバックの起票（GitHub issue と `gh` を前提にするが、技術スタックには依存しない。`feedback.enabled` で無効化できる）
+16. `measuring-dev-process` — 工程テレメトリと開発フィードバックの集計・効果測定（同上）
 
 これらの skill 内に含まれる下流プロジェクト固有値（`user_app` / `admin_app` / `develop` 等のサンプル値）は、
 Phase 1 で Handlebars 変数（`{{apps[].path}}` / `{{project.primary_branch}}` 等）に置換する。

@@ -1,0 +1,67 @@
+#!/bin/bash
+# テスト用の偽の gh。$FAKE_GH（ディレクトリ）の fixture を返し、書き込み系の呼び出しを記録する。
+#
+#   calls.log   呼び出しの引数（1 行 1 呼び出し）
+#   bodies.log  --body-file で渡された本文（呼び出しごとに "=== <サブコマンド>" で区切る）
+#
+# 読み取り系は fixture の JSON を返す。--jq があれば jq -r に通す（gh の --jq と同じく生の文字列で出す）。
+#   label list                       → label-list.json
+#   issue list                       → issue-list.json
+#   issue view <n>                   → issue-view-<n>.json
+#   pr view                          → pr-view.json
+#   pr list --state <s>              → pr-list-<s>.json
+#   api .../issues/<n>/timeline      → timeline-<n>.json（無ければ []）
+# 書き込み系:
+#   issue create                     → https://github.com/o/r/issues/${FAKE_GH_NEXT:-101} を出力
+#   pr comment                       → pr-view.json の comments に OWNER のコメントとして追加
+#   それ以外（comment/close/reopen/edit/label create・edit）は記録だけ
+# FAKE_GH_FAIL にサブコマンド（例 "issue create"）を入れると、その呼び出しは exit 1。
+
+set -u
+D="${FAKE_GH:?FAKE_GH が未設定}"
+printf '%s\n' "$*" >> "$D/calls.log"
+
+sub="${1:-} ${2:-}"
+[ -n "${FAKE_GH_FAIL:-}" ] && [ "$sub" = "$FAKE_GH_FAIL" ] && exit 1
+
+JQ=""; BODY_FILE=""; STATE=""; prev=""
+for a in "$@"; do
+    case "$prev" in
+        --jq) JQ="$a" ;;
+        --body-file) BODY_FILE="$a" ;;
+        --state) STATE="$a" ;;
+    esac
+    prev="$a"
+done
+
+body() {
+    [ -n "$BODY_FILE" ] || return 0
+    { echo "=== $sub"; if [ "$BODY_FILE" = "-" ]; then cat; else cat "$BODY_FILE"; fi; } >> "$D/bodies.log"
+}
+
+out() {
+    local f="$1"
+    [ -f "$f" ] || { echo "fake-gh: fixture がありません: $f" >&2; exit 1; }
+    if [ -n "$JQ" ]; then jq -r "$JQ" "$f"; else cat "$f"; fi
+}
+
+case "$sub" in
+    "auth status") exit 0 ;;
+    "label list") out "$D/label-list.json" ;;
+    "issue list") out "$D/issue-list.json" ;;
+    "issue view") out "$D/issue-view-$3.json" ;;
+    "pr view") out "$D/pr-view.json" ;;
+    "pr list") out "$D/pr-list-${STATE:-open}.json" ;;
+    "issue create") body; echo "https://github.com/o/r/issues/${FAKE_GH_NEXT:-101}" ;;
+    "pr comment")
+        body
+        jq --arg b "$(cat "$BODY_FILE")" '.comments += [{"authorAssociation":"OWNER","body":$b}]' "$D/pr-view.json" > "$D/pr-view.json.tmp" \
+            && mv "$D/pr-view.json.tmp" "$D/pr-view.json" ;;
+    "issue comment"|"issue close"|"issue reopen"|"issue edit"|"label create"|"label edit") body ;;
+    api*)
+        n=$(printf '%s' "$2" | sed -n 's|.*/issues/\([0-9]*\)/timeline.*|\1|p')
+        f="$D/timeline-$n.json"
+        [ -f "$f" ] || echo '[]' > "$f"
+        out "$f" ;;
+    *) echo "fake-gh: 想定外の呼び出し: $*" >&2; exit 1 ;;
+esac
