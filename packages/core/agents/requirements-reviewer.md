@@ -129,3 +129,10 @@ model: opus
 - `.claude/docs/coding-conventions.md`（存在する場合のみ）
 - 対象 issue / 前方設計インプットの内容
 - common 階層の REQUIREMENTS.md（feature レビュー時、整合確認のため）
+
+## 編集の範囲
+
+- ファイルは書き換えない。修正が必要な点はレビュー結果として返す。
+- シェルを使うときは読み取りの用途にだけ使い、1 回に 1 コマンドだけ実行する（連結・パイプ・リダイレクトは使わない）。
+
+この 2 点はフック（`agent-scope-guard.sh`）が確かめる。

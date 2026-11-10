@@ -148,3 +148,10 @@ model: opus
 - 対象機能の **確定版 REQUIREMENTS.md**（要件カバレッジの基準）
 - `AGENTS.md / CLAUDE.md` / `.claude/docs/coding-conventions.md`（存在する場合のみ）
 - common 階層の TABLE_DEFINITION.md / API_SPEC.md / ARCHITECTURE.md（整合確認のため）
+
+## 編集の範囲
+
+- ファイルは書き換えない。修正が必要な点はレビュー結果として返す。
+- シェルを使うときは読み取りの用途にだけ使い、1 回に 1 コマンドだけ実行する（連結・パイプ・リダイレクトは使わない）。
+
+この 2 点はフック（`agent-scope-guard.sh`）が確かめる。

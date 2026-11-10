@@ -1,5 +1,5 @@
 {
-  "description": "STDD hooks（spec-first の促し・緊急モードの申し出の記録。packages/core から生成・直接編集しない）",
+  "description": "STDD hooks（spec-first の促し・緊急モードの申し出の記録・subagent の範囲と作業先の確認・全件テストの抑止。packages/core から生成・直接編集しない）",
   "hooks": {
     "PreToolUse": [
       {
@@ -9,6 +9,36 @@
             "type": "command",
             "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/spec-first-check.sh\"",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/agent-scope-guard.sh\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/worktree-lock-guard.sh\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/agent-scope-guard.sh\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/worktree-lock-guard.sh\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/test-scope-guard.sh\"",
+            "timeout": 10
           }
         ]
       }
