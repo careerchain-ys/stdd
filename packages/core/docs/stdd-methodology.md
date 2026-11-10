@@ -252,7 +252,7 @@ Spec が「常に最新の仕様」を保持するのに対し、PLAN は「1 �
 - Priority 順 (P0 → P1 → P2) でセッションを切ると、最重要部分が早期に動く
 - 各 PLAN セッション中に Spec の修正が必要になったら、即座に Spec 側を更新する (PLAN だけ独走させない)
 
-配置パスは `.stdd.config.yml` の `docs.layout.plan` で設定する。デフォルト例は `docs/<app>/<feature_path>/plans/<yyyy-mm-dd>.md`。
+配置パスは `.stdd.config.yml` の `docs.layout.plan` で設定する。デフォルト例は `docs/<app>/<feature_path>/plans/<yyyy-mm-dd>.md`。PLAN を作らない体系では `docs.layout.plan` を書かない（任意項目）。そのときは PLAN の作成を飛ばし、TEST_PLAN.md のテスト戦略から直接実装に入る。
 
 ---
 

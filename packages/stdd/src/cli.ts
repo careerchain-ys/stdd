@@ -21,6 +21,8 @@ interface InitFlags {
   yes: boolean;
   name: string | undefined;
   agents: AgentTarget[];
+  exclude: string[];
+  include: string[];
 }
 
 function readVersion(): string {
@@ -43,6 +45,8 @@ function printHelp(): void {
     --agent <claude|codex|both>  導入するエージェントビュー（既定: both）
     --name <name>   .stdd.config.yml の project.name（既定: ディレクトリ名）
     --force         tailoring 済み（編集された）STDD ファイルも最新へ上書きする
+    --exclude <kind>:<name>  skill / agent / hook を導入しない（記録して、再実行でも復活させない）
+    --include <kind>:<name>  除外の記録から外して導入し直す（kind は skill / agent / hook）
     --yes, -y       対話プロンプトをスキップし既定値で進める
     --help, -h      このヘルプを表示
     --version, -v   バージョンを表示
@@ -70,7 +74,14 @@ function parseAgents(value: string | undefined): AgentTarget[] {
 }
 
 function parseInitFlags(args: string[]): InitFlags {
-  const flags: InitFlags = { force: false, yes: false, name: undefined, agents: ["claude", "codex"] };
+  const flags: InitFlags = {
+    force: false,
+    yes: false,
+    name: undefined,
+    agents: ["claude", "codex"],
+    exclude: [],
+    include: [],
+  };
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === "--force") flags.force = true;
@@ -79,6 +90,10 @@ function parseInitFlags(args: string[]): InitFlags {
     else if (arg.startsWith("--name=")) flags.name = arg.slice("--name=".length);
     else if (arg === "--agent") flags.agents = parseAgents(args[++i]);
     else if (arg.startsWith("--agent=")) flags.agents = parseAgents(arg.slice("--agent=".length));
+    else if (arg === "--exclude") flags.exclude.push(args[++i] ?? "");
+    else if (arg.startsWith("--exclude=")) flags.exclude.push(arg.slice("--exclude=".length));
+    else if (arg === "--include") flags.include.push(args[++i] ?? "");
+    else if (arg.startsWith("--include=")) flags.include.push(arg.slice("--include=".length));
     else console.warn(`  注意: 未対応のオプションを無視します: ${arg}`);
   }
   return flags;
@@ -151,6 +166,8 @@ async function runInit(args: string[]): Promise<void> {
       overwriteClaude,
       version: VERSION,
       agents: flags.agents,
+      exclude: flags.exclude,
+      include: flags.include,
     });
   } catch (err) {
     if (err instanceof InstallError) {
@@ -177,6 +194,17 @@ async function runInit(args: string[]): Promise<void> {
 
   if (result.claude) printSkips(result.claude, ".claude/");
   if (result.codex) printSkips(result.codex, "");
+
+  if (result.exclusions.detected.length > 0) {
+    console.log("");
+    console.log(`  ℹ 削除された配布物を検出したので、復活させずに ${result.exclusions.file} へ記録しました:`);
+    result.exclusions.detected.forEach((k) => console.log(`      - ${k}`));
+    console.log("    戻すときは: stdd init --include <kind>:<name>");
+  }
+  if (result.exclusions.recorded.length > 0) {
+    console.log("");
+    console.log(`  除外の記録（${result.exclusions.file}）: ${result.exclusions.recorded.join(", ")}`);
+  }
 
   console.log("");
   console.log("  次の手順:");

@@ -375,3 +375,222 @@ test("mergeSettings 単体: union と user-wins", () => {
   assert.deepEqual(out.enabledMcpjsonServers, ["a", "b"]);
   assert.equal(out.hooks.PreToolUse.length, 1);
 });
+
+// ---- 除外の記録（削除した配布物を再導入で復活させない） -------------------------
+
+const EXCLUSIONS_REL = path.join(".stdd", "exclusions.json");
+
+/** skill を 2 本・フックの登録を 2 つ持つ assetsRoot（削除の検出はビューに 2 つ以上あるときに働く）。 */
+async function makeRichAssets() {
+  const root = await makeAssets();
+  for (const base of [path.join(root, ".claude", "skills"), path.join(root, ".agents", "skills")]) {
+    await fs.mkdir(path.join(base, "kaizen"), { recursive: true });
+    await fs.writeFile(path.join(base, "kaizen", "SKILL.md"), "---\nname: kaizen\n---\nbody\n");
+  }
+  await fs.writeFile(path.join(root, ".claude", "hooks", "pre-push-check.sh"), "#!/bin/sh\n");
+  const settingsPath = path.join(root, ".claude", "settings.json");
+  const settings = JSON.parse(await read(settingsPath));
+  settings.hooks.PreToolUse.unshift({
+    matcher: "Bash",
+    hooks: [{ type: "command", command: ".claude/hooks/pre-push-check.sh", timeout: 600 }],
+  });
+  await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2));
+  await fs.writeFile(
+    path.join(root, ".codex", "hooks.json"),
+    JSON.stringify({
+      hooks: {
+        PreToolUse: [
+          { matcher: "Edit", hooks: [{ type: "command", command: 'bash ".codex/hooks/spec-first-check.sh"' }] },
+        ],
+        UserPromptSubmit: [{ hooks: [{ type: "command", command: 'bash ".codex/hooks/work-mode-prompt.sh"' }] }],
+      },
+    }),
+  );
+  return root;
+}
+
+const both = { agents: ["claude", "codex"] };
+
+function hookCommands(settings) {
+  return Object.values(settings.hooks ?? {})
+    .flat()
+    .flatMap((g) => g.hooks.map((h) => h.command));
+}
+
+test("削除した skill は再導入で復活せず、記録され、もう一方のビューからも外れる", async () => {
+  const assets = await makeRichAssets();
+  const target = await makeTarget();
+  await install(baseOpts(target, assets, both));
+
+  await fs.rm(path.join(target, ".claude", "skills", "kaizen"), { recursive: true });
+  const result = await install(baseOpts(target, assets, both));
+
+  assert.ok(!(await exists(path.join(target, ".claude", "skills", "kaizen"))));
+  assert.ok(!(await exists(path.join(target, ".agents", "skills", "kaizen", "SKILL.md"))));
+  assert.deepEqual(result.exclusions.detected, ["skill:kaizen"]);
+  const recorded = JSON.parse(await read(path.join(target, EXCLUSIONS_REL)));
+  assert.deepEqual(recorded.skills, ["kaizen"]);
+  // 残した skill は通常どおり
+  assert.ok(await exists(path.join(target, ".claude", "skills", "auto-implement", "SKILL.md")));
+
+  // 3 回目も復活しない（記録が効く）。検出は 1 回だけ。
+  const third = await install(baseOpts(target, assets, both));
+  assert.ok(!(await exists(path.join(target, ".claude", "skills", "kaizen"))));
+  assert.deepEqual(third.exclusions.detected, []);
+  assert.deepEqual(third.exclusions.recorded, ["skill:kaizen"]);
+});
+
+test("--force でも除外の記録は上書きしない", async () => {
+  const assets = await makeRichAssets();
+  const target = await makeTarget();
+  await install(baseOpts(target, assets));
+  await fs.rm(path.join(target, ".claude", "skills", "kaizen"), { recursive: true });
+  await install(baseOpts(target, assets, { overwriteClaude: true }));
+  assert.ok(!(await exists(path.join(target, ".claude", "skills", "kaizen"))));
+});
+
+test("削除した agent は再導入で復活しない", async () => {
+  const assets = await makeRichAssets();
+  const target = await makeTarget();
+  await install(baseOpts(target, assets));
+  await fs.rm(path.join(target, ".claude", "agents", "implementer.md"));
+  const result = await install(baseOpts(target, assets));
+  assert.ok(!(await exists(path.join(target, ".claude", "agents", "implementer.md"))));
+  assert.deepEqual(result.exclusions.detected, ["agent:implementer"]);
+});
+
+test("ビューごと消したときは導入し直しとみなし、除外を記録しない", async () => {
+  const assets = await makeRichAssets();
+  const target = await makeTarget();
+  await install(baseOpts(target, assets, { agents: ["codex"] }));
+  await fs.rm(path.join(target, ".agents"), { recursive: true });
+  await fs.rm(path.join(target, ".codex", "agents"), { recursive: true });
+  const result = await install(baseOpts(target, assets, { agents: ["codex"] }));
+  assert.deepEqual(result.exclusions.detected, []);
+  assert.ok(await exists(path.join(target, ".agents", "skills", "kaizen", "SKILL.md")));
+  assert.ok(!(await exists(path.join(target, EXCLUSIONS_REL))));
+});
+
+test("skill の一部のファイルだけが消えたときは作り直す（削除とみなさない）", async () => {
+  const assets = await makeRichAssets();
+  await fs.writeFile(path.join(assets, ".claude", "skills", "kaizen", "notes.md"), "notes\n");
+  const target = await makeTarget();
+  await install(baseOpts(target, assets));
+  await fs.rm(path.join(target, ".claude", "skills", "kaizen", "notes.md"));
+  const result = await install(baseOpts(target, assets));
+  assert.ok(await exists(path.join(target, ".claude", "skills", "kaizen", "notes.md")));
+  assert.deepEqual(result.exclusions.detected, []);
+});
+
+test("--exclude は未編集の実体を消し、編集済みは残して報告する。--include で戻る", async () => {
+  const assets = await makeRichAssets();
+  const target = await makeTarget();
+  await install(baseOpts(target, assets, both));
+  const tailored = path.join(target, ".agents", "skills", "kaizen", "SKILL.md");
+  await fs.writeFile(tailored, "TAILORED\n");
+
+  const r1 = await install(baseOpts(target, assets, { ...both, exclude: ["skill:kaizen"] }));
+  assert.ok(!(await exists(path.join(target, ".claude", "skills", "kaizen"))));
+  assert.ok(r1.claude.removed.includes("skills/kaizen/SKILL.md"));
+  assert.equal(await read(tailored), "TAILORED\n");
+  assert.ok(r1.codex.skippedModified.includes(".agents/skills/kaizen/SKILL.md"));
+  assert.deepEqual(r1.exclusions.recorded, ["skill:kaizen"]);
+  assert.deepEqual(r1.exclusions.detected, []);
+
+  const r2 = await install(baseOpts(target, assets, { ...both, include: ["skill:kaizen"] }));
+  assert.ok(await exists(path.join(target, ".claude", "skills", "kaizen", "SKILL.md")));
+  assert.deepEqual(r2.exclusions.recorded, []);
+  assert.deepEqual(r2.exclusions.detected, []);
+  const recorded = JSON.parse(await read(path.join(target, EXCLUSIONS_REL)));
+  assert.deepEqual(recorded.skills, []);
+});
+
+test("初回の導入から --exclude で入れないものを選べる", async () => {
+  const assets = await makeRichAssets();
+  const target = await makeTarget();
+  const result = await install(
+    baseOpts(target, assets, { ...both, exclude: ["skill:kaizen", "hook:pre-push-check"] }),
+  );
+  assert.ok(!(await exists(path.join(target, ".claude", "skills", "kaizen"))));
+  assert.ok(!(await exists(path.join(target, ".agents", "skills", "kaizen"))));
+  const settings = JSON.parse(await read(path.join(target, ".claude", "settings.json")));
+  assert.ok(!hookCommands(settings).some((c) => c.includes("pre-push-check")));
+  assert.ok(hookCommands(settings).some((c) => c.includes("spec-first-check")));
+  // フックのスクリプトの実体は残す（ほかの手順から呼ばれるため）
+  assert.ok(await exists(path.join(target, ".claude", "hooks", "pre-push-check.sh")));
+  assert.deepEqual(result.exclusions.recorded, ["hook:pre-push-check", "skill:kaizen"]);
+});
+
+test("settings.json から外したフックの登録は再導入で戻らず、記録される", async () => {
+  const assets = await makeRichAssets();
+  const target = await makeTarget();
+  await install(baseOpts(target, assets));
+  const settingsPath = path.join(target, ".claude", "settings.json");
+  const settings = JSON.parse(await read(settingsPath));
+  settings.hooks.PreToolUse = settings.hooks.PreToolUse.filter(
+    (g) => !g.hooks.some((h) => h.command.includes("pre-push-check")),
+  );
+  await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2));
+
+  const result = await install(baseOpts(target, assets));
+  const after = JSON.parse(await read(settingsPath));
+  assert.ok(!hookCommands(after).some((c) => c.includes("pre-push-check")));
+  assert.deepEqual(result.exclusions.detected, ["hook:pre-push-check"]);
+
+  // --include で登録が戻る
+  await install(baseOpts(target, assets, { include: ["hook:pre-push-check"] }));
+  const restored = JSON.parse(await read(settingsPath));
+  assert.ok(hookCommands(restored).some((c) => c.includes("pre-push-check")));
+});
+
+test("利用者が書き換えたフックの登録は残し、STDD の登録を重ねて足さない", async () => {
+  const assets = await makeRichAssets();
+  const target = await makeTarget();
+  await install(baseOpts(target, assets));
+  const settingsPath = path.join(target, ".claude", "settings.json");
+  const settings = JSON.parse(await read(settingsPath));
+  for (const g of settings.hooks.PreToolUse) for (const h of g.hooks) h.timeout = 5;
+  await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2));
+
+  const result = await install(baseOpts(target, assets));
+  const after = JSON.parse(await read(settingsPath));
+  assert.equal(after.hooks.PreToolUse.length, 2);
+  assert.ok(after.hooks.PreToolUse.every((g) => g.hooks.every((h) => h.timeout === 5)));
+  assert.deepEqual(result.exclusions.detected, []);
+});
+
+test("配布から外れたフックの登録は settings.json から外す", async () => {
+  const assets = await makeRichAssets();
+  const target = await makeTarget();
+  await install(baseOpts(target, assets));
+  const srcSettings = path.join(assets, ".claude", "settings.json");
+  const s = JSON.parse(await read(srcSettings));
+  s.hooks.PreToolUse = s.hooks.PreToolUse.filter((g) => !g.hooks.some((h) => h.command.includes("pre-push")));
+  await fs.writeFile(srcSettings, JSON.stringify(s, null, 2));
+
+  const result = await install(baseOpts(target, assets));
+  const after = JSON.parse(await read(path.join(target, ".claude", "settings.json")));
+  assert.ok(!hookCommands(after).some((c) => c.includes("pre-push-check")));
+  assert.deepEqual(result.exclusions.detected, []);
+});
+
+test("除外したフックは Codex の hooks.json の登録からも外す", async () => {
+  const assets = await makeRichAssets();
+  const target = await makeTarget();
+  await install(baseOpts(target, assets, { agents: ["codex"], exclude: ["hook:work-mode-prompt"] }));
+  const hooks = JSON.parse(await read(path.join(target, ".codex", "hooks.json")));
+  assert.equal(hooks.hooks.UserPromptSubmit, undefined);
+  assert.equal(hooks.hooks.PreToolUse.length, 1);
+  // 再導入しても編集扱いにならない（変換後の内容で記録している）
+  const again = await install(baseOpts(target, assets, { agents: ["codex"] }));
+  assert.equal(again.codex.skippedModified.length, 0);
+  const still = JSON.parse(await read(path.join(target, ".codex", "hooks.json")));
+  assert.equal(still.hooks.UserPromptSubmit, undefined);
+});
+
+test("除外の指定の書式が誤っていればエラーにする", async () => {
+  const assets = await makeRichAssets();
+  const target = await makeTarget();
+  await assert.rejects(install(baseOpts(target, assets, { exclude: ["kaizen"] })), /skill:<名前>/);
+  await assert.rejects(install(baseOpts(target, assets, { exclude: ["plugin:x"] })), /skill:<名前>/);
+});
