@@ -15,6 +15,11 @@
 #   link_fix_only      リンクの修正だけの変更
 #   regenerate_only    生成物の再生成だけの変更
 #   user_waived        ユーザーがレビュー不要と指示した
+#   emergency          緊急モードで作った PR（レビューをした場合も使う。回数はそのまま記録する）
+#
+# 緊急モードとの照合: 同じ skill 群の choosing-work-mode/scripts/work-mode.sh で、現在のブランチが
+# 緊急モードかを確かめる。緊急モードの枝では --exempt emergency を必須にし、そうでない枝では使わせない。
+# --exempt emergency のときは、PR 本文に「緊急モード」の見出しがあることも確かめる。
 #
 # 項目はレビュー工程の進め方に依存しない最小限にしてある: 規模・所要時間・レビューの回数と免除・
 # フィードバックの棚卸しの件数。値が測れなかった項目は null（0 とは区別する）。
@@ -36,7 +41,7 @@ while [ $# -gt 0 ]; do
     case "$1" in
         --root) ROOT="${2:-}"; shift 2 ;;
         --repo) REPO="${2:-}"; shift 2 ;;
-        --help|-h) sed -n '2,29p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --help|-h) sed -n '2,35p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *)
             if [ -z "$CMD" ]; then CMD="$1"; else ARGS+=("$1"); fi
             shift ;;
@@ -75,7 +80,9 @@ if [ "$ENABLED" = "false" ]; then
 fi
 
 STEPS="spec plan test implement qa review"
-EXEMPT_KINDS="typo_format_only link_fix_only regenerate_only user_waived"
+EXEMPT_KINDS="typo_format_only link_fix_only regenerate_only user_waived emergency"
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+WORK_MODE="$SCRIPT_DIR/../../choosing-work-mode/scripts/work-mode.sh"
 MARKER="<!-- stdd-telemetry -->"
 SCHEMA="stdd-telemetry/1"
 
@@ -156,7 +163,16 @@ EOF
     fi
     [ -n "$rounds_override" ] && rounds="$rounds_override"
 
-    if [ -n "$exempt" ]; then
+    local emergency=no
+    if [ -f "$WORK_MODE" ] && bash "$WORK_MODE" --root "$ROOT" active >/dev/null 2>&1; then emergency=yes; fi
+    if [ "$emergency" = yes ] && [ "$exempt" != "emergency" ]; then
+        die "このブランチは緊急モードです。--exempt emergency を付けて投稿してください（レビューをした回数はそのまま記録されます）"
+    fi
+    if [ "$exempt" = "emergency" ]; then
+        [ "$emergency" = yes ] || die "--exempt emergency は緊急モードを宣言したブランチでだけ使います（choosing-work-mode）"
+        gh pr view --json body --jq '.body // ""' 2>/dev/null | grep -qE '^#{1,6}[[:space:]]*緊急モード[[:space:]]*$' \
+            || die "PR 本文に「## 緊急モード」の節がありません。宣言の理由・省いた工程・赤のまま残した検査・後追いが要るものを書いてから投稿してください"
+    elif [ -n "$exempt" ]; then
         case " $EXEMPT_KINDS " in *" $exempt "*) ;; *) die "--exempt は $EXEMPT_KINDS のどれかです: '$exempt'" ;; esac
         [ "$rounds" -eq 0 ] || die "--exempt はレビューをしなかった PR にだけ使います（記録上のレビュー: ${rounds} 回）"
     elif [ "$rounds" -eq 0 ]; then
@@ -191,7 +207,7 @@ comment_body() {
     echo '```'
 }
 
-# head の SHA と一致する payload の数と、そのうち feedback を持つ数
+# head の SHA と一致する payload の数と、そのうち feedback を持つ数（緊急モードの PR は棚卸しをしないので数に含める）
 #   出力: matched<TAB>with_feedback
 count_payloads() {
     gh pr view --json headRefOid,comments --jq '
@@ -203,7 +219,7 @@ count_payloads() {
             | (capture("```json\\s*(?<j>\\{[\\s\\S]*\\})\\s*```").j | fromjson?)
             | select((.schema // "") | startswith("stdd-telemetry/"))
             | select(.head_sha == $h) ]
-        | [ length, (map(select(.feedback != null)) | length) ] | map(tostring) | @tsv'
+        | [ length, (map(select(.feedback != null or .review.exempt == "emergency")) | length) ] | map(tostring) | @tsv'
 }
 
 cmd_verify() {

@@ -96,6 +96,32 @@ OUT=$(posted)
 run post --exempt typo_format_only --review-rounds 1
 assert_rc "レビューをした PR に免除は使えない" 1
 
+echo "== post: 緊急モード"
+new_case emergency
+pr_fixture
+declare_emergency() {
+    mkdir -p "$REPO_DIR/.git/stdd-work-mode"
+    printf 'mode=emergency\nbranch=claude/test\nreason=障害対応\ndeclared_at=1\n' > "$REPO_DIR/.git/stdd-work-mode/claude__test"
+}
+run post --exempt emergency
+assert_rc "宣言していないブランチでは --exempt emergency を使えない" 1
+assert_contains "宣言が無いと伝える" "緊急モードを宣言したブランチでだけ"
+declare_emergency
+run post --exempt user_waived
+assert_rc "緊急モードのブランチでは --exempt emergency が必須" 1
+run post --review-rounds 1
+assert_rc "レビューをしても --exempt emergency が必須" 1
+run post --exempt emergency
+assert_rc "PR 本文に「緊急モード」の節が無ければ投稿しない" 1
+assert_contains "節が無いと伝える" "「## 緊急モード」の節がありません"
+jq '.body = "## 緊急モード\n\n- 理由: 障害対応\n\n## 概要\n"' "$FAKE_GH/pr-view.json" > "$FAKE_GH/pr-view.json.tmp" && mv "$FAKE_GH/pr-view.json.tmp" "$FAKE_GH/pr-view.json"
+run post --exempt emergency --review-rounds 1
+assert_rc "節があれば、レビューをした回数とともに投稿できる" 0
+OUT=$(posted)
+[ "$(printf '%s' "$OUT" | jq -c .review)" = '{"rounds":1,"exempt":"emergency"}' ] && ok "回数と緊急モードの区分を両方持つ" || ng "回数と緊急モードの区分"
+run verify
+assert_not_contains "緊急モードでは棚卸しの記録が無くても警告しない" "フィードバックの棚卸しの記録がありません"
+
 echo "== post: --review-rounds"
 new_case rounds
 pr_fixture

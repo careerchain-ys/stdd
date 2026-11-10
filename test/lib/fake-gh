@@ -8,7 +8,7 @@
 #   label list                       → label-list.json
 #   issue list                       → issue-list.json
 #   issue view <n>                   → issue-view-<n>.json
-#   pr view                          → pr-view.json
+#   pr view                          → pr-view.json（pr view <n> は pr-view-<n>.json があればそれ）
 #   pr list --state <s>              → pr-list-<s>.json
 #   api .../issues/<n>/timeline      → timeline-<n>.json（無ければ []）
 # 書き込み系:
@@ -50,7 +50,11 @@ case "$sub" in
     "label list") out "$D/label-list.json" ;;
     "issue list") out "$D/issue-list.json" ;;
     "issue view") out "$D/issue-view-$3.json" ;;
-    "pr view") out "$D/pr-view.json" ;;
+    "pr view")
+        case "${3:-}" in
+            [0-9]*) [ -f "$D/pr-view-$3.json" ] && { out "$D/pr-view-$3.json"; exit 0; } ;;
+        esac
+        out "$D/pr-view.json" ;;
     "pr list") out "$D/pr-list-${STATE:-open}.json" ;;
     "issue create") body; echo "https://github.com/o/r/issues/${FAKE_GH_NEXT:-101}" ;;
     "pr comment")

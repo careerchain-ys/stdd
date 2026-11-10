@@ -98,6 +98,7 @@ stdd/
 ## 現状の制約
 
 - **対象は「ブラウザで操作する Web アプリ」に限定**しています。方法論・テンプレート自体は技術スタック非依存で、任意の Web フレームワーク（Next.js / Rails / Django / Laravel など）で立ち上げられますが、QA フローのブラウザ動作確認（Playwright MCP）やワイヤーフレーム / UI キャプチャが**ブラウザ UI を前提**とするため、ネイティブモバイルアプリ（React Native 等）や UI を持たない CLI / バックエンド専用サービスは現状の主対象外です。
+- **方法論としての適用限界**があります。STDD は既定で品質を優先するため、要件が頻繁に変わる段階や速度が求められる段階では負担が大きくなります。速さが必要な場面のための緊急モード（ユーザーが明示したときだけ入る）と、STDD をそのまま当てるべきでない局面の判断の目安、未解決の問いは [`作業モードと適用限界`](packages/core/docs/work-modes-and-limits.md) にまとめています。
 - 公式に対応している AI エージェントは **Claude Code** と **OpenAI Codex** です。単一の SSoT（`packages/core`）から各エージェントのネイティブ形式（Claude=`.claude/`、Codex=`.agents/skills`・`.codex/`・`AGENTS.md`）を生成します。`npx @careerchain/stdd init --agent claude|codex|both`（既定 both）で選択できます。他エージェントも agents.md 標準の `AGENTS.md` を提供しているため随時対応を検討中です。
 
 ---
