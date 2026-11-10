@@ -56,6 +56,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 | トレーサビリティ監査スクリプトの検証 | `bash test/trace-audit.test.sh`（`packages/core/hooks/trace-audit.sh` の順方向 gap 検知・逆方向影響範囲の振る舞いテスト）        |
 | フィードバックの仕組みのスクリプトの検証 | `bash test/dev-feedback.test.sh` / `bash test/pr-telemetry.test.sh` / `bash test/collect.test.sh`（偽の `gh` と `jq` で、起票・再発・見送り・テレメトリの投稿と集計の振る舞いを確かめる） |
 | 緊急モードのスクリプトとフックの検証 | `bash test/work-mode.test.sh`（申し出の記録・宣言・解除と、pre-push の緩和を確かめる） |
+| skill / agent の文字数の検査 | `npm run check:harness-size`（1 本あたりの上限と総量の基準値。規約は `docs/config-driven-authoring.md` §7。スクリプトのテストは `node --test test/harness-size.test.mjs`） |
 | 生成物のドリフト検査          | `npm run check:adapters`（`.claude/` `.agents/` `.codex/` が `packages/core/` と一致するか検査）                          |
 
 > **Core + Adapter**: skill / agent / hook / spec-first ルールの SSoT は `packages/core/{skills,agents,hooks,rules}` です。`scripts/build-adapters.mjs`（`npm run build:adapters`）がこれを各エージェントのネイティブ形式へ生成します — Claude ビュー `.claude/`、Codex ビュー `.agents/skills`・`.codex/`（agents は TOML、hooks は `.codex/hooks.json` + 共有スクリプト）。生成物は committed です。**編集は必ず `packages/core/` 側で行い**、`.claude/` 等の生成物を直接編集しないでください（`npm run check:adapters` がドリフトを検出します）。下流への導入は `stdd init --agent claude|codex|both` が担います。
