@@ -1,7 +1,7 @@
 ---
 name: starting-new-with-stdd
 description: |-
-  新規（コードがまだ無い）プロジェクトを STDD で立ち上げる作業を、エージェントのセッションで段階的に駆動する。立ち上げガイドに従い、アプリ骨組み生成→common 階層の前方設計→最初の feature→フォーマット策定→feature ループ→通常運用への移行までを、既存スキル（documenting-requirements / documenting-tech-specs / generating-wireframes / tailoring-spec-format / documenting-plans / auto-implement / verifying-consistency）を順に呼びながら進める。進捗は立ち上げPLANで保持し、セッションを跨いで再開できる。既に稼働しているコードへの導入は introducing-stdd を使う。
+  新規（コードがまだ無い）プロジェクトを STDD で立ち上げる作業を、エージェントのセッションで段階的に駆動する。立ち上げガイドに従い、アプリ骨組み生成→common 階層の前方設計→最初の feature→フォーマット策定→feature ループ→通常運用への移行までを、要件・技術設計・ワイヤーフレーム・フォーマット策定・PLAN・実装・整合性確認の各スキルを順に呼びながら進める。進捗は立ち上げPLANで保持し、セッションを跨いで再開できる。既に稼働しているコードへの導入は introducing-stdd を使う。
 when_to_use: |-
   新規（コードがまだ無い）プロジェクトの立ち上げを進める／再開するとき。「新規プロジェクトをstddで立ち上げる」「立ち上げの続き」「greenfield stdd」など、新規フローと確定している場合。新規/既存が未確定の最初の入口は setup-stdd（ルーター）が判定して本スキルへ委譲する。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash

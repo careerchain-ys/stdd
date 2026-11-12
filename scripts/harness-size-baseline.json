@@ -7,20 +7,13 @@
     "agent-description": 200,
     "rule": 3000
   },
-  "over_limit": {
-    "skill:documenting-requirements": 10000,
-    "skill:documenting-tech-specs": 9000,
-    "skill:reverse-engineering-feature-spec": 13000,
-    "skill-metadata:starting-new-with-stdd": 550,
-    "agent:code-reviewer": 6500,
-    "agent:test-reviewer": 8000
-  },
+  "over_limit": {},
   "totals": {
-    "skill": 109169,
-    "skill-metadata": 6317,
-    "agent": 46723,
+    "skill": 100846,
+    "skill-metadata": 6196,
+    "agent": 43646,
     "agent-description": 947,
     "rule": 1905,
-    "all": 235525
+    "all": 227821
   }
 }
