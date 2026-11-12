@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
-    "stdd": "./dist/cli.js"
+    "stdd": "dist/cli.js"
   },
   "publishConfig": {
     "access": "public"
@@ -38,7 +38,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/careerchain-ys/stdd.git",
+    "url": "git+https://github.com/careerchain-ys/stdd.git",
     "directory": "packages/stdd"
   },
   "homepage": "https://github.com/careerchain-ys/stdd"
