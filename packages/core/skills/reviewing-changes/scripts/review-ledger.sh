@@ -167,8 +167,9 @@ ledger_file() {
     printf '%s/stdd-review/%s.tsv' "$common" "$(printf '%s' "$branch" | sed 's|/|__|g')"
 }
 LEDGER=$(ledger_file) || LEDGER=""
+LEDGER_HINT="台帳の置き場を決められません（git の作業ツリーの外か detached HEAD）。PR のブランチに切り替えてから実行してください"
 record() {
-    [ -n "$LEDGER" ] || die "台帳の置き場を決められません（git の作業ツリーの外か detached HEAD）"
+    [ -n "$LEDGER" ] || die "$LEDGER_HINT"
     mkdir -p "$(dirname "$LEDGER")" || die "台帳の置き場を作れません: $(dirname "$LEDGER")"
     local IFS="$TAB"
     printf '%s\n' "$*" | tr -d '\r' >> "$LEDGER"
@@ -285,7 +286,14 @@ print_plan() {
     done
 }
 
+require_base() {
+    local b; b=$(base_ref)
+    [ -n "$b" ] || die "差分の基準を決められません（origin/$PRIMARY も $PRIMARY もありません）。.stdd.config.yml の project.primary_branch か --base <ref> を指定してください"
+    git -C "$ROOT" merge-base "$b" HEAD >/dev/null 2>&1 || die "差分の基準 $b と HEAD の共通の祖先がありません（浅い clone なら git fetch --unshallow）。--base <ref> でも指定できます"
+}
+
 cmd_plan() {
+    require_base
     echo "差分の基準: $(base_ref)"
     print_plan "$(plan_roles)"
 }
@@ -307,6 +315,7 @@ cmd_round() {
                 esac
             done
             case "$indep" in yes|no) ;; *) die "--independent は yes か no です" ;; esac
+            require_base
             local h n p
             h=$(head_sha) || die "HEAD を解決できません"
             [ -z "$(git -C "$ROOT" status --porcelain 2>/dev/null)" ] || warn "コミットしていない変更があります。レビューはコミットに対して行うので、先にコミットしてください"
@@ -339,7 +348,7 @@ cmd_round() {
     esac
 }
 
-# 引数の解析: --key value を KEY_<key> に入れる
+# 引数の解析: --key value を OPT_<key> に入れる
 parse_opts() {
     OPT_id=""; OPT_role=""; OPT_trigger=""; OPT_frequency=""; OPT_impact=""; OPT_target=""; OPT_evidence=""
     OPT_reason=""; OPT_commit=""; OPT_issue=""; OPT_ids=""; OPT_file=""; OPT_json=no
@@ -413,6 +422,14 @@ EOF
     echo "$OPT_id: 種別 $kind / 範囲 $scope / 起こりやすさ $lk / 影響 $impact → 処置: $act$(action_note "$act")"
 }
 
+# 修正のコミットとして妥当か: $1 = コミット, $2 = 指摘のラウンドでレビューした時点。妥当なら 0
+valid_fix_commit() {
+    git -C "$ROOT" merge-base --is-ancestor "$1" HEAD 2>/dev/null || return 1
+    git -C "$ROOT" merge-base --is-ancestor "$1" "$2" 2>/dev/null && return 1
+    return 0
+}
+round_sha() { lines round | awk -F'\t' -v n="$1" '$2 == n { print $3 }'; }
+
 cmd_state() {
     local kind="$1"; shift
     parse_opts "$@"
@@ -420,11 +437,14 @@ cmd_state() {
     [ -n "$act" ] || die "ID $OPT_id は台帳にありません"
     case "$kind" in
         fixed)
-            local sha; sha=$(git -C "$ROOT" rev-parse -q --verify "${OPT_commit}^{commit}" 2>/dev/null) || die "--commit にコミットを渡してください: ${OPT_commit}"
+            local sha rv; sha=$(git -C "$ROOT" rev-parse -q --verify "${OPT_commit}^{commit}" 2>/dev/null) || die "--commit にコミットを渡してください: ${OPT_commit}"
+            rv=$(round_sha "$(finding_field "$OPT_id" 3)")
+            valid_fix_commit "$sha" "$rv" || die "${sha:0:12} は修正のコミットになりません。レビューした時点（${rv:0:12}）より後で、HEAD に含まれるコミットを渡してください"
             record state "$OPT_id" 修正済み "$sha"; echo "$OPT_id: 修正済み（${sha:0:12}）" ;;
         filed)
-            case "$OPT_issue" in ''|*[!0-9#]*) die "--issue に issue の番号を渡してください" ;; esac
-            record state "$OPT_id" 起票済み "${OPT_issue#\#}"; echo "$OPT_id: 起票済み（#${OPT_issue#\#}）" ;;
+            local num="${OPT_issue#\#}"
+            case "$num" in ''|*[!0-9]*) die "--issue に issue の番号を渡してください: ${OPT_issue}" ;; esac
+            record state "$OPT_id" 起票済み "$num"; echo "$OPT_id: 起票済み（#$num）" ;;
         defer)
             [ "$act" = 見送り可 ] || die "$OPT_id の処置は「$act」です。見送れるのは処置が「見送り可」の指摘だけです"
             [ -n "$OPT_reason" ] || die "--reason を渡してください"
@@ -456,11 +476,24 @@ cmd_derive() {
     valid_impact "$OPT_impact" || die "--impact は 致命 / 支障 / 軽微 のどれかです"
     [ "$OPT_role" = security ] || valid_freq "$OPT_frequency" || die "--frequency は 常時 / 条件付き / 稀 のどれかです"
     case "$OPT_evidence" in ''|[1-5]) ;; *) die "--evidence は確信の段階（1〜5）です" ;; esac
+    if is_proof "$OPT_role" && [ -z "$OPT_evidence" ]; then die "担当 $OPT_role は実行で確かめる担当なので、--evidence（確信の段階）を渡してください"; fi
     local d; d=$(derive "$OPT_role" "${OPT_frequency:--}" "$OPT_impact" "$OPT_target" "$OPT_evidence")
     IFS="$TAB" read -r kind scope lk act <<EOF
 $d
 EOF
     echo "種別 $kind / 範囲 $scope / 起こりやすさ $lk / 処置: $act$(action_note "$act")"
+}
+
+# マージのコミット $1 で、最初の親から変わったファイルが、どれもほかの親のどれかの版と同じなら 0
+merge_takes_base_only() {
+    local c="$1" parents="$2" f p same first
+    first=$(git -C "$ROOT" rev-parse "$c^1")
+    while IFS= read -r -d '' f; do
+        same=no
+        for p in $parents; do git -C "$ROOT" diff --quiet "$p" "$c" -- "$f" 2>/dev/null && same=yes; done
+        [ "$same" = yes ] || return 1
+    done < <(git -C "$ROOT" diff -z --name-only "$first" "$c")
+    return 0
 }
 
 # ---------------------------------------------------------------------------
@@ -472,6 +505,8 @@ cmd_gate() {
     n=$(current_round)
     h=$(head_sha)
     b=$(base_ref)
+
+    [ -n "$LEDGER" ] || { echo "review-ledger gate NG: $LEDGER_HINT"; return 1; }
 
     # 条件 1: PR の中身がレビューされている
     if [ "$n" -eq 0 ]; then
@@ -488,7 +523,13 @@ cmd_gate() {
                 if [ -n "$parents" ] && [ -n "$b" ]; then
                     ok=yes
                     for p in $parents; do git -C "$ROOT" merge-base --is-ancestor "$p" "$b" 2>/dev/null || ok=no; done
-                    [ "$ok" = yes ] && continue   # 主ブランチの取り込み
+                    # 主ブランチの取り込みは、マージで変わったファイルがどれも主ブランチ側の版と同じときだけ通す
+                    # （競合の解消やマージに足した変更は、レビューしていない変更として扱う）
+                    if [ "$ok" = yes ] && merge_takes_base_only "$c" "$parents"; then continue; fi
+                    if [ "$ok" = yes ]; then
+                        add_problem "条件 1: マージのコミット ${c:0:12} に、主ブランチ側の版と違うファイルがあります（競合の解消やマージに足した変更）。もう一度ラウンドを回してください"
+                        continue
+                    fi
                 fi
                 add_problem "条件 1: レビューの後のコミット ${c:0:12}（$(git -C "$ROOT" log -1 --format=%s "$c")）は、台帳の修正済みの指摘が指す修正ではありません。fixed で対応づけるか、もう一度ラウンドを回してください"
             done
@@ -502,7 +543,12 @@ cmd_gate() {
         [ -n "$id" ] || continue
         st=$(latest_state "$id" | cut -f1)
         case "$act" in
-            直す) [ "$st" = 修正済み ] || add_problem "条件 2: $id は処置が「直す」で、修正済みになっていません（状態: ${st:-未対応}）" ;;
+            直す)
+                if [ "$st" != 修正済み ]; then
+                    add_problem "条件 2: $id は処置が「直す」で、修正済みになっていません（状態: ${st:-未対応}）"
+                elif ! valid_fix_commit "$(latest_state "$id" | cut -f2)" "$(round_sha "$(finding_field "$id" 3)")"; then
+                    add_problem "条件 2: $id の修正のコミットが、レビューした時点より後で HEAD に含まれるコミットではありません"
+                fi ;;
             起票) case "$st" in 起票済み|修正済み) ;; *) add_problem "条件 2: $id は処置が「起票」で、issue がありません（filed --issue <番号>）" ;; esac ;;
         esac
     done <<EOF

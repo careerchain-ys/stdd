@@ -9,13 +9,14 @@
 #   3. 指摘が記録から漏れていない（reviewer の報告の末尾の指摘 ID がすべて台帳にある）
 #   判定の本体は reviewing-changes/scripts/review-ledger.sh gate。このフックは呼ぶだけである。
 #
-# 判定: コマンドに `gh pr create` を含むときだけ動く。
+# 判定: コマンドに PR を作る `gh pr create`（`gh pr new`、`gh -R <repo> pr create`、`bash -c '...'` の中を含む）があるときだけ動く。
 # 通すもの:
-#   - STDD_REVIEW_GATE_SKIP_REASON="<理由>" を前置した実行（理由が空なら通さない）。誤字の修正だけの PR など
+#   - STDD_REVIEW_GATE_SKIP_REASON="<理由>" を、PR を作るコマンドの先頭に前置した実行（理由が空・$VAR なら通さない）
 #   - 緊急モードのブランチ（choosing-work-mode）。条件を満たさなくても警告にとどめる
 # 強さ: .stdd.config.yml の workflow.enforce_review_gate = off | warn（既定）| block。
 # 失敗時: 設定が無い・jq が無い・review-ledger.sh が見つからないときは通す（フックの故障で作業を止めない）。
-# 限界: `gh pr create` 以外の方法（Web の画面、gh api）で作る PR は確かめられない。
+# 限界: `gh pr create` 以外の方法（Web の画面、gh api、スクリプトの中からの実行）で作る PR は確かめられない。
+#   ゲートが確かめるのは、コマンドを実行する作業ツリーの現在のブランチの台帳である（--head で別のブランチを指すと確かめられない）。
 
 command -v jq >/dev/null 2>&1 || exit 0
 hook_input=$(cat)
@@ -23,8 +24,28 @@ jqr() { printf '%s' "$hook_input" | jq -r "$1 // empty" 2>/dev/null; }
 
 [ "$(jqr '.tool_name')" = "Bash" ] || exit 0
 CMD=$(jqr '.tool_input.command')
-printf '%s' "$CMD" | grep -Eq '(^|[^[:alnum:]_-])gh[[:space:]]+pr[[:space:]]+create([[:space:]]|$)' || exit 0
-printf '%s' "$CMD" | grep -Eq "STDD_REVIEW_GATE_SKIP_REASON=(\"[^\"]+\"|'[^']+'|[^[:space:]\"']+)" && exit 0
+[ -n "$CMD" ] || exit 0
+
+# PR を作るコマンドか: コマンドを ; & | 改行 で部分に分け、引用符と括弧を外してから、
+#   gh（前にパスや -R などのオプションがあってもよい）… pr … create|new の並びを探す（bash -c '...' の中も見る）
+# 例外の前置は、PR を作る部分の先頭の環境変数の代入に、空でない理由として書かれたときだけ認める
+#   （本文や echo の中の文字列、$VAR の値は認めない）
+creates_pr() { # $1 = 部分
+    printf '%s' "$1" | tr "\"'()\`" '     ' \
+        | grep -Eq '(^|[[:space:]/])gh([[:space:]]+[^[:space:]]+)*[[:space:]]+pr[[:space:]]+(create|new)([[:space:]]|$)'
+}
+has_skip_prefix() { # $1 = 部分
+    printf '%s' "$1" | grep -Eq "^[[:space:](]*([A-Za-z_][A-Za-z0-9_]*=[^[:space:]]*[[:space:]]+)*STDD_REVIEW_GATE_SKIP_REASON=(\"[^\"\$]+\"|'[^']+'|[^[:space:]\"'\$]+)[[:space:]]"
+}
+NEED_GATE=no
+while IFS= read -r seg; do
+    creates_pr "$seg" || continue
+    has_skip_prefix "$seg" && continue
+    NEED_GATE=yes
+done <<EOF
+$(printf '%s\n' "$CMD" | tr ';&|' '\n\n\n')
+EOF
+[ "$NEED_GATE" = yes ] || exit 0
 
 INPUT_CWD=$(jqr '.cwd')
 [ -n "$INPUT_CWD" ] && [ -d "$INPUT_CWD" ] || INPUT_CWD=$(pwd)

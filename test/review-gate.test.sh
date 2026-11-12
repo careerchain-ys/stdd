@@ -55,7 +55,7 @@ L derive --role cross --frequency 常時 --impact 軽微 --target "docs/common/R
 assert_contains "全体のパスを含めば範囲は全体（高 × 軽微 → 起票）" "範囲 全体 / 起こりやすさ 高 / 処置: 起票"
 L derive --role cross --frequency 稀 --impact 致命 --target "src/a.ts"
 assert_contains "致命は起こりやすさに関わらず直す" "処置: 直す"
-L derive --role security --impact 軽微 --target "src/a.ts"
+L derive --role security --impact 軽微 --target "src/a.ts" --evidence 4
 assert_contains "セキュリティは頻度を見ず、軽微でも起票" "起こりやすさ - / 処置: 起票"
 L add --id X --role security --frequency 稀 --impact 軽微 --trigger t --target src/a.ts --evidence 4
 assert_rc "セキュリティの指摘に頻度を書けば拒否する" 1
@@ -72,6 +72,26 @@ L derive --role cross --frequency 稀 --impact 支障 --target "認可の判定"
 assert_contains "設定で上書きした既定の語は使わない" "範囲 単一"
 L derive --role cross --frequency 稀 --impact 支障 --target "x"
 assert_contains "設定の harness_paths で種別を決める" "種別 ハーネス"
+
+echo "[表の全セル]"
+D="$TMP_ROOT/derive"
+L table
+EXPECTED='起こりやすさ（頻度 × 範囲）
+  常時 全体:高 複数:高 単一:中
+  条件付き 全体:高 複数:中 単一:低
+  稀    全体:中 複数:低 単一:低
+処置（種別 × 起こりやすさ × 影響）
+  プロダクト 高 致命:直す 支障:直す 軽微:起票
+  プロダクト 中 致命:直す 支障:直す 軽微:見送り可
+  プロダクト 低 致命:直す 支障:起票 軽微:見送り可
+  ハーネス 高 致命:直す 支障:直す 軽微:見送り可
+  ハーネス 中 致命:直す 支障:見送り可 軽微:見送り可
+  ハーネス 低 致命:直す 支障:見送り可 軽微:見送り可
+  セキュリティ（頻度は評価しない） 致命:直す 支障:直す 軽微:起票'
+[ "$OUT" = "$EXPECTED" ] && ok "処置の表と起こりやすさの表の全セルが決めた値と一致する" || ng "表のセル"
+L derive --role cross --frequency 常時 --impact 支障 --target "src/a.ts"
+L derive --role code-quality --frequency 常時 --impact 支障 --target "src/a.ts"
+assert_rc "実行で確かめる担当の derive は --evidence を求める" 1
 
 echo "[担当の決定]"
 D="$TMP_ROOT/derive"
@@ -113,6 +133,10 @@ L raise --id R1-cross-1 --impact 軽微 --frequency 稀
 assert_rc "4 項目は下げられない" 1
 L raise --id R1-cross-1 --impact 致命
 assert_contains "4 項目を上げると処置を導き直す" "処置: 直す"
+L raise --id R1-cross-1 --impact 軽微
+assert_rc "影響だけを下げる raise も拒否する" 1
+L raise --id R1-cross-1 --frequency 稀
+assert_rc "頻度だけを下げる raise も拒否する" 1
 L defer --id R1-cross-1 --reason "後で"
 assert_rc "処置が直すの指摘は見送れない" 1
 
@@ -168,6 +192,65 @@ commit "fix"; L fixed --id R1-cross-1 --commit HEAD
 L gate
 assert_rc "直すを修正し、起票を issue にすれば合格" 0
 
+G="$TMP_ROOT/g2b"; new_repo "$G"; D="$G"
+L round start
+L add --id R1-cross-1 --role cross --trigger t --frequency 常時 --impact 致命 --target src/a.ts --evidence 2
+L add --id R1-cross-2 --role cross --trigger t --frequency 条件付き --impact 支障 --target src/a.ts --evidence 2
+for r in $(lines_of launch); do [ "$r" = cross ] && L report --role cross --ids "R1-cross-1,R1-cross-2" || L report --role "$r" --ids none; done
+L round end
+L filed --id R1-cross-1 --issue 3
+L filed --id R1-cross-2 --issue 4
+L gate
+assert_rc "処置が直すの指摘を起票済みにしても不合格" 1
+assert_contains "直すの指摘を知らせる" "条件 2: R1-cross-1 は処置が「直す」"
+L fixed --id R1-cross-1 --commit HEAD
+assert_rc "レビューした時点のコミットを修正のコミットにできない" 1
+L fixed --id R1-cross-1 --commit HEAD~1
+assert_rc "レビューより前のコミットを修正のコミットにできない" 1
+L filed --id R1-cross-2 --issue '#'
+assert_rc "番号の無い issue は記録しない" 1
+L filed --id R1-cross-2 --issue '1#2'
+assert_rc "番号でない issue は記録しない" 1
+commit "fix"; L fixed --id R1-cross-1 --commit HEAD
+L gate
+assert_rc "レビューの後の修正のコミットなら合格" 0
+( cd "$D" && git checkout -q -b claude/other HEAD~1 && echo z > z.ts && git add -A && git commit -qm other && git checkout -q claude/test )
+L fixed --id R1-cross-1 --commit claude/other
+assert_rc "HEAD に含まれないコミットを修正のコミットにできない" 1
+
+echo "[ゲート: 2 回目のラウンド]"
+G="$TMP_ROOT/g2r"; new_repo "$G"; D="$G"
+L round start; report_all_none; L round end
+commit "after-round-1"
+L gate
+assert_rc "ラウンド 1 の後のコミットは不合格" 1
+L round start; report_all_none; L round end
+L gate
+assert_rc "最後のラウンド（2 回目）の時点で判定する" 0
+
+echo "[ゲート: マージのコミット]"
+G="$TMP_ROOT/gm"; new_repo "$G"; D="$G"
+L round start; report_all_none; L round end
+( cd "$D" && git checkout -q main && echo m > m.txt && git add -A && git commit -qm main && git checkout -q claude/test \
+    && git merge -q --no-commit main && echo EVIL >> src/a.ts && git add -A && git commit -qm "merge main" )
+L gate
+assert_rc "マージのコミットに足した変更は不合格" 1
+assert_contains "マージの変更を知らせる" "主ブランチ側の版と違うファイル"
+
+echo "[基準と置き場]"
+NB="$TMP_ROOT/nobase"; mkdir -p "$NB"; ( cd "$NB" && git init -q -b trunk && git config user.email t@e.com && git config user.name t \
+    && echo a > a.ts && git add -A && git commit -qm i && git checkout -qb f && echo b > b.ts && git add -A && git commit -qm f )
+OUT=$(cd "$NB" && bash "$LEDGER_SRC" plan 2>&1); RC=$?
+assert_rc "差分の基準が決まらなければ担当を決めない" 1
+assert_contains "基準の指定を案内する" "差分の基準を決められません"
+OUT=$(cd "$NB" && bash "$LEDGER_SRC" round start 2>&1); RC=$?
+assert_rc "差分の基準が決まらなければラウンドを始めない" 1
+D="$TMP_ROOT/gm"; ( cd "$D" && git checkout -q --detach HEAD )
+L gate
+assert_rc "detached HEAD では不合格" 1
+assert_contains "detached HEAD を案内する" "detached HEAD"
+( cd "$D" && git checkout -q claude/test )
+
 echo "[ゲート: 条件 3 指摘が記録から漏れていない]"
 G="$TMP_ROOT/g3"; new_repo "$G"; D="$G"
 L round start
@@ -202,6 +285,13 @@ run_hook $H "$(pr "gh pr create --title x --body-file b.md")" "$D"; expect_deny 
 expect_out_contains "理由に条件を書く" "条件 1"
 expect_out_contains "例外の前置を案内する" "STDD_REVIEW_GATE_SKIP_REASON="
 run_hook $H "$(pr "git push && gh pr create --fill")" "$D"; expect_deny "連結したコマンドの中の gh pr create も見る"
+for c in "gh -R o/r pr create --fill" "gh pr new --fill" "gh pr create;echo done" "bash -c 'gh pr create --fill'" "/usr/local/bin/gh pr create" "(gh pr create --fill)"; do
+    run_hook $H "$(pr "$c")" "$D"; expect_deny "PR を作る別の書き方も見る: $c"
+done
+run_hook $H "$(pr "gh pr create --body \"例: STDD_REVIEW_GATE_SKIP_REASON=\\\"誤字\\\"\"")" "$D"; expect_deny "本文の中の例外の文字列では通さない"
+run_hook $H "$(pr 'STDD_REVIEW_GATE_SKIP_REASON=$EMPTY gh pr create')" "$D"; expect_deny "変数の値を理由にしては通さない"
+run_hook $H "$(pr "echo STDD_REVIEW_GATE_SKIP_REASON=x && gh pr create")" "$D"; expect_deny "別のコマンドの中の例外の文字列では通さない"
+run_hook $H "$(pr "gh pr list && gh issue create")" "$D"; expect_silent "PR を作らない gh は見ない"
 run_hook $H "$(pr "STDD_REVIEW_GATE_SKIP_REASON=\"誤字の修正だけ\" gh pr create --fill")" "$D"; expect_silent "理由を前置すれば通す"
 run_hook $H "$(pr "STDD_REVIEW_GATE_SKIP_REASON= gh pr create --fill")" "$D"; expect_deny "空の理由では通さない"
 L round start; report_all_none; L round end
