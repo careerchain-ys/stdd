@@ -2,7 +2,7 @@
 name: tech-specs-reviewer
 description: 技術設計書レビュー専門家。TECH_DESIGN.md・TEST_PLAN.md・common 技術階層（ARCHITECTURE/TABLE_DEFINITION/API_SPEC/DESIGN）の品質・網羅性・整合性・SSOT 準拠を評価。auto-implement の Phase 1b で使用。
 tools: Read, Grep, Glob
-model: inherit
+model: opus
 ---
 
 # Tech Specs Reviewer Specialist

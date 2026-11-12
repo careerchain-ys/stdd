@@ -2,7 +2,7 @@
 name: tech-specs-writer
 description: 技術設計書作成専門家。確定した REQUIREMENTS.md を前提に、feature の TECH_DESIGN.md + TEST_PLAN.md / common の ARCHITECTURE・TABLE_DEFINITION・API_SPEC・DESIGN を作成。auto-implement の Phase 1b で使用。
 tools: Read, Grep, Glob, Edit, Write
-model: inherit
+model: opus
 ---
 
 # Tech Specs Writer Specialist

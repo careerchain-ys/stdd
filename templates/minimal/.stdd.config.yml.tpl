@@ -84,10 +84,10 @@ emergency_mode:
 
 # subagent と skill のモデルの使い分け（packages/core/docs/model-selection.md）。Claude Code 向けのみ。
 # 値はモデルの別名（inherit / opus / sonnet / haiku / fable）。モデルの ID は書かない。
-# agent の既定は inherit（メインの会話と同じモデル）。変えたら stdd init を実行し直す。
+# agent の既定は opus（plan-writer と qa-engineer は sonnet）。変えたら stdd init を実行し直す。
 # models:
 #   agents:
-#     qa-engineer: sonnet
+#     code-reviewer: fable    # 影響の大きい変更のレビューで上げる例
 #   mechanical: haiku         # 機械的な作業を subagent に任せるときのモデル（既定 haiku）
 
 plugins: []

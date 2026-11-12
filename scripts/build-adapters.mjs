@@ -49,7 +49,7 @@ const MODEL_ALIASES = ["inherit", "opus", "sonnet", "haiku", "fable"];
 
 function assertModelAlias(md, rel) {
   const { data } = parseFrontmatter(md);
-  if (data.model === undefined) throw new Error(`agent frontmatter に model がありません（既定は inherit）: ${rel}`);
+  if (data.model === undefined) throw new Error(`agent frontmatter に model がありません（packages/core/docs/model-selection.md §2）: ${rel}`);
   if (!MODEL_ALIASES.includes(data.model.trim())) {
     throw new Error(`agent の model はモデルの別名（${MODEL_ALIASES.join(" / ")}）で書く: ${rel}: ${data.model}`);
   }

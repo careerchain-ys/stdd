@@ -1,5 +1,5 @@
 // subagent のモデルの使い分け（packages/core/docs/model-selection.md）の検査。
-// - 配布する agent の既定は model: inherit
+// - 配布する agent の既定のモデルが章 §2 の表どおり（判断が中心の agent は opus から下げない）
 // - Codex 向けの生成物にはモデルを出力しない
 // - モデルの別名の一覧が、生成器・導入コマンド・設定の schema で一致している
 import test from "node:test";
@@ -21,13 +21,34 @@ function aliasesIn(source, re) {
   return [...m[1].matchAll(/"([a-z]+)"/g)].map((x) => x[1]);
 }
 
-test("配布する agent の既定は model: inherit（Claude 向けの生成物も同じ）", async () => {
-  for (const name of await agentNames()) {
+// 章 packages/core/docs/model-selection.md §2 の表と同じ。変えるときは章と一緒に変える。
+const EXPECTED_MODELS = {
+  "requirements-writer": "opus",
+  "tech-specs-writer": "opus",
+  implementer: "opus",
+  "requirements-reviewer": "opus",
+  "tech-specs-reviewer": "opus",
+  "test-reviewer": "opus",
+  "code-reviewer": "opus",
+  "plan-writer": "sonnet",
+  "qa-engineer": "sonnet",
+};
+
+test("配布する agent の既定のモデルが章 §2 の表どおり（Claude 向けの生成物も同じ）", async () => {
+  assert.deepEqual((await agentNames()).sort(), Object.keys(EXPECTED_MODELS).sort(), "agent を足したら既定のモデルを決める");
+  for (const [name, model] of Object.entries(EXPECTED_MODELS)) {
     for (const file of [path.join(agentsDir, `${name}.md`), path.join(repoRoot, ".claude", "agents", `${name}.md`)]) {
       const md = await fs.readFile(file, "utf8");
       const fm = md.slice(0, md.indexOf("\n---", 3));
-      assert.match(fm, /^model: inherit$/m, file);
+      assert.match(fm, new RegExp(`^model: ${model}$`, "m"), file);
     }
+  }
+});
+
+test("章 §2 の表が、テストの既定の一覧と一致する", async () => {
+  const doc = await fs.readFile(path.join(repoRoot, "packages", "core", "docs", "model-selection.md"), "utf8");
+  for (const [name, model] of Object.entries(EXPECTED_MODELS)) {
+    assert.match(doc, new RegExp(`^\\| ${name} \\| \`${model}\` \\|`, "m"), name);
   }
 });
 

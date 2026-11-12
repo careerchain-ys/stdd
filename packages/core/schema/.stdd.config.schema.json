@@ -432,7 +432,7 @@
       "properties": {
         "agents": {
           "type": "object",
-          "description": "Per-agent model override, keyed by agent name (e.g. qa-engineer). Applied to the 'model' line of .claude/agents/<name>.md when 'stdd init' runs. Agents not listed keep the shipped default (inherit).",
+          "description": "Per-agent model override, keyed by agent name (e.g. qa-engineer). Applied to the 'model' line of .claude/agents/<name>.md when 'stdd init' runs. Agents not listed keep the shipped default (see model-selection.md §2).",
           "propertyNames": { "pattern": "^[a-z0-9][a-z0-9-]*$" },
           "additionalProperties": { "$ref": "#/$defs/modelAlias" }
         },

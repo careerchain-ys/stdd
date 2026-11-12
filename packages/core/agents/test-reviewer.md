@@ -2,7 +2,7 @@
 name: test-reviewer
 description: テストコードレビュー専門家。TEST_PLAN.mdのテスト戦略準拠・テストコード品質・形骸的テストの検出を行う。auto-implementのPhase 2（Red直後・実装前）で使用。
 tools: Read, Grep, Glob
-model: inherit
+model: opus
 ---
 
 # Test Reviewer Specialist
