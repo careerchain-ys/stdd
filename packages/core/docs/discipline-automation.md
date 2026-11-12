@@ -148,6 +148,7 @@ subagent を起動する側（メインのエージェント）が、作業す�
 | subagent は指定された作業ツリーで作業する | フック `worktree-lock-guard.sh` と宣言のスクリプト | 宣言するかどうかは起動する側の手順（`auto-implement` Step 4）に任せる |
 | Red / Green の確認ではテストの対象を絞る | フック `test-scope-guard.sh` | どのテストが対象かの選び方は技術スタックに依存する |
 | skill・agent の正本と生成物は一致している | `npm run check:adapters` | — |
+| 複数の agent に共通する規律は書き写さず、部品として差し込む | 生成器 `scripts/build-adapters.mjs`（参照が壊れていれば失敗）とテスト `node --test test/shared-parts.test.mjs`（書き写しの検出。`docs/config-driven-authoring.md` §10） | 1 文程度の言い回しの一致と、意図して文面を変えた箇所は追わない。部品にするかどうかは文面が揃っているかの判断を伴う |
 | skill・agent・rule の定義は文字数の上限と総量の基準値を超えない | `npm run check:harness-size`（`docs/config-driven-authoring.md` §7） | 基準値を上げるかどうかは判断を伴うので、理由を PR の本文に書く |
 | 着手前に、ほかの作業ツリーや作成中の PR との重なりを確かめる | `work-overlap.sh`（[`parallel-work.md`](parallel-work.md)） | 着手の時点を機械で知る手段が無いので、フックにせず手順で呼ぶ |
 | 開発の課題を PR の前に棚卸しする | skill の手順（[`feedback-loop.md`](feedback-loop.md) §7） | 何を起票するかは判断を伴う |

@@ -132,7 +132,7 @@ skill / agent / rule の定義は、エージェントが読み込むたびに�
 | --- | --- | --- |
 | `skill` | `packages/core/skills/<name>/SKILL.md` 全体 | skill の起動時 |
 | `skill-metadata` | SKILL.md の `description` + `when_to_use` | 全セッションで常に |
-| `agent` | `packages/core/agents/<name>.md` 全体 | agent の起動時（システムプロンプトに載る） |
+| `agent` | `packages/core/agents/<name>.md` 全体（共通の部品を差し込んだ後。§10） | agent の起動時（システムプロンプトに載る） |
 | `agent-description` | agent の `description` | 全セッションで常に |
 | `rule` | `packages/core/rules/*.md` | 全セッションで常に |
 | `all` | skills / agents / rules 配下の `.md` の合計（`references/`・`templates/` を含む） | — |
@@ -218,3 +218,61 @@ bash packages/core/skills/documenting-requirements/scripts/state-claims.sh packa
 bash test/trace-audit.test.sh
 bash test/trace-tables.test.sh
 ```
+
+---
+
+## 10. 共通の規律を部品にする
+
+複数の agent に共通する規律（reviewer の姿勢、報告の書式、編集の範囲など）は、agent ごとに書き写さず、部品として 1 か所に置く。
+書き写すと、1 本だけ直し忘れたときに agent の間で規律が食い違い、その食い違いはレビューでは見つけにくい。
+部品は `npm run build:adapters` が生成のときに差し込むので、Claude の `.claude/agents/` と Codex の `.codex/agents/` の両方に同じ本文が届く。
+
+### 10.1 書き方
+
+- 部品は `packages/core/agents/_shared/<id>.md` に置く。id は英小文字・数字・ハイフンで、部品の内容を表す名前にする。
+- agent の本文で、部品を入れたい位置に次の 1 行だけを置く。行頭から書き、前後に空白や文字を置かない。
+
+  ```
+  <!-- shared: report-format -->
+  ```
+
+- 生成物では、この行が部品の本文に置き換わる。部品は見出しや箇条を含んでよい。箇条の途中に置けば、部品の箇条がそのまま続く。
+- `_shared/` の下のファイルは agent として扱わず、導入先にも配らない。
+
+### 10.2 部品にするもの・しないもの
+
+- **2 本以上の agent で同じ文面になるものを部品にする。** agent の役割に合わせた具体例（コードの例・テストの例）は、
+  部品の後に agent ごとの箇条として書く。
+- **文面が 1 本でも違うなら、まず違いが意図したものかを確かめる。** 意図しない違いは揃えてから部品にする。
+  意図した違いなら、その agent は部品を使わず自分の本文を持つ。
+- **起動のたびに読まれる量を増やさない。** 部品は agent の起動時にすべて読まれる。短い言い方で足りていた agent に長い部品を差し込むと、
+  その agent を起動するたびに差分のぶんを読む。文字数は差し込んだ後の本文で数える（§7）。
+
+### 10.3 生成が失敗する場合
+
+部品の参照が壊れているときは、生成も検査（`npm run check:adapters`）も失敗し、生成物を書かない。
+
+| 状態 | 失敗させる理由 |
+| --- | --- |
+| 無い部品を参照している | 綴り違いを通すと、その agent から規律が黙って消える |
+| 差し込みの行の形が正しくない（空白の過不足・大文字・コロン落ち・`_` 区切りなど） | 通すとただの HTML コメントとして生成物に残り、規律が黙って消える |
+| 部品の中に差し込みの行がある | 入れ子は解決しないので、差し込みの行がそのまま配られる |
+| 部品が空、ファイル名が `<id>.md` の形でない | 規律を書いたつもりで何も届かない |
+| どの agent からも使われない部品がある | 読まれない規律が残り、次の書き手が有効だと思って編集する |
+| agent の定義が 1 本も見つからない | 置き場の取り違えを合格にしない（§9） |
+
+通常の HTML コメントは書いてよい。ただし、`<!--` と `shared` を同じ行に含む行は差し込みの書き損じとみなすので、
+agent と部品の本文では差し込みの書き方を説明しない（説明はこの節に置く）。
+
+部品を変えると、それを使う agent の生成物がすべて変わる。`npm run check:adapters` は部品を差し込んだ結果で一致を判定するので、
+部品だけを直して再生成し忘れた変更も検出する。
+
+### 10.4 検証
+
+```bash
+npm run check:adapters
+node --test test/shared-parts.test.mjs
+```
+
+`test/shared-parts.test.mjs` は、壊れた参照の不合格の例と通す例に加え、配る agent の正本に部品へ寄せていない書き写し
+（2 行以上続く同じ文面、または長い 1 行の同じ文面）が無いことを確かめる。
