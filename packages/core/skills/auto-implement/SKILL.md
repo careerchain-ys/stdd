@@ -125,8 +125,7 @@ subagent には分けない。subagent に任せるのは、書いた経緯を�
 | メインのセッション | [references/implementation.md](references/implementation.md) | 2 テスト・実装 |
 | 別の文脈（並列） | `requirements-reviewer` / `tech-specs-reviewer` | 1a / 1b のレビュー |
 | 別の文脈（並列） | `test-reviewer` | 2.5 テストレビュー |
-| 別の文脈（並列） | `qa-engineer` | 3 QA（全件のテスト・整合性の監査・動作確認） |
-| 別の文脈（並列） | `code-reviewer` | 4 コードレビュー |
+| メインのセッション + 別の文脈（並列） | `reviewing-changes`（`qa-engineer`・`code-reviewer`・差分に応じた reviewer） | 3・4 PR 前レビュー |
 | メインのセッション | Figma の更新・`recording-dev-feedback`・`create-pr` | 4.5・4.8・5 |
 
 - reviewer には、対象のファイルと基準の Spec のパスを渡し、書いたときの判断の理由は渡さない。
@@ -145,8 +144,7 @@ subagent には分けない。subagent に任せるのは、書いた経緯を�
 | Phase 1.5  | PLAN作成                      | ✓    |           | ✓         |       |
 | Phase 2   | 実装                   | ✓    |           | ✓         | ✓     |
 | Phase 2.5 | テストレビュー         | ✓    |           | ✓         |       |
-| Phase 3   | QA                     | ✓    |           | ✓         |       |
-| Phase 4   | コードレビュー         | ✓    |           | ✓         |       |
+| Phase 3–4 | PR 前レビュー（QA・コードレビュー） | ✓    |           | ✓         |       |
 | Phase 4.5 | Figma更新              | ✓    |           | ✓         |       |
 | Phase 4.8 | フィードバックの棚卸し | ✓    | ✓         | ✓         | ✓     |
 | Phase 5   | PR作成                 | ✓    | ✓         | ✓         | ✓     |
@@ -176,8 +174,7 @@ subagent には分けない。subagent に任せるのは、書いた経緯を�
 | テスト作成 | OK / SKIP | |
 | テストレビュー | OK / SKIP | |
 | 実装 | OK / SKIP | |
-| QA | OK / SKIP | |
-| コードレビュー | OK / SKIP | |
+| PR 前レビュー | OK / SKIP | ラウンド数・指摘の処置の内訳（`review-ledger.sh summary`） |
 | Figma更新 | OK / SKIP | |
 | レビューの実行 | agent teams / subagent | |
 | フィードバックの棚卸し | OK / SKIP | 起票・再発・上限で起票しなかった件数 |
@@ -187,8 +184,9 @@ subagent には分けない。subagent に任せるのは、書いた経緯を�
 
 ## エラーハンドリング
 
-- 各フェーズで3回の修正ループを超えた場合、そのフェーズで停止し、現状をコミット・pushしてdraft PRを作成する
+- Spec とテストの各フェーズ（1a / 1b / 2.5）で3回の修正ループを超えた場合、そのフェーズで停止し、現状をコミット・pushしてdraft PRを作成する
 - PR descriptionに未解決の問題を記載し、手動対応を依頼する
+- PR 前レビュー（Phase 3–4）のラウンドには上限を設けない。同じ論点の指摘が繰り返すときはユーザーに判断を仰ぐ（`reviewing-changes` の `references/fixing.md`）
 
 ## 注意事項
 

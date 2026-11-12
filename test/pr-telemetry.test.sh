@@ -71,12 +71,12 @@ assert_contains "読み直して確かめる" "pr-telemetry verify OK"
 assert_not_contains "棚卸しの記録があれば警告しない" "警告"
 P=$(posted)
 OUT="$P"
-[ "$(printf '%s' "$P" | jq -r .schema)" = "stdd-telemetry/1" ] && ok "schema の版を名乗る" || ng "schema の版を名乗る"
+[ "$(printf '%s' "$P" | jq -r .schema)" = "stdd-telemetry/2" ] && ok "schema の版を名乗る" || ng "schema の版を名乗る"
 [ "$(printf '%s' "$P" | jq -r .head_sha)" = "$(head_sha)" ] && ok "head の SHA を持つ" || ng "head の SHA を持つ"
 [ "$(printf '%s' "$P" | jq -c .size)" = '{"files":3,"additions":30,"deletions":5,"commits":2}' ] && ok "規模は PR から採る" || ng "規模は PR から採る"
 [ "$(printf '%s' "$P" | jq -c .duration_min.steps)" = '{"spec":10,"implement":10,"review":7}' ] && ok "完了した工程だけを分で集計する（終わっていない qa は含めない）" || ng "工程別の所要"
 [ "$(printf '%s' "$P" | jq -r .duration_min.lead_time)" = "90" ] && ok "所要は最初の記録から" || ng "所要は最初の記録から"
-[ "$(printf '%s' "$P" | jq -c .review)" = '{"rounds":2,"exempt":null}' ] && ok "レビュー回数は完了した review の組の数" || ng "レビュー回数"
+[ "$(printf '%s' "$P" | jq -c '.review | {rounds, exempt}')" = '{"rounds":2,"exempt":null}' ] && ok "レビュー回数は完了した review の組の数" || ng "レビュー回数"
 [ "$(printf '%s' "$P" | jq -c .feedback)" = '{"filed":1,"recurred":1,"skipped_by_cap":1}' ] && ok "棚卸しの件数を持つ" || ng "棚卸しの件数"
 assert_file_contains "目印のコメントを付ける" "$FAKE_GH/bodies.log" "<!-- stdd-telemetry -->"
 
@@ -89,7 +89,7 @@ run post --exempt user_waived
 assert_rc "免除の申告で投稿できる" 0
 assert_contains "棚卸しの記録が無ければ警告する" "フィードバックの棚卸しの記録がありません"
 OUT=$(posted)
-[ "$(printf '%s' "$OUT" | jq -c .review)" = '{"rounds":0,"exempt":"user_waived"}' ] && ok "免除の区分を持つ" || ng "免除の区分"
+[ "$(printf '%s' "$OUT" | jq -c .review)" = '{"rounds":0,"exempt":"user_waived","findings":null,"independent":null,"unproven":null}' ] && ok "免除の区分を持つ" || ng "免除の区分"
 [ "$(printf '%s' "$OUT" | jq -c .feedback)" = 'null' ] && ok "棚卸しをしていなければ feedback は null" || ng "feedback は null"
 [ "$(printf '%s' "$OUT" | jq -c .duration_min.steps)" = 'null' ] && ok "工程の記録が無ければ steps は null（0 にしない）" || ng "steps は null"
 [ "$(printf '%s' "$OUT" | jq -r .duration_min.lead_time)" = 'null' ] && ok "起点が無ければ所要は null" || ng "所要は null"
@@ -118,7 +118,7 @@ jq '.body = "## 緊急モード\n\n- 理由: 障害対応\n\n## 概要\n"' "$FAK
 run post --exempt emergency --review-rounds 1
 assert_rc "節があれば、レビューをした回数とともに投稿できる" 0
 OUT=$(posted)
-[ "$(printf '%s' "$OUT" | jq -c .review)" = '{"rounds":1,"exempt":"emergency"}' ] && ok "回数と緊急モードの区分を両方持つ" || ng "回数と緊急モードの区分"
+[ "$(printf '%s' "$OUT" | jq -c '.review | {rounds, exempt}')" = '{"rounds":1,"exempt":"emergency"}' ] && ok "回数と緊急モードの区分を両方持つ" || ng "回数と緊急モードの区分"
 run verify
 assert_not_contains "緊急モードでは棚卸しの記録が無くても警告しない" "フィードバックの棚卸しの記録がありません"
 
@@ -130,6 +130,21 @@ assert_rc "回数でない値は拒否する" 1
 run post --review-rounds 3
 assert_rc "回数の申告で投稿できる" 0
 OUT=$(posted); [ "$(printf '%s' "$OUT" | jq -r .review.rounds)" = 3 ] && ok "申告した回数を持つ" || ng "申告した回数"
+
+echo "== post: PR 前レビューの台帳"
+new_case ledger
+pr_fixture
+LEDGER_SH="$REPO_ROOT/packages/core/skills/reviewing-changes/scripts/review-ledger.sh"
+( cd "$REPO_DIR" && bash "$LEDGER_SH" round start --independent yes >/dev/null 2>&1 \
+    && bash "$LEDGER_SH" add --id R1-cross-1 --role cross --trigger t --frequency 常時 --impact 支障 --target README.md --evidence 2 >/dev/null \
+    && bash "$LEDGER_SH" unproven --id R1-security-1 --role security --reason x >/dev/null \
+    && bash "$LEDGER_SH" round end >/dev/null 2>&1 )
+run post
+assert_rc "台帳があればレビューの記録として投稿できる" 0
+OUT=$(posted)
+[ "$(printf '%s' "$OUT" | jq -c '.review | {rounds, independent}')" = '{"rounds":1,"independent":true}' ] && ok "台帳のラウンド数と独立性を持つ" || ng "台帳のラウンド数と独立性"
+[ "$(printf '%s' "$OUT" | jq -r '.review.findings.fix')" = 1 ] && ok "指摘の処置の内訳を持つ" || ng "処置の内訳"
+[ "$(printf '%s' "$OUT" | jq -c '.review.unproven')" = '{"security":1}' ] && ok "実行で確かめられなかった指摘の担当ごとの件数を持つ" || ng "unproven"
 
 echo "== post: push していない"
 new_case unpushed

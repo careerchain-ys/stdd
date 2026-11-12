@@ -116,6 +116,11 @@ cd <apps[].path> && <commands.build>
 
 問題があれば Implementer に修正を依頼する（QA フロー全体で最大3回の修正ループ）。Playwright MCP が利用できない／dev サーバが起動しない場合は、当フェーズをスキップしてレポートに明記し、他フェーズの結果で判定する。
 
+## PR 前レビューで起動されたとき
+
+依頼文で `reviewing-changes` の `references/reporting.md` を渡されたら、下の書式と判定の代わりにその書式で報告する
+（指摘ごとに 4 項目を書き、重大度と判定は付けない）。
+
 ## レポートフォーマット
 
 ```markdown

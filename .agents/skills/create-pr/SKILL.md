@@ -51,7 +51,18 @@ git diff origin/<primary_branch>...HEAD
 
 ## 4. PRの作成
 
-`gh pr create` を使ってPRを作成する。
+`gh pr create` を使ってPRを作成する。**作る前に、PR 前レビューのゲートを通す**（`reviewing-changes` skill §6）。
+
+```bash
+# <reviewing-changes> は reviewing-changes skill のディレクトリ
+bash <reviewing-changes>/scripts/review-ledger.sh gate
+```
+
+- 不合格なら、表示された対処（台帳の更新か、レビューのラウンド）を済ませてから作る。フック `review-gate.sh` も
+  `gh pr create` の直前に同じゲートを呼ぶ（強さは `.stdd.config.yml` の `workflow.enforce_review_gate`）。
+- レビューの要らない PR（誤字の修正だけなど）は、`STDD_REVIEW_GATE_SKIP_REASON="<理由>"` を `gh pr create` の前に置く。
+  §5 では同じ理由の区分を `--exempt` で申告する。
+- 合格したら、`review-ledger.sh summary` の出力を備考に貼る。
 
 ### タイトル
 
@@ -97,6 +108,7 @@ git diff origin/<primary_branch>...HEAD
 
 [レビュアーへの補足事項があれば記載]
 [recording-dev-feedback の triage が出力した「開発フィードバック: …」の 1 行（棚卸しをした場合）]
+[PR 前レビューの review-ledger.sh summary の出力（レビューをした場合）]
 [どちらもなければセクションごと削除]
 
 Closes #[issue番号]
@@ -140,6 +152,8 @@ bash <skill_dir>/scripts/pr-telemetry.sh post --exempt emergency
 - `post` は投稿のあとに PR を読み直し、head の SHA と一致する記録が載っているかを確かめる（`verify`）。
   **ここで失敗したら PR 作成は完了していない**。原因（未 push、投稿の失敗）を直してから再実行する。
 - レビューの記録も免除の申告も無いと `post` は止まる。どちらかを明示する。
+- PR 前レビューの台帳（`reviewing-changes`）があれば、ラウンド数・指摘の処置の内訳・独立性・実行で確かめられなかった指摘の件数も
+  自動で記録に入る。
 - フィードバックの棚卸し（`recording-dev-feedback`）の記録が無いと警告が出る。棚卸しをしていなければ、ここで行ってから投稿し直す。
 - PR を作ったあとにコミットを積んだり、追加のレビューをしたりしたら、もう一度 `post` する（追記のみ。前のコメントは消さない）。
 - 免除の出典（誰の指示か）はコメントに入れない。必要なら PR の本文に書く。

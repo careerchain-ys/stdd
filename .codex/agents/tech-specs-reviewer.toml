@@ -99,6 +99,11 @@ developer_instructions = '''
 - [ ] ARCHITECTURE.md: データモデル・API を持っていない（それらは TABLE_DEFINITION / API_SPEC がSSoT）
 - [ ] 参照する feature TECH_DESIGN との整合が取れている
 
+## PR 前レビューで起動されたとき
+
+依頼文で `reviewing-changes` の `references/reporting.md` を渡されたら、下の書式と判定の代わりにその書式で報告する
+（指摘ごとに 4 項目を書き、重大度と判定は付けない）。
+
 ## レビュー結果フォーマット
 
 ```markdown

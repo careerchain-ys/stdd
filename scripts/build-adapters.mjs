@@ -116,6 +116,7 @@ const CODEX_HOOK_SCRIPTS = [
   "agent-scope-guard.sh",
   "worktree-lock-guard.sh",
   "test-scope-guard.sh",
+  "review-gate.sh",
 ];
 
 /** Codex の hooks.json の 1 コマンド分。 */
@@ -127,7 +128,7 @@ function codexHookCommand(script, timeout) {
 function codexHooksJson() {
   const obj = {
     description:
-      "STDD hooks（spec-first の促し・緊急モードの申し出の記録・subagent の範囲と作業先の確認・全件テストの抑止。packages/core から生成・直接編集しない）",
+      "STDD hooks（spec-first の促し・緊急モードの申し出の記録・subagent の範囲と作業先の確認・全件テストの抑止・PR 作成前のレビューのゲート。packages/core から生成・直接編集しない）",
     hooks: {
       PreToolUse: [
         {
@@ -144,6 +145,7 @@ function codexHooksJson() {
             codexHookCommand("agent-scope-guard.sh", 10),
             codexHookCommand("worktree-lock-guard.sh", 10),
             codexHookCommand("test-scope-guard.sh", 10),
+            codexHookCommand("review-gate.sh", 30),
           ],
         },
       ],

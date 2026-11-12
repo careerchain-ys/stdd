@@ -209,6 +209,12 @@
           "default": "warn",
           "description": "Behavior of the test-scope PreToolUse hook (.claude/hooks/test-scope-guard.sh). Reports running commands.test without any target argument (a full run) outside the QA phase. qa-engineer subagents and commands prefixed with STDD_FULL_TEST_REASON=\"<reason>\" are exempt. 'off': disabled. 'warn' (default): report without stopping. 'block': deny the command."
         },
+        "enforce_review_gate": {
+          "type": "string",
+          "enum": ["off", "warn", "block"],
+          "default": "warn",
+          "description": "Behavior of the review-gate PreToolUse hook (.claude/hooks/review-gate.sh). Right before `gh pr create`, it checks the three pre-PR review conditions with skills/reviewing-changes/scripts/review-ledger.sh gate: the PR content was reviewed (the last reviewed commit is an ancestor of HEAD and later commits are only recorded fixes or merges of the primary branch), no finding whose action is 'fix' remains open and every 'file' finding has an issue, and every finding ID listed at the end of the reviewer reports is in the ledger. Commands prefixed with STDD_REVIEW_GATE_SKIP_REASON=\"<reason>\" are exempt; emergency-mode branches only get a warning. 'off': disabled. 'warn' (default): report without stopping. 'block': deny the command."
+        },
         "worktree": {
           "type": "object",
           "additionalProperties": false,
@@ -395,9 +401,42 @@
         }
       }
     },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Pre-PR review (reviewing-changes skill, script skills/reviewing-changes/scripts/review-ledger.sh, packages/core/docs/review-process.md). All keys are optional; the script has defaults.",
+      "properties": {
+        "harness_paths": {
+          "type": "string",
+          "description": "Extended regular expression for harness files. When every changed file matches, findings are classified as harness findings instead of product findings. The default covers .claude/ .agents/ .codex/ .stdd/ AGENTS.md CLAUDE.md and .stdd.config.yml."
+        },
+        "global_paths": {
+          "type": "string",
+          "description": "Extended regular expression for paths such as shared components, always-loaded rules and common specs. A finding whose target contains a match has the scope 'global'."
+        },
+        "global_words": {
+          "type": "string",
+          "description": "Extended regular expression for words such as authentication, authorization and tenant isolation. A finding whose target contains a match has the scope 'global'."
+        },
+        "triggers": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "When to launch each reviewer role: an extended regular expression matched against the changed file paths, 'always', or 'never'. 'code' applies to the code-quality and code-performance roles; 'security' falls back to 'code' when unset.",
+          "properties": {
+            "cross": { "type": "string" },
+            "consistency": { "type": "string" },
+            "requirements": { "type": "string" },
+            "tech_specs": { "type": "string" },
+            "test": { "type": "string" },
+            "code": { "type": "string" },
+            "security": { "type": "string" }
+          }
+        }
+      }
+    },
     "telemetry": {
       "type": "object",
-      "description": "Per-PR process telemetry posted as a PR comment right after PR creation (create-pr skill, script skills/create-pr/scripts/pr-telemetry.sh). Holds only review-process-independent fields: size, durations, review rounds / exemption, and feedback triage counts. Optional.",
+      "description": "Per-PR process telemetry posted as a PR comment right after PR creation (create-pr skill, script skills/create-pr/scripts/pr-telemetry.sh). Holds size, durations, review rounds / exemption, feedback triage counts and, from schema version 2, the pre-PR review ledger summary (findings by action, independence, unproven findings per role). Optional.",
       "additionalProperties": false,
       "properties": {
         "enabled": {
