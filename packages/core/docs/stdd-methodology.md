@@ -252,7 +252,7 @@ Spec が「常に最新の仕様」を保持するのに対し、PLAN は「1 �
 - Priority 順 (P0 → P1 → P2) でセッションを切ると、最重要部分が早期に動く
 - 各 PLAN セッション中に Spec の修正が必要になったら、即座に Spec 側を更新する (PLAN だけ独走させない)
 
-配置パスは `.stdd.config.yml` の `docs.layout.plan` で設定する。デフォルト例は `docs/<app>/<feature_path>/plans/<yyyy-mm-dd>.md`。
+配置パスは `.stdd.config.yml` の `docs.layout.plan` で設定する。デフォルト例は `docs/<app>/<feature_path>/plans/<yyyy-mm-dd>.md`。PLAN を作らない体系では `docs.layout.plan` を書かない（任意項目）。そのときは PLAN の作成を飛ばし、TEST_PLAN.md のテスト戦略から直接実装に入る。
 
 ---
 
@@ -335,6 +335,7 @@ STDD は「テスト・実装の改修も必ず Spec 起点で行う」ことを
 - 開発プロセス自体の課題を作業のたびに集め、定期的に効果を測って改善する（→ 8）
 - 局面に応じて適用の強さを選ぶ。速さが必要なときはユーザーが明示して緊急モードを使い、あとで通常の工程で見直す（→ 9）
 - 規律を足すときは、それを確かめる自動化（フック・検査スクリプト・skill の手順）を一緒に用意する（→ 10）
+- 並行して作業するときは、1 つのセッションにつき 1 つの作業ツリーを使い、着手前にほかの作業ツリーや作成中の PR との重なりを確かめる。共有している作業ツリーでは、変更を退避・破棄するコマンド（`git stash` など）を使わない（→ [`parallel-work.md`](parallel-work.md)）
 
 ---
 
@@ -380,6 +381,7 @@ PR 本文に緊急モードで作ったことを明記する（`choosing-work-mo
 - `feedback-loop.md` — フィードバックの収集と改善のループ（課題の起票・工程テレメトリ・定期の効果測定）
 - `work-modes-and-limits.md` — 作業モードと適用限界（緊急モード・STDD が向かない局面と判断の目安）
 - `discipline-automation.md` — 規律の自動化（規律を足すときの方針・フックの一覧と限界）
+- `parallel-work.md` — 並行作業の規律（1 セッション 1 作業ツリー・重なりの検出・共有作業ツリーで使わないコマンド）
 - `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
 - `.claude/skills/documenting-tech-specs/templates/` — 技術 spec テンプレ（feature: `tech-design.md` / `test-plan.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
 - `.claude/skills/documenting-plans/templates/plan.md` — 実装計画テンプレ

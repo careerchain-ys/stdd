@@ -116,3 +116,50 @@ grep -rn "user_app\|admin_app" .claude/ plugins/
 grep -rn "npx tsc --noEmit" .claude/ plugins/
 grep -rn "origin/develop" .claude/ plugins/
 ```
+
+---
+
+## 7. 文字数の上限と総量の基準値
+
+skill / agent / rule の定義は、エージェントが読み込むたびにトークンを使う。文章は読みやすさを理由に育ちやすく、
+読み込む量の増加はレビューでは見えにくい。そこで定義の文字数を検査で確かめる。
+
+### 7.1 数える対象
+
+読み込まれる時機が違うので、種別ごとに数える（文字数は Unicode のコードポイント。日本語 1 文字 = 1）。
+
+| 種別 | 対象 | 読み込まれる時機 |
+| --- | --- | --- |
+| `skill` | `packages/core/skills/<name>/SKILL.md` 全体 | skill の起動時 |
+| `skill-metadata` | SKILL.md の `description` + `when_to_use` | 全セッションで常に |
+| `agent` | `packages/core/agents/<name>.md` 全体 | agent の起動時（システムプロンプトに載る） |
+| `agent-description` | agent の `description` | 全セッションで常に |
+| `rule` | `packages/core/rules/*.md` | 全セッションで常に |
+| `all` | skills / agents / rules 配下の `.md` の合計（`references/`・`templates/` を含む） | — |
+
+### 7.2 ルール
+
+- **1 本あたりの上限**: 種別ごとの上限（`scripts/harness-size-baseline.json` の `limits`）を超える定義を新しく作らない。
+  いま上限を超えている定義は `over_limit` に在庫として載せ、その値までは許す。在庫の値は増やさない。
+- **総量の基準値**: 種別ごとの合計（`totals`）を基準値より増やす変更は、検査で不合格になる。
+  本数を増やす育ち方は 1 本あたりの上限では捉えられないので、総量でも見る。
+  増やすと決めたら `node scripts/check-harness-size.mjs --accept-growth` で台帳を更新し、**理由を PR の本文に書く**。
+- **減らしたら締め直す**: 総量が減ったとき・在庫が上限内に戻ったときは、`--update-baseline` で台帳を締め直す。
+  このオプションは減らす方向にしか書かない。
+- 上限は文章の質を測らない。上限に収めるために規範を削らない。
+
+### 7.3 減らし方
+
+- **判定をスクリプトに移す**: 条件の判定や手順の分岐を文章で説明するより、スクリプトにして skill から呼ぶほうが確実に減る。
+  skill の文章は手順書にする。
+- **毎回は読まない節を `references/` に分ける**: skill の起動時には SKILL.md だけが読まれる。
+  条件に当たったときだけ読む節は `references/` に分け、SKILL.md から参照する。
+  毎回読む節を分けても、読み込む回数が増えるだけで減らない。
+- **経緯を規範から外す**: 「なぜそう決めたか」の経緯は、規範の文から外して設計メモや PR に残す。
+
+### 7.4 検証
+
+```bash
+npm run check:harness-size
+node --test test/harness-size.test.mjs
+```
