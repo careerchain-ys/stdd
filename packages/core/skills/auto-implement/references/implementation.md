@@ -4,7 +4,7 @@ Phase 2 でテストを書き、実装する手順。メインのセッション
 
 ## 1. 着手の前に
 
-- **Spec を読む**: 対象機能の REQUIREMENTS.md・TECH_DESIGN.md・TEST_PLAN.md と、PLAN（あれば）。
+- **Spec を読む**: 対象機能の REQUIREMENTS.md・技術設計とテスト設計（`docs.lineup` が `single` なら TECH_DESIGN.md・TEST_PLAN.md、`layered` なら API_DESIGN.md・SCREEN_DESIGN.md・各テスト設計・TEST_DESIGN.md）と、PLAN（あれば）。
 - **規約を読む**: `AGENTS.md` / `CLAUDE.md` / `.claude/docs/coding-conventions.md`（存在する場合）と、common の ARCHITECTURE.md のレイヤ規約。
 - **既にあるものを探す**: 自前で書く前に、次の順で同等のものを探す。
   1. プロジェクト内（各 `apps[].path` 配下と共有のディレクトリ）
@@ -14,7 +14,7 @@ Phase 2 でテストを書き、実装する手順。メインのセッション
 
 ## 2. テスト（Red）
 
-1. TEST_PLAN.md のテストケースに沿ってテストを書く（Unit → Integration → E2E）。テストには対象の要件 ID を付ける。
+1. テスト計画（TEST_PLAN.md、`layered` では層別のテスト設計の行）に沿ってテストを書く（Unit → Integration → E2E）。テストには対象の要件 ID を付ける。
 2. 書いたテストだけを実行し、失敗することを確かめる。
 3. テストをコミットする。`quick` 以外では、ここで Phase 2.5（テストレビュー）に進む。
 

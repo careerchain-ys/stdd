@@ -37,6 +37,8 @@ cd e2e && npm run test
 
 チェック内容:
 
+`.stdd.config.yml` の `docs.lineup` が `layered` のときは、TEST_PLAN.md を TEST_DESIGN.md と層別のテスト設計（API_TEST_DESIGN.md / SCREEN_TEST_DESIGN.md）、TECH_DESIGN.md を API_DESIGN.md / SCREEN_DESIGN.md と読み替える。
+
 1. **REQUIREMENTS.md ⇔ テスト**:
    - 受入基準がすべてテストケースでカバーされているか
    - テストケースが要件を正しく検証しているか

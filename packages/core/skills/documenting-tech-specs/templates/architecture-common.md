@@ -176,6 +176,8 @@ sequenceDiagram
 - テーブル定義: [`./TABLE_DEFINITION.md`](./TABLE_DEFINITION.md)
 - API 仕様: [`./API_SPEC.md`](./API_SPEC.md)
 - 機能別 Spec: `docs/<app>/<feature>/TECH_DESIGN.md`
+
+テンプレート版: 1.0
 ````
 
 ## 記述しない内容（責務分界）
@@ -186,3 +188,11 @@ sequenceDiagram
 - 機能個別のロジック設計・画面項目・テスト → 各 feature の `TECH_DESIGN.md` / `TEST_PLAN.md`
 - 関数 / メソッドの具体実装コード。特定の型定義は載せない（データ構造は `TABLE_DEFINITION.md`、I/F は `API_SPEC.md`）
 - 履歴・経緯・version（SSoT 原則）
+
+## テンプレート更新履歴
+
+最新の行の版が現行版である。テンプレートを変えたら版を 0.1 上げ、作成済みの文書を新しい版に合わせる手順を書く。
+
+| 版 | 変更内容 | 作成済みの文書の直し方 |
+| --- | --- | --- |
+| 1.0 | 版の管理を始めた（この時点の内容を 1.0 とする） | 文書の末尾に「テンプレート版: 1.0」を足す |

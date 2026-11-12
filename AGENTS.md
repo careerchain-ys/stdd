@@ -62,6 +62,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 | agent の役割の検査 | `node --test test/agent-roles.test.mjs`（配る agent が書き込みの道具を持たないか。基準は `packages/core/docs/skill-and-agent.md`） |
 | モデルの使い分けの検査 | `node --test test/model-selection.test.mjs`（agent の既定が章 §2 の表どおり・Codex の生成物にモデルが無い・別名の一覧が生成器と導入コマンドと schema で一致することを確かめる。設定の上書きの振る舞いは `packages/stdd` の `npm test`） |
 | skill / agent の文字数の検査 | `npm run check:harness-size`（1 本あたりの上限と総量の基準値。規約は `docs/config-driven-authoring.md` §7。スクリプトのテストは `node --test test/harness-size.test.mjs`） |
+| 設計書の構造定義の検査 | `node --test test/doc-structure.test.mjs`（テンプレートの章名・列名・版の宣言が `documenting-tech-specs/references/doc-structure.json` と一致するか） |
 | 生成物のドリフト検査          | `npm run check:adapters`（`.claude/` `.agents/` `.codex/` が `packages/core/` と一致するか検査）                          |
 
 > **Core + Adapter**: skill / agent / hook / spec-first ルールの SSoT は `packages/core/{skills,agents,hooks,rules}` です。`scripts/build-adapters.mjs`（`npm run build:adapters`）がこれを各エージェントのネイティブ形式へ生成します — Claude ビュー `.claude/`、Codex ビュー `.agents/skills`・`.codex/`（agents は TOML、hooks は `.codex/hooks.json` + 共有スクリプト）。生成物は committed です。**編集は必ず `packages/core/` 側で行い**、`.claude/` 等の生成物を直接編集しないでください（`npm run check:adapters` がドリフトを検出します）。下流への導入は `stdd init --agent claude|codex|both` が担います。
@@ -134,6 +135,7 @@ stdd 本体（ドキュメント・テンプレート）は監査スクリプト
 | 規律の自動化 | `packages/core/docs/discipline-automation.md` |
 | 並行作業の規律 | `packages/core/docs/parallel-work.md` |
 | skill と agent の使い分け | `packages/core/docs/skill-and-agent.md` |
+| 設計書のラインナップと章立て | `packages/core/docs/spec-lineup.md` |
 | skill / agent / hook / rule の SSoT | `packages/core/{skills,agents,hooks,rules}/`      |
 | 要件テンプレート      | `packages/core/skills/documenting-requirements/templates/`             |
 | 技術設計テンプレート  | `packages/core/skills/documenting-tech-specs/templates/tech-design.md` |

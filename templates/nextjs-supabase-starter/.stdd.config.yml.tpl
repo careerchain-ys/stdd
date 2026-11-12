@@ -25,6 +25,11 @@ commands:
   db_types: "npx supabase gen types typescript --local"
 
 docs:
+  # 技術 spec のラインナップ（packages/core/docs/spec-lineup.md）。
+  #   layered: バックエンド（API_DESIGN / API_TEST_DESIGN）とフロントエンド（SCREEN_DESIGN / SCREEN_TEST_DESIGN）を分け、
+  #            機能全体の担保は TEST_DESIGN にまとめる。API だけ・画面だけの構成なら片方の 2 行を消す
+  #   single : 機能ごとに TECH_DESIGN と TEST_PLAN の 2 本（layout に tech_design / test_plan を書く）
+  lineup: "layered"
   layout:
     # common ティア（プロジェクト全体の俯瞰 spec）
     common_requirements: "docs/common/REQUIREMENTS.md"
@@ -34,8 +39,11 @@ docs:
     common_design: "docs/common/DESIGN.md"
     # feature ティア（機能単位の spec）
     requirements: "docs/{{feature_path}}/REQUIREMENTS.md"
-    tech_design: "docs/{{feature_path}}/TECH_DESIGN.md"
-    test_plan: "docs/{{feature_path}}/TEST_PLAN.md"
+    api_design: "docs/{{feature_path}}/API_DESIGN.md"
+    api_test_design: "docs/{{feature_path}}/API_TEST_DESIGN.md"
+    screen_design: "docs/{{feature_path}}/SCREEN_DESIGN.md"
+    screen_test_design: "docs/{{feature_path}}/SCREEN_TEST_DESIGN.md"
+    test_design: "docs/{{feature_path}}/TEST_DESIGN.md"
     plan: "docs/{{feature_path}}/plans/{{date}}.md"
 
 workflow:

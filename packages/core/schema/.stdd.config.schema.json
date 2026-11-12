@@ -115,11 +115,81 @@
       "description": "Documentation layout used by spec / plan skills.",
       "required": ["layout"],
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "type": "object", "properties": { "lineup": { "const": "layered" } }, "required": ["lineup"] },
+          "then": {
+            "properties": {
+              "layout": {
+                "type": "object",
+                "required": ["test_design"],
+                "anyOf": [{ "type": "object", "required": ["api_design"] }, { "type": "object", "required": ["screen_design"] }],
+                "dependentRequired": {
+                  "api_design": ["api_test_design"],
+                  "screen_design": ["screen_test_design"]
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "layout": { "type": "object", "required": ["tech_design", "test_plan"] }
+            }
+          }
+        }
+      ],
       "properties": {
+        "lineup": {
+          "type": "string",
+          "enum": ["single", "layered"],
+          "default": "single",
+          "description": "Line-up of the feature-tier technical specs. 'single' (default; existing installs): one TECH_DESIGN.md and one TEST_PLAN.md per feature. 'layered' (default for new installs): backend and frontend are designed separately — API_DESIGN.md + API_TEST_DESIGN.md, SCREEN_DESIGN.md + SCREEN_TEST_DESIGN.md, and the feature-wide TEST_DESIGN.md. A backend-only or frontend-only feature set may omit one side. See packages/core/docs/spec-lineup.md."
+        },
+        "structure": {
+          "type": "object",
+          "description": "Overrides of section names, table column names, table row labels, and row-ID prefixes of spec documents. Defaults per language are in skills/documenting-tech-specs/references/doc-structure.json; checkers read the override first. Keys are the language-independent identifiers used in that file. Example: { api_design: { sections: { operations: 'エンドポイント' }, tables: { response_codes: { columns: { condition: '条件' } } } } }.",
+          "propertyNames": {
+            "enum": ["requirements", "tech_design", "test_plan", "api_design", "screen_design", "api_test_design", "screen_test_design", "test_design"]
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sections": {
+                "type": "object",
+                "additionalProperties": { "type": "string", "minLength": 1 },
+                "description": "Section key -> section name (without the number)."
+              },
+              "ids": {
+                "type": "object",
+                "additionalProperties": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*$" },
+                "description": "Row-ID kind -> prefix (e.g. { event: 'EV' })."
+              },
+              "tables": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "columns": {
+                      "type": "object",
+                      "additionalProperties": { "type": "string", "minLength": 1 }
+                    },
+                    "rows": {
+                      "type": "object",
+                      "additionalProperties": { "type": "string", "minLength": 1 }
+                    }
+                  }
+                },
+                "description": "Table key -> column / row-label overrides."
+              }
+            }
+          }
+        },
         "layout": {
           "type": "object",
           "description": "Path templates that map an app + feature to its documentation files. Handlebars variables available: {{app.id}}, {{app.path}}, {{feature_path}}, {{date}}. {{app.*}} resolves against each entry of the top-level `apps[]`. Note: test file layout (e2e / integration / unit paths) is intentionally out of scope for this schema in Phase 1-A; templates currently assume conventional layouts and Phase 1-B may introduce a separate `tests.layout` object.",
-          "required": ["requirements", "tech_design", "test_plan"],
+          "required": ["requirements"],
           "additionalProperties": false,
           "properties": {
             "common_requirements": {
@@ -155,12 +225,37 @@
             "tech_design": {
               "type": "string",
               "minLength": 1,
-              "description": "Path template for TECH_DESIGN.md (概要 / 設計判断 / 画面項目定義 / 処理ロジック / エラーハンドリング / 非機能要件). Part of the technical specs (tech_specs). Same variables as 'requirements'."
+              "description": "Path template for TECH_DESIGN.md (概要 / 設計判断 / 画面項目定義 / 処理ロジック / エラーハンドリング / 非機能要件). Part of the technical specs (tech_specs). Same variables as 'requirements'. Required when docs.lineup is 'single' (or omitted)."
             },
             "test_plan": {
               "type": "string",
               "minLength": 1,
-              "description": "Path template for TEST_PLAN.md — the feature's test strategy (use-case to test-level mapping). Split out of TECH_DESIGN. Part of the technical specs (tech_specs). Same variables as 'requirements'. Example: 'docs/{{app.id}}/{{feature_path}}/TEST_PLAN.md'."
+              "description": "Path template for TEST_PLAN.md — the feature's test strategy (use-case to test-level mapping). Split out of TECH_DESIGN. Part of the technical specs (tech_specs). Same variables as 'requirements'. Example: 'docs/{{app.id}}/{{feature_path}}/TEST_PLAN.md'. Required when docs.lineup is 'single' (or omitted)."
+            },
+            "api_design": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Path template for API_DESIGN.md (docs.lineup 'layered') — the semantics of the feature's API operations: per-operation info table, response codes and when each is returned, procedure, response specification, state transitions, feature rules, other process flows. Same variables as 'requirements'. Example: 'docs/{{app.id}}/{{feature_path}}/API_DESIGN.md'. Requires api_test_design."
+            },
+            "screen_design": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Path template for SCREEN_DESIGN.md (docs.lineup 'layered') — screen items with IDs, validation / event / response-handling tables, and the text and state catalog. Same variables as 'requirements'. Example: 'docs/{{app.id}}/{{feature_path}}/SCREEN_DESIGN.md'. Requires screen_test_design."
+            },
+            "api_test_design": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Path template for API_TEST_DESIGN.md (docs.lineup 'layered') — one row per API_DESIGN row (operation x code, transition, rule, flow) with test level and test reference. Same variables as 'requirements'."
+            },
+            "screen_test_design": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Path template for SCREEN_TEST_DESIGN.md (docs.lineup 'layered') — one row per SCREEN_DESIGN row (items with conditions, validations, events, response handling). Same variables as 'requirements'."
+            },
+            "test_design": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Path template for TEST_DESIGN.md (docs.lineup 'layered') — the feature-wide test design: coverage of every use case and acceptance criterion, E2E scenarios, cross-feature rules, and what is not tested. Same variables as 'requirements'. Required when docs.lineup is 'layered'."
             },
             "wireframes": {
               "type": "string",
@@ -242,6 +337,35 @@
             "override_config": {
               "type": "string",
               "description": "Path to a devcontainer override config used by the worktree flow."
+            }
+          }
+        }
+      }
+    },
+    "response_codes": {
+      "type": "object",
+      "description": "Overrides for the response-code system (skills/documenting-tech-specs/guides/response-codes.md). The bands (0 normal / 1 user-recoverable rejection / 9 not recoverable by the user) and the granularity (one code per terminating branch) are fixed by STDD; the feature-code format and the list of common codes can be overridden here. Optional; omitted keys use the guide's defaults.",
+      "additionalProperties": false,
+      "properties": {
+        "feature_code_pattern": {
+          "type": "string",
+          "minLength": 1,
+          "default": "^[A-Z]{3,4}$",
+          "description": "Regular expression for the feature code that prefixes every response code (e.g. 'ORD' in 'ORD-1001')."
+        },
+        "common_codes": {
+          "type": "array",
+          "description": "List of common codes. When present it replaces the default list in the guide (VALIDATION_ERROR 1800, AUTH_REQUIRED 9800, NOT_FOUND 9820, INTERNAL_ERROR 9900).",
+          "items": {
+            "type": "object",
+            "required": ["name", "code", "http"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$", "description": "Classification name returned as commonCode." },
+              "code": { "type": "string", "pattern": "^[019][89][0-9]{2}$", "description": "Band digit + reserved serial 800-999 (e.g. '1800')." },
+              "http": { "type": "integer", "minimum": 100, "maximum": 599 },
+              "meaning": { "type": "string" },
+              "default_behavior": { "type": "string", "description": "Default screen behavior when a screen receives this code." }
             }
           }
         }

@@ -24,6 +24,8 @@ model: opus
 
 TEST_PLAN.md の「テスト戦略」セクションと照合する。
 
+`docs.lineup: layered` では、TEST_PLAN.md を TEST_DESIGN.md と層別のテスト設計、TECH_DESIGN.md を API_DESIGN.md / SCREEN_DESIGN.md と読み替える。
+
 - [ ] テストのレベル（E2E / Integration / Unit）の分類が、TEST_PLAN.md の**ユースケース別テスト戦略**と一致している
 - [ ] 各テストのタイトルに**対象 ID タグ**（`[UC-<feature>-NN]` / `[FL-<feature>-NN]`）があり、TEST_PLAN の対象 ID と一致している（`bash .claude/hooks/trace-audit.sh` で「テスト実装漏れ」「孤児テスト」が出ない）
 - [ ] TEST_PLAN.md のテストケースリストと実際のテストが個別に一致し、テスト総数・内訳も計画と大きく乖離していない（過不足の検出）

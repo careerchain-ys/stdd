@@ -38,7 +38,7 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
    - [generating-wireframes Skill](../generating-wireframes/SKILL.md) を参照
    - 生成後、REQUIREMENTS.md「2.4 UI/UX・画面」から `./wireframes/index.html` にリンクする
 
-3. **技術設計に進む** → [documenting-tech-specs Skill](../documenting-tech-specs/SKILL.md)（TECH_DESIGN.md / TEST_PLAN.md）
+3. **技術設計に進む** → [documenting-tech-specs Skill](../documenting-tech-specs/SKILL.md)（`docs.lineup` の構成の技術 spec）
 
 ### 既存機能の要件定義書を更新する場合
 
