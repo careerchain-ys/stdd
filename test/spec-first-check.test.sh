@@ -84,6 +84,8 @@ run_hook "$D" "src/foo.ts"; assert_contains_exit0 "impl file (warn default) emit
 
 # 2. Spec ファイル → 無言 / exit 0
 run_hook "$D" "docs/feature-x/REQUIREMENTS.md"; assert_silent_exit0 "spec file is silent" "$OUT"
+run_hook "$D" "src/orders/API_DESIGN.md"; assert_silent_exit0 "layered spec file outside docs is silent" "$OUT"
+run_hook "$D" "src/orders/SCREEN_TEST_DESIGN.md"; assert_silent_exit0 "layered test design outside docs is silent" "$OUT"
 
 # 3. テストファイル → 無言 / exit 0
 run_hook "$D" "src/foo.test.ts"; assert_silent_exit0 "test file (*.test.*) is silent" "$OUT"
