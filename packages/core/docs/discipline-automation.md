@@ -83,7 +83,7 @@ STDD の規律の多くは、規約・skill・agent の定義に文章として�
 | フック | 確かめる規律 | 設定（既定） | 対象 |
 | --- | --- | --- | --- |
 | `spec-first-check.sh` | 実装の前に Spec とテストを更新する | `workflow.enforce_spec_first`（`warn`） | 実装ファイルの編集 |
-| `agent-scope-guard.sh` | reviewer はファイルを書かない。シェルは読み取りにだけ使う | `workflow.enforce_agent_scope`（`warn`） | reviewer の subagent の編集とシェル |
+| `agent-scope-guard.sh` | reviewer はレビューされる作業ツリーを書き換えない。作業ツリーが分かれていなければシェルは読み取りにだけ使う | `workflow.enforce_agent_scope`（`warn`） | reviewer の subagent の編集とシェル |
 | `worktree-lock-guard.sh` | subagent は指定された作業ツリーの中で作業する | `workflow.enforce_worktree_lock`（`warn`） | 作業ツリーを宣言したセッションの subagent の編集とシェル |
 | `test-scope-guard.sh` | Red / Green の確認ではテストの対象を絞る。全件は QA の工程・pre-push・CI が受け持つ | `workflow.enforce_test_scope`（`warn`） | 対象を絞らない `commands.test` の実行 |
 | `pre-push-check.sh` | push の前にテスト・ビルド・トレーサビリティ監査を通す | `traceability.enforce` ほか | `git push` |
@@ -98,9 +98,17 @@ Codex が `.codex/hooks.json`（`scripts/build-adapters.mjs` が生成）で、`
 メインのエージェントと QA の agent は対象にしない。設計書と実装はメインのセッションが skill を使って書くので
 （[`skill-and-agent.md`](skill-and-agent.md)）、書く側の範囲は、このフックでは確かめない。
 
-- reviewer はファイルを書けない。agent の `tools` で編集の道具を外していても、シェル経由の書き込みは防げないためである。
-- シェルは、読み取りの許可一覧に完全に一致する 1 コマンドだけを許す。連結・パイプ・リダイレクト・置換を含むものは違反とする。
-  先頭のコマンド名だけで許可すると、連結や書き込み用のオプションで規律を抜けられるためである。
+守りたいのは「reviewer がレビューされる作業ツリーを書き換えない」ことで、「何も実行しない」ことではない。実行を禁じると
+指摘が推測だけになる。そこで、書き込みを一律に防ぐのではなく、作業ツリーを分けたうえで、元の作業ツリーへの書き込みを検出する。
+
+- **分離されているとき**（subagent の cwd の git toplevel が、`CLAUDE_PROJECT_DIR` の toplevel と違う。`isolation: worktree` で起動した
+  `test-reviewer`・`code-reviewer`）: シェルは通す。書き込みは、書き込み先の git toplevel がレビューされる作業ツリーと同じときだけ違反とする。
+  Claude の作業ツリーはレビューされる作業ツリーのパスの中（`.claude/worktrees/`）にできるので、パスの前方一致では判定しない。
+- **分離されていないとき、または `CLAUDE_PROJECT_DIR` が無いとき**（Codex、作業ツリーを分けずに動く agent teams のメンバーなど）:
+  書き込みは宛先を問わず違反とし、シェルは読み取りの許可一覧に完全に一致する 1 コマンドだけを許す。連結・パイプ・リダイレクト・置換を
+  含むものは違反とする。先頭のコマンド名だけで許可すると、連結や書き込み用のオプションで規律を抜けられるためである。
+- **フックで防げないもの**: 分離されたシェルから絶対パスで元の作業ツリーを書き換えること。統合のときにメインのセッションが、
+  起動の前後で `git status --porcelain` と HEAD が変わっていないことを確かめて検出する（`auto-implement` の phases.md「作業ツリーを分ける」）。
 
 名前を付けて起動した subagent や agent teams のメンバーでは、入力の `agent_type` に付けた名前が入ることがある。
 そのため、agent の名前に「-」と続けた名前（`code-reviewer-security` など）も reviewer として扱う。reviewer に名前を付けるときは
@@ -131,7 +139,8 @@ subagent を起動する側（メインのエージェント）が、作業す�
 | --- | --- | --- |
 | 実装の前に Spec とテストを更新する | フック `spec-first-check.sh`。ID による影響範囲の確認は `trace-audit.sh` | 変更が仕様の振る舞いを変えるかどうかは判断を伴う |
 | 要件・設計・テスト・実装に ID を通す | 検査スクリプト `trace-audit.sh`（pre-push・CI） | — |
-| reviewer はファイルを書かない | フック `agent-scope-guard.sh` | agent の名前で始まらない名前を付けて起動した subagent は判定できない（§3.1） |
+| reviewer はレビューされる作業ツリーを書き換えない | フック `agent-scope-guard.sh` と、統合のときの `git status --porcelain`・HEAD の突合 | 分離されたシェルからの絶対パスでの書き込みはフックでは防げず、突合で検出する。agent の名前で始まらない名前を付けて起動した subagent は判定できない（§3.1） |
+| reviewer の High 以上の指摘には再現を付ける | 統合のときにメインのセッションが再現を実行し直す（`auto-implement` の phases.md） | 再現として十分かは判断を伴う |
 | 配る agent に書き込みの道具を持たせない | テスト `test/agent-roles.test.mjs`（[`skill-and-agent.md`](skill-and-agent.md)） | — |
 | subagent は指定された作業ツリーで作業する | フック `worktree-lock-guard.sh` と宣言のスクリプト | 宣言するかどうかは起動する側の手順（`auto-implement` Step 4）に任せる |
 | Red / Green の確認ではテストの対象を絞る | フック `test-scope-guard.sh` | どのテストが対象かの選び方は技術スタックに依存する |

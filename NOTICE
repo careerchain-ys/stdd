@@ -27,8 +27,12 @@ and are licensed under their respective licenses.
 2. pstack（考え方の取り込み）
    Location: packages/core/skills/assessing-change-impact/
              packages/core/skills/correcting-repeated-mistakes/
+             packages/core/agents/code-reviewer.md / test-reviewer.md / qa-engineer.md
+             packages/core/skills/auto-implement/references/implementation.md / phases.md
    License:  MIT License
    Source:   https://github.com/cursor/plugins/tree/main/pstack
              Copyright (c) 2026 Lauren Tan
    Notes:    pstack の skill `blast-radius` と `correct` の考え方を、STDD の工程に
-             合わせて日本語で書き直したもの。原文は含まない。
+             合わせて日本語で書き直したもの。あわせて `interrogate` と `prove-it-works` の
+             考え方（指摘や完了の主張を、実行して得た結果で裏付ける）を、reviewer・
+             qa-engineer の判定の根拠と、実装の手順に取り込んだ。原文は含まない。
