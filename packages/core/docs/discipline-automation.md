@@ -139,6 +139,8 @@ subagent を起動する側（メインのエージェント）が、作業す�
 | --- | --- | --- |
 | 実装の前に Spec とテストを更新する | フック `spec-first-check.sh`。ID による影響範囲の確認は `trace-audit.sh` | 変更が仕様の振る舞いを変えるかどうかは判断を伴う |
 | 要件・設計・テスト・実装に ID を通す | 検査スクリプト `trace-audit.sh`（pre-push・CI） | — |
+| 設計書の行とレスポンスコードを、対になる文書が過不足なく受ける | `trace-audit.sh` の表の突合（[`id-chain.md`](id-chain.md)） | 意味の一致（受入基準の要約の取り違えなど）は判定できないので、レビューで読む |
+| 検査スクリプトは 0 件や読めない表を合格にしない | 振る舞いのテスト（`test/trace-tables.test.sh` など。`docs/config-driven-authoring.md` §8） | — |
 | reviewer はレビューされる作業ツリーを書き換えない | フック `agent-scope-guard.sh` と、統合のときの `git status --porcelain`・HEAD の突合 | 分離されたシェルからの絶対パスでの書き込みはフックでは防げず、突合で検出する。agent の名前で始まらない名前を付けて起動した subagent は判定できない（§3.1） |
 | reviewer の High 以上の指摘には再現を付ける | 統合のときにメインのセッションが再現を実行し直す（`auto-implement` の phases.md） | 再現として十分かは判断を伴う |
 | 配る agent に書き込みの道具を持たせない | テスト `test/agent-roles.test.mjs`（[`skill-and-agent.md`](skill-and-agent.md)） | — |

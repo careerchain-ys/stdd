@@ -64,6 +64,9 @@ workflow:
 #   enabled: true
 #   enforce: "warn"            # off | warn | block（抜け漏れで pre-push を止めるなら block）
 #   require_impl_annotation: false
+#   patterns:
+#     # テスト名の先頭に置いた ID だけをテストとして数える（例: it('[AT-03] [UC-orders-01] 在庫が無ければ拒否する')）
+#     test_tag: '\([[:space:]]*.(\[[A-Z]+-[0-9]+\] *)?\[((UC|FL)-[a-z0-9]+-[0-9]+)\]'
 #   scan:
 #     tests:
 #       - "**/*.test.*"

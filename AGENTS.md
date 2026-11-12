@@ -54,6 +54,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 | プラグインメタデータの構文検証 | `for f in plugins/*/plugin.json; do python3 -m json.tool "$f" > /dev/null && echo "OK $f"; done` |
 | 禁止語監査                    | リポジトリの公開状態に応じて、旧名称・固有名詞が残っていないかを `grep -rI` で確認                                          |
 | トレーサビリティ監査スクリプトの検証 | `bash test/trace-audit.test.sh`（`packages/core/hooks/trace-audit.sh` の順方向 gap 検知・逆方向影響範囲の振る舞いテスト）        |
+| 設計書の表の突合の検証 | `bash test/trace-tables.test.sh`（layered の設計書一式を 1 か所ずつ壊し、レスポンスコード・行の ID・受入基準の突合が不合格にすることと、テンプレートの例文を読めることを確かめる） |
 | フィードバックの仕組みのスクリプトの検証 | `bash test/dev-feedback.test.sh` / `bash test/pr-telemetry.test.sh` / `bash test/collect.test.sh`（偽の `gh` と `jq` で、起票・再発・見送り・テレメトリの投稿と集計の振る舞いを確かめる） |
 | 並行作業の重なりの検出の検証 | `bash test/work-overlap.test.sh`（ほかの作業ツリー・作成中の PR との重なりの検出を確かめる） |
 | 緊急モードのスクリプトとフックの検証 | `bash test/work-mode.test.sh`（申し出の記録・宣言・解除と、pre-push の緩和を確かめる） |
@@ -136,6 +137,7 @@ stdd 本体（ドキュメント・テンプレート）は監査スクリプト
 | 並行作業の規律 | `packages/core/docs/parallel-work.md` |
 | skill と agent の使い分け | `packages/core/docs/skill-and-agent.md` |
 | 設計書のラインナップと章立て | `packages/core/docs/spec-lineup.md` |
+| ID チェーンの突合 | `packages/core/docs/id-chain.md` |
 | skill / agent / hook / rule の SSoT | `packages/core/{skills,agents,hooks,rules}/`      |
 | 要件テンプレート      | `packages/core/skills/documenting-requirements/templates/`             |
 | 技術設計テンプレート  | `packages/core/skills/documenting-tech-specs/templates/tech-design.md` |
