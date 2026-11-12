@@ -75,14 +75,9 @@ docs/common/ARCHITECTURE.md / TABLE_DEFINITION.md / API_SPEC.md / DESIGN.md
 
 ## ドキュメント配置ルール
 
-| 実装ファイル                  | 技術設計の配置先 |
-| ----------------------------- | --- |
-| `<app>/app/<path>/page.tsx`   | `docs/<app>/<path>/TECH_DESIGN.md`<br>`docs/<app>/<path>/TEST_PLAN.md` |
-| `<app>/components/<name>.tsx` | `docs/<app>/components/<name>/TECH_DESIGN.md`<br>`docs/<app>/components/<name>/TEST_PLAN.md` |
-
 配置先は `.stdd.config.yml` の `docs.layout.*`（`docs.layout.tech_design` 等）テンプレートに、対象アプリの `app`（`apps[].id`）と `feature_path` を適用して決定する。
 
-**例**: 実装 `<app.path>/app/login/page.tsx` → `docs/<app.id>/login/TECH_DESIGN.md`, `docs/<app.id>/login/TEST_PLAN.md`
+**例**: 実装 `<app.path>/app/login/page.tsx` → `docs/<app.id>/login/TECH_DESIGN.md`, `docs/<app.id>/login/TEST_PLAN.md`。コンポーネント `<app.path>/components/<name>.tsx` → `docs/<app.id>/components/<name>/` 配下に同じ 2 ファイル
 
 ## 絶対ルール: SSOT原則・要確認マーカー（最優先）
 
@@ -132,22 +127,9 @@ docs/common/ARCHITECTURE.md / TABLE_DEFINITION.md / API_SPEC.md / DESIGN.md
 - 振る舞い（手順）→E2E、受入基準（EARS）→Unit/Integration の対応で組む
 - REQUIREMENTS の Priority（P0/P1/P2）と対応させる
 
-## 基本原則: common 階層の技術ドキュメント
+## Priority（優先度）とテスト戦略
 
-- **ARCHITECTURE.md**: システム概要（構成 / スタック / 連携 / セキュリティ / インフラ）。データモデル・API は持たない。
-- **TABLE_DEFINITION.md**: 全テーブル定義のSSoT（カード形式・ER 図なし）。feature が参照する。
-- **API_SPEC.md**: API 契約のSSoT（OpenAPI 風 Markdown）。feature が参照する。
-- **DESIGN.md**（任意）: デザイン標準。
-
-### Priority（優先度）ガイドライン
-
-テスト戦略は REQUIREMENTS の Priority に従う。
-
-| Priority | 定義                                                     | テスト戦略                 |
-| -------- | -------------------------------------------------------- | -------------------------- |
-| **P0**   | Critical Path - ビジネスに直結、高頻度、複数システム統合 | E2E 必須 + Integration     |
-| **P1**   | Important - 重要だが Critical Path ではない              | E2E 検討、Integration 必須 |
-| **P2**   | Nice to Have - エッジケース、低頻度                      | Integration または Unit    |
+テスト戦略は REQUIREMENTS の Priority（P0/P1/P2）に従う。各 Priority で求めるテストレベル（P0 は E2E 必須 + Integration など）は [documenting-requirements「Priority（優先度）ガイドライン」](../documenting-requirements/SKILL.md) を正本とする。
 
 ## 次のステップ
 
@@ -155,24 +137,6 @@ docs/common/ARCHITECTURE.md / TABLE_DEFINITION.md / API_SPEC.md / DESIGN.md
 
 1. **PLANドキュメントを作成** → [documenting-plans Skill](../documenting-plans/SKILL.md)
 2. PLANドキュメントに従ってテスト作成・実装を進める
-
-## 参照ファイル
-
-- **テンプレート（feature）**
-  - [TECH_DESIGN.md](templates/tech-design.md) ← 概要 / 設計判断 / 画面項目定義 / ロジック設計 / エラーハンドリング / 非機能要件
-  - [TEST_PLAN.md](templates/test-plan.md) ← テスト戦略
-- **テンプレート（common）**
-  - [ARCHITECTURE.md](templates/architecture-common.md) ← システム概要
-  - [TABLE_DEFINITION.md](templates/table-definition-common.md) ← テーブル定義
-  - [API_SPEC.md](templates/api-spec-common.md) ← API 仕様
-  - [DESIGN.md](templates/design-common.md) ← デザイン標準（任意）
-- **ガイド**
-  - [エラーハンドリングガイド](guides/error-handling.md)
-  - [STDD違反例と対策](../documenting-requirements/guides/stdd-violations.md) ← SSOT原則（SSoTは documenting-requirements）
-- **関連スキル**
-  - [documenting-requirements Skill](../documenting-requirements/SKILL.md) ← 要件（前提・SSOTSSoT）
-- **次のステップ**
-  - [PLANドキュメント作成スキル](../documenting-plans/SKILL.md)
 
 ## When NOT to Use This Skill
 
