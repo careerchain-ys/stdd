@@ -191,6 +191,24 @@
           "default": "warn",
           "description": "Behavior of the spec-first PreToolUse hook (.claude/hooks/spec-first-check.sh) that nudges the Spec -> Test -> Implementation order on ad-hoc edits. 'off': disabled. 'warn' (default): inject a non-blocking reminder when editing an implementation file. 'block': deny implementation edits when the current branch has no Spec / test change yet. Spec, test, docs, .claude, and config / lockfile edits are always exempt."
         },
+        "enforce_agent_scope": {
+          "type": "string",
+          "enum": ["off", "warn", "block"],
+          "default": "warn",
+          "description": "Behavior of the agent-scope PreToolUse hook (.claude/hooks/agent-scope-guard.sh). Applies only to subagent calls of the spec writers (requirements-writer / tech-specs-writer / plan-writer) and reviewers (requirements-reviewer / tech-specs-reviewer / test-reviewer / code-reviewer). Writers may edit only inside the directories that docs.layout points to; reviewers may not write files; both may run only one read-only shell command per call. 'off': disabled. 'warn' (default): report the violation in context without stopping. 'block': deny the operation."
+        },
+        "enforce_worktree_lock": {
+          "type": "string",
+          "enum": ["off", "warn", "block"],
+          "default": "warn",
+          "description": "Behavior of the worktree-lock PreToolUse hook (.claude/hooks/worktree-lock-guard.sh). When the session has declared its working tree with skills/auto-implement/scripts/worktree-lock.sh lock, subagent edits and shell working directories outside the declared tree are reported. Sessions without a declaration are not affected. 'off': disabled. 'warn' (default): report without stopping. 'block': deny the operation."
+        },
+        "enforce_test_scope": {
+          "type": "string",
+          "enum": ["off", "warn", "block"],
+          "default": "warn",
+          "description": "Behavior of the test-scope PreToolUse hook (.claude/hooks/test-scope-guard.sh). Reports running commands.test without any target argument (a full run) outside the QA phase. qa-engineer subagents and commands prefixed with STDD_FULL_TEST_REASON=\"<reason>\" are exempt. 'off': disabled. 'warn' (default): report without stopping. 'block': deny the command."
+        },
         "worktree": {
           "type": "object",
           "additionalProperties": false,

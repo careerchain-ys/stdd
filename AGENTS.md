@@ -57,6 +57,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 | フィードバックの仕組みのスクリプトの検証 | `bash test/dev-feedback.test.sh` / `bash test/pr-telemetry.test.sh` / `bash test/collect.test.sh`（偽の `gh` と `jq` で、起票・再発・見送り・テレメトリの投稿と集計の振る舞いを確かめる） |
 | 並行作業の重なりの検出の検証 | `bash test/work-overlap.test.sh`（ほかの作業ツリー・作成中の PR との重なりの検出を確かめる） |
 | 緊急モードのスクリプトとフックの検証 | `bash test/work-mode.test.sh`（申し出の記録・宣言・解除と、pre-push の緩和を確かめる） |
+| 規律のフックの検証 | `bash test/agent-scope-guard.test.sh` / `bash test/worktree-lock.test.sh` / `bash test/test-scope-guard.test.sh`（subagent の編集範囲・作業ツリーの突合・全件テストの抑止を確かめる） |
 | skill / agent の文字数の検査 | `npm run check:harness-size`（1 本あたりの上限と総量の基準値。規約は `docs/config-driven-authoring.md` §7。スクリプトのテストは `node --test test/harness-size.test.mjs`） |
 | 生成物のドリフト検査          | `npm run check:adapters`（`.claude/` `.agents/` `.codex/` が `packages/core/` と一致するか検査）                          |
 
@@ -127,6 +128,7 @@ stdd 本体（ドキュメント・テンプレート）は監査スクリプト
 | 方法論ドキュメント（開発フロー図を含む） | `packages/core/docs/stdd-methodology.md` |
 | フィードバックの収集と改善のループ | `packages/core/docs/feedback-loop.md` |
 | 作業モードと適用限界 | `packages/core/docs/work-modes-and-limits.md` |
+| 規律の自動化 | `packages/core/docs/discipline-automation.md` |
 | 並行作業の規律 | `packages/core/docs/parallel-work.md` |
 | skill / agent / hook / rule の SSoT | `packages/core/{skills,agents,hooks,rules}/`      |
 | 要件テンプレート      | `packages/core/skills/documenting-requirements/templates/`             |

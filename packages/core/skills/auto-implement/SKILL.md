@@ -101,6 +101,16 @@ devcontainer up --workspace-folder ../worktree-<instance-id> --override-config .
 
 以降の作業はすべてworktree内のdevcontainerで実行する。
 
+作業ツリーで作業するときは、専門エージェントに依頼する前に、作業する作業ツリーを宣言する。宣言すると、
+フック `worktree-lock-guard.sh` がエージェントの書き込み先と実行先を宣言と突き合わせる（宣言しなければ確かめない）。
+
+```bash
+# <skill-dir> はこの skill のディレクトリ（Claude は .claude/skills/auto-implement、Codex は .agents/skills/auto-implement）
+bash <skill-dir>/scripts/worktree-lock.sh lock --root <作業ツリーの絶対パス>
+```
+
+エージェントに一時ディレクトリを使わせるときは `--allow <ディレクトリ>` を足す。作業を終えたら `unlock` で外す。
+
 ## Step 5: フェーズ実行
 
 このスキルは **Team Lead（オーケストレーター）** として動作し、専門エージェントにタスクを依頼しながら開発フロー全体を統括する。

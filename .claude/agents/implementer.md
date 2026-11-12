@@ -81,12 +81,16 @@ cd <apps[].path> && <commands.typecheck>
 
 ## テストコマンド
 
-`.stdd.config.yml` の `apps[]` を読み、各アプリについて `apps[].path` ディレクトリで `commands.test` を実行する（apps[] の数だけ繰り返す）。
+`.stdd.config.yml` の `apps[]` を読み、対象のアプリの `apps[].path` ディレクトリで `commands.test` を実行する。
+Red / Green の確認では、**作成・変更したテストだけを引数で指定して**実行する。全件の実行は QA の工程（qa-engineer）・pre-push・CI が受け持つ。
 
 ```bash
 # 例（実際の値は .stdd.config.yml に従う）
-cd <apps[].path> && <commands.test>
+cd <apps[].path> && <commands.test> <対象のテストファイル>
 ```
+
+対象を絞らない実行はフック（`test-scope-guard.sh`）が知らせる。共通部品の変更などで全件が必要なときは、
+`STDD_FULL_TEST_REASON="<理由>" <commands.test>` のように理由を前置して実行する。
 
 ## 必須の事前読み込み
 

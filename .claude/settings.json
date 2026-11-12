@@ -59,6 +59,21 @@
             "type": "command",
             "command": ".claude/hooks/pre-push-check.sh",
             "timeout": 600
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/agent-scope-guard.sh",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/worktree-lock-guard.sh",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/test-scope-guard.sh",
+            "timeout": 10
           }
         ]
       },
@@ -69,6 +84,21 @@
             "type": "command",
             "command": ".claude/hooks/spec-first-check.sh",
             "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/agent-scope-guard.sh",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/worktree-lock-guard.sh",
+            "timeout": 10
           }
         ]
       }

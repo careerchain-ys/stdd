@@ -94,22 +94,40 @@ async function planCodexView() {
 }
 
 /** Codex 側に配線する hook スクリプト（packages/core/hooks 配下）。pre-push-check.sh は Claude 専用のため含めない。 */
-const CODEX_HOOK_SCRIPTS = ["spec-first-check.sh", "work-mode-prompt.sh"];
+const CODEX_HOOK_SCRIPTS = [
+  "spec-first-check.sh",
+  "work-mode-prompt.sh",
+  "agent-scope-guard.sh",
+  "worktree-lock-guard.sh",
+  "test-scope-guard.sh",
+];
 
-/** Codex の hooks.json（Claude settings.json とほぼ同一構造）。PreToolUse の matcher は編集系ツール。UserPromptSubmit は matcher を使わない。 */
+/** Codex の hooks.json の 1 コマンド分。 */
+function codexHookCommand(script, timeout) {
+  return { type: "command", command: `bash "$(git rev-parse --show-toplevel)/.codex/hooks/${script}"`, timeout };
+}
+
+/** Codex の hooks.json（Claude settings.json とほぼ同一構造）。PreToolUse の matcher は編集系ツールとシェル。UserPromptSubmit は matcher を使わない。 */
 function codexHooksJson() {
   const obj = {
-    description: "STDD hooks（spec-first の促し・緊急モードの申し出の記録。packages/core から生成・直接編集しない）",
+    description:
+      "STDD hooks（spec-first の促し・緊急モードの申し出の記録・subagent の範囲と作業先の確認・全件テストの抑止。packages/core から生成・直接編集しない）",
     hooks: {
       PreToolUse: [
         {
           matcher: "apply_patch|Edit|Write",
           hooks: [
-            {
-              type: "command",
-              command: 'bash "$(git rev-parse --show-toplevel)/.codex/hooks/spec-first-check.sh"',
-              timeout: 30,
-            },
+            codexHookCommand("spec-first-check.sh", 30),
+            codexHookCommand("agent-scope-guard.sh", 10),
+            codexHookCommand("worktree-lock-guard.sh", 10),
+          ],
+        },
+        {
+          matcher: "Bash",
+          hooks: [
+            codexHookCommand("agent-scope-guard.sh", 10),
+            codexHookCommand("worktree-lock-guard.sh", 10),
+            codexHookCommand("test-scope-guard.sh", 10),
           ],
         },
       ],

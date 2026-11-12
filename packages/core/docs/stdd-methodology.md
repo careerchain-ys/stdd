@@ -334,6 +334,7 @@ STDD は「テスト・実装の改修も必ず Spec 起点で行う」ことを
 - 要件・テスト・実装に ID を貫通させ、抜け漏れと影響範囲を機械的に検知できる状態を保つ（→ 6）
 - 開発プロセス自体の課題を作業のたびに集め、定期的に効果を測って改善する（→ 8）
 - 局面に応じて適用の強さを選ぶ。速さが必要なときはユーザーが明示して緊急モードを使い、あとで通常の工程で見直す（→ 9）
+- 規律を足すときは、それを確かめる自動化（フック・検査スクリプト・skill の手順）を一緒に用意する（→ 10）
 - 並行して作業するときは、1 つのセッションにつき 1 つの作業ツリーを使い、着手前にほかの作業ツリーや作成中の PR との重なりを確かめる。共有している作業ツリーでは、変更を退避・破棄するコマンド（`git stash` など）を使わない（→ [`parallel-work.md`](parallel-work.md)）
 
 ---
@@ -362,12 +363,24 @@ PR 本文に緊急モードで作ったことを明記する（`choosing-work-mo
 
 ---
 
-## 10. 関連ドキュメント
+## 10. 規律の自動化
+
+文章で書いた規律は、agent や工程が増えるほど守られにくくなる。STDD では、規約や skill に規律を足すときに、それを確かめる
+手段を同時に検討する。手段はフック・検査スクリプト・skill の確認手順・文章のみ、の順に検討し、文章だけにとどめる
+規律には理由を残す。操作を止める検査は数を絞り、既定は警告にして、誤検知が無いことを確かめてから止める設定に上げる。
+
+あわせて、subagent の編集範囲の制限・作業ツリーの突合・全件テストの抑止のフックを用意する。詳細は
+[`discipline-automation.md`](discipline-automation.md) を参照。
+
+---
+
+## 11. 関連ドキュメント
 
 - `guide-for-existing-project.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
 - `guide-for-new-project.md` — 新規プロジェクトの STDD 立ち上げ手順（最初から順行）
 - `feedback-loop.md` — フィードバックの収集と改善のループ（課題の起票・工程テレメトリ・定期の効果測定）
 - `work-modes-and-limits.md` — 作業モードと適用限界（緊急モード・STDD が向かない局面と判断の目安）
+- `discipline-automation.md` — 規律の自動化（規律を足すときの方針・フックの一覧と限界）
 - `parallel-work.md` — 並行作業の規律（1 セッション 1 作業ツリー・重なりの検出・共有作業ツリーで使わないコマンド）
 - `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
 - `.claude/skills/documenting-tech-specs/templates/` — 技術 spec テンプレ（feature: `tech-design.md` / `test-plan.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
