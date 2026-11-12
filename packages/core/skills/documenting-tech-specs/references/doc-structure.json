@@ -1,0 +1,348 @@
+{
+  "version": 1,
+  "description": "Spec ドキュメントの章名・表の列名・行 ID の既定。キーは言語に依らない識別子で、表示名は言語ごとに持つ。検査スクリプトはこのファイルを読み、.stdd.config.yml の docs.structure で上書きされた名前を優先する。テンプレートとの一致は test/doc-structure.test.mjs が確かめる。",
+  "languages": ["ja", "en"],
+  "common": {
+    "template_version": { "ja": "テンプレート版", "en": "Template version" },
+    "template_history": { "ja": "テンプレート更新履歴", "en": "Template history" }
+  },
+  "documents": {
+    "requirements": {
+      "file": "REQUIREMENTS.md",
+      "template": "../documenting-requirements/templates/requirements.md",
+      "lineups": ["single", "layered"],
+      "sections": {
+        "business": { "number": "1", "ja": "業務要件", "en": "Business requirements" },
+        "functional": { "number": "2", "ja": "機能要件", "en": "Functional requirements" },
+        "use_cases": { "number": "2.1", "ja": "ユースケース別 機能要件", "en": "Functional requirements by use case" },
+        "rules": { "number": "2.2", "ja": "業務ルール / 制約", "en": "Business rules / constraints" },
+        "non_functional": { "number": "3", "ja": "非機能要件", "en": "Non-functional requirements" },
+        "out_of_scope": { "number": "4", "ja": "スコープ外", "en": "Out of scope" }
+      },
+      "labels": {
+        "id": { "ja": "ID", "en": "ID" },
+        "priority": { "ja": "Priority", "en": "Priority" }
+      },
+      "ids": { "rule": "BR" },
+      "tables": {}
+    },
+    "tech_design": {
+      "file": "TECH_DESIGN.md",
+      "template": "templates/tech-design.md",
+      "lineups": ["single"],
+      "sections": {
+        "overview": { "number": "1", "ja": "概要", "en": "Overview" },
+        "use_cases": { "number": "1.1", "ja": "対応ユースケース", "en": "Use cases covered" },
+        "apis": { "number": "1.2", "ja": "使用 API", "en": "APIs used" },
+        "decisions": { "number": "2", "ja": "主要な設計判断", "en": "Key design decisions" },
+        "items": { "number": "3", "ja": "画面項目定義", "en": "Screen items" },
+        "logic": { "number": "4", "ja": "ロジック設計", "en": "Logic design" },
+        "flows": { "number": "4.2", "ja": "その他処理フロー", "en": "Other process flows" },
+        "errors": { "number": "5", "ja": "エラーハンドリング戦略", "en": "Error handling" },
+        "non_functional": { "number": "6", "ja": "非機能要件", "en": "Non-functional requirements" }
+      },
+      "ids": {},
+      "tables": {
+        "use_cases": {
+          "columns": {
+            "id": { "ja": "要件ID", "en": "Requirement ID" },
+            "use_case": { "ja": "ユースケース（REQUIREMENTS §2.1）", "en": "Use case (REQUIREMENTS §2.1)" },
+            "priority": { "ja": "Priority", "en": "Priority" },
+            "design": { "ja": "実現する設計", "en": "Realized by" }
+          }
+        }
+      }
+    },
+    "test_plan": {
+      "file": "TEST_PLAN.md",
+      "template": "templates/test-plan.md",
+      "lineups": ["single"],
+      "sections": {
+        "use_cases": { "number": "1", "ja": "ユースケース別テスト戦略", "en": "Test strategy by use case" },
+        "flows": { "number": "2", "ja": "その他処理フロー別テスト戦略", "en": "Test strategy by process flow" }
+      },
+      "ids": {},
+      "tables": {
+        "use_cases": {
+          "columns": {
+            "id": { "ja": "対象ID", "en": "Target ID" },
+            "use_case": { "ja": "ユースケース（REQUIREMENTS §2.1）", "en": "Use case (REQUIREMENTS §2.1)" },
+            "priority": { "ja": "Priority", "en": "Priority" },
+            "e2e": { "ja": "E2E", "en": "E2E" },
+            "integration": { "ja": "Integration", "en": "Integration" },
+            "unit": { "ja": "Unit", "en": "Unit" },
+            "rationale": { "ja": "根拠", "en": "Rationale" }
+          }
+        }
+      }
+    },
+    "api_design": {
+      "file": "API_DESIGN.md",
+      "template": "templates/api-design.md",
+      "lineups": ["layered"],
+      "sections": {
+        "operations": { "number": "1", "ja": "操作", "en": "Operations" },
+        "response_codes": { "ja": "レスポンスコード", "en": "Response codes" },
+        "procedure": { "ja": "処理内容", "en": "Procedure" },
+        "response_spec": { "ja": "応答仕様", "en": "Response specification" },
+        "state_transitions": { "number": "2", "ja": "状態遷移", "en": "State transitions" },
+        "rules": { "number": "3", "ja": "機能ルール", "en": "Feature rules" },
+        "flows": { "number": "4", "ja": "その他処理フロー", "en": "Other process flows" },
+        "decisions": { "number": "5", "ja": "設計判断", "en": "Design decisions" }
+      },
+      "ids": { "transition": "TR" },
+      "vocabularies": {
+        "operation_kind": [
+          { "ja": "参照（単体）", "en": "Read (single)" },
+          { "ja": "参照（一覧）", "en": "Read (list)" },
+          { "ja": "参照（集約）", "en": "Read (aggregate)" },
+          { "ja": "作成", "en": "Create" },
+          { "ja": "更新", "en": "Update" },
+          { "ja": "削除", "en": "Delete" },
+          { "ja": "状態遷移", "en": "State transition" },
+          { "ja": "非同期実行", "en": "Asynchronous run" },
+          { "ja": "ストリーミング配信", "en": "Streaming" },
+          { "ja": "ファイル入出力", "en": "File transfer" },
+          { "ja": "エクスポート", "en": "Export" }
+        ]
+      },
+      "tables": {
+        "operation_info": {
+          "columns": {
+            "item": { "ja": "項目", "en": "Item" },
+            "value": { "ja": "内容", "en": "Value" }
+          },
+          "rows": {
+            "api": { "ja": "使用 API", "en": "API" },
+            "kind": { "ja": "種別", "en": "Kind" },
+            "use_cases": { "ja": "対応ユースケース", "en": "Use cases" },
+            "authorization": { "ja": "認可", "en": "Authorization" },
+            "idempotency": { "ja": "冪等性", "en": "Idempotency" },
+            "concurrency": { "ja": "同時実行制御", "en": "Concurrency control" },
+            "transaction": { "ja": "トランザクション", "en": "Transaction" },
+            "side_effects": { "ja": "副作用", "en": "Side effects" }
+          }
+        },
+        "response_codes": {
+          "columns": {
+            "code": { "ja": "コード", "en": "Code" },
+            "common_code": { "ja": "commonCode", "en": "commonCode" },
+            "http": { "ja": "HTTP", "en": "HTTP" },
+            "condition": { "ja": "発生条件", "en": "Condition" }
+          }
+        },
+        "transitions": {
+          "columns": {
+            "id": { "ja": "ID", "en": "ID" },
+            "transition": { "ja": "遷移", "en": "Transition" },
+            "trigger": { "ja": "トリガ", "en": "Trigger" },
+            "guard": { "ja": "ガード条件", "en": "Guard" },
+            "side_effects": { "ja": "副作用", "en": "Side effects" }
+          }
+        }
+      }
+    },
+    "screen_design": {
+      "file": "SCREEN_DESIGN.md",
+      "template": "templates/screen-design.md",
+      "lineups": ["layered"],
+      "sections": {
+        "transitions": { "number": "1", "ja": "画面遷移", "en": "Screen transitions" },
+        "items": { "number": "2", "ja": "画面項目定義", "en": "Screen items" },
+        "ui_logic": { "number": "3", "ja": "UI ロジック", "en": "UI logic" },
+        "validations": { "number": "3.1", "ja": "バリデーション", "en": "Validation" },
+        "events": { "number": "3.2", "ja": "イベント処理", "en": "Events" },
+        "responses": { "number": "3.3", "ja": "レスポンス処理", "en": "Response handling" },
+        "catalog": { "number": "4", "ja": "文言・状態カタログ", "en": "Text and state catalog" }
+      },
+      "ids": {
+        "screen": "UI",
+        "item": "I",
+        "option": "S",
+        "button": "B",
+        "validation": "VA",
+        "event": "EV",
+        "response": "RS"
+      },
+      "tables": {
+        "screen_info": {
+          "columns": {
+            "item": { "ja": "項目", "en": "Item" },
+            "value": { "ja": "内容", "en": "Value" }
+          },
+          "rows": {
+            "screen_id": { "ja": "画面 ID", "en": "Screen ID" },
+            "route": { "ja": "ルート", "en": "Route" },
+            "use_cases": { "ja": "対応ユースケース", "en": "Use cases" },
+            "wireframe": { "ja": "ワイヤーフレーム", "en": "Wireframe" }
+          }
+        },
+        "items": {
+          "columns": {
+            "id": { "ja": "項目ID", "en": "Item ID" },
+            "label": { "ja": "ラベル", "en": "Label" },
+            "component": { "ja": "コンポーネント", "en": "Component" },
+            "type": { "ja": "型", "en": "Type" },
+            "validation": { "ja": "バリデーション", "en": "Validation" },
+            "enabled": { "ja": "活性条件", "en": "Enabled when" },
+            "visible": { "ja": "表示条件", "en": "Visible when" },
+            "initial": { "ja": "初期値", "en": "Initial value" },
+            "data_source": { "ja": "データの取得元", "en": "Data source" },
+            "note": { "ja": "備考", "en": "Notes" }
+          }
+        },
+        "options": {
+          "columns": {
+            "id": { "ja": "ID", "en": "ID" },
+            "label": { "ja": "表示ラベル", "en": "Label" },
+            "value": { "ja": "値", "en": "Value" },
+            "note": { "ja": "備考", "en": "Notes" }
+          }
+        },
+        "buttons": {
+          "columns": {
+            "id": { "ja": "ID", "en": "ID" },
+            "label": { "ja": "ラベル", "en": "Label" },
+            "visible": { "ja": "表示条件", "en": "Visible when" },
+            "enabled": { "ja": "活性条件", "en": "Enabled when" },
+            "action": { "ja": "アクション", "en": "Action" }
+          }
+        },
+        "validations": {
+          "columns": {
+            "id": { "ja": "ID", "en": "ID" },
+            "rule": { "ja": "ルール", "en": "Rule" },
+            "note": { "ja": "備考", "en": "Notes" }
+          }
+        },
+        "events": {
+          "columns": {
+            "id": { "ja": "ID", "en": "ID" },
+            "trigger": { "ja": "トリガ", "en": "Trigger" },
+            "operation": { "ja": "呼び出す操作", "en": "Operation called" },
+            "behavior": { "ja": "画面挙動", "en": "Screen behavior" }
+          }
+        },
+        "responses": {
+          "columns": {
+            "id": { "ja": "ID", "en": "ID" },
+            "event": { "ja": "イベント", "en": "Event" },
+            "code": { "ja": "レスポンスコード", "en": "Response code" },
+            "behavior": { "ja": "画面挙動", "en": "Screen behavior" },
+            "note": { "ja": "備考", "en": "Notes" }
+          }
+        },
+        "catalog": {
+          "columns": {
+            "element": { "ja": "項目", "en": "Element" },
+            "state": { "ja": "状態", "en": "State" },
+            "text": { "ja": "文言", "en": "Text" },
+            "note": { "ja": "備考", "en": "Notes" }
+          }
+        }
+      }
+    },
+    "api_test_design": {
+      "file": "API_TEST_DESIGN.md",
+      "template": "templates/api-test-design.md",
+      "lineups": ["layered"],
+      "sections": {
+        "operations": { "number": "1", "ja": "操作", "en": "Operations" },
+        "state_transitions": { "number": "2", "ja": "状態遷移", "en": "State transitions" },
+        "rules": { "number": "3", "ja": "機能ルール", "en": "Feature rules" },
+        "flows": { "number": "4", "ja": "その他処理フロー", "en": "Other process flows" }
+      },
+      "ids": { "row": "AT" },
+      "tables": {
+        "test_rows": {
+          "columns": {
+            "id": { "ja": "ID", "en": "ID" },
+            "target": { "ja": "対象", "en": "Target" },
+            "check": { "ja": "検証内容", "en": "What is verified" },
+            "integration": { "ja": "Integration", "en": "Integration" },
+            "unit": { "ja": "Unit", "en": "Unit" },
+            "test_ref": { "ja": "テスト参照", "en": "Test reference" },
+            "rationale": { "ja": "根拠", "en": "Rationale" }
+          }
+        }
+      }
+    },
+    "screen_test_design": {
+      "file": "SCREEN_TEST_DESIGN.md",
+      "template": "templates/screen-test-design.md",
+      "lineups": ["layered"],
+      "sections": {
+        "items": { "number": "1", "ja": "画面項目", "en": "Screen items" },
+        "ui_logic": { "number": "2", "ja": "UI ロジック", "en": "UI logic" }
+      },
+      "ids": { "row": "ST" },
+      "tables": {
+        "test_rows": {
+          "columns": {
+            "id": { "ja": "ID", "en": "ID" },
+            "target": { "ja": "対象", "en": "Target" },
+            "check": { "ja": "検証内容", "en": "What is verified" },
+            "integration": { "ja": "Integration", "en": "Integration" },
+            "unit": { "ja": "Unit", "en": "Unit" },
+            "test_ref": { "ja": "テスト参照", "en": "Test reference" },
+            "rationale": { "ja": "根拠", "en": "Rationale" }
+          }
+        }
+      }
+    },
+    "test_design": {
+      "file": "TEST_DESIGN.md",
+      "template": "templates/test-design.md",
+      "lineups": ["layered"],
+      "sections": {
+        "use_cases": { "number": "1", "ja": "ユースケース", "en": "Use cases" },
+        "acceptance": { "number": "1.1", "ja": "受入基準の担保先", "en": "Coverage of acceptance criteria" },
+        "scenarios": { "number": "1.2", "ja": "E2E のシナリオ手順", "en": "E2E scenarios" },
+        "cross_rules": { "number": "1.3", "ja": "機能をまたぐルールの担保", "en": "Coverage of cross-feature rules" },
+        "exclusions": { "number": "2", "ja": "テスト対象外", "en": "Not tested" }
+      },
+      "ids": {},
+      "tables": {
+        "use_cases": {
+          "columns": {
+            "use_case": { "ja": "ユースケース", "en": "Use case" },
+            "priority": { "ja": "Priority", "en": "Priority" },
+            "e2e": { "ja": "E2E", "en": "E2E" },
+            "integration": { "ja": "Integration", "en": "Integration" },
+            "unit": { "ja": "Unit", "en": "Unit" },
+            "test_ref": { "ja": "テスト参照", "en": "Test reference" },
+            "rationale": { "ja": "根拠", "en": "Rationale" }
+          }
+        },
+        "acceptance": {
+          "columns": {
+            "criterion": { "ja": "受入基準", "en": "Acceptance criterion" },
+            "summary": { "ja": "内容（要約）", "en": "Summary" },
+            "covered_by": { "ja": "担保先", "en": "Covered by" }
+          }
+        },
+        "scenario_steps": {
+          "columns": {
+            "step": { "ja": "#", "en": "#" },
+            "action": { "ja": "操作", "en": "Action" },
+            "expected": { "ja": "期待結果", "en": "Expected result" }
+          }
+        },
+        "cross_rules": {
+          "columns": {
+            "rule": { "ja": "ルール", "en": "Rule" },
+            "reason": { "ja": "対象とする理由", "en": "Why it applies" },
+            "covered_by": { "ja": "担保先", "en": "Covered by" },
+            "level": { "ja": "テストレベル", "en": "Test level" }
+          }
+        },
+        "exclusions": {
+          "columns": {
+            "item": { "ja": "内容", "en": "Item" },
+            "reason": { "ja": "理由", "en": "Reason" }
+          }
+        }
+      }
+    }
+  }
+}

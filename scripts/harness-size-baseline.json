@@ -9,11 +9,11 @@
   },
   "over_limit": {},
   "totals": {
-    "skill": 107667,
-    "skill-metadata": 6706,
-    "agent": 25989,
-    "agent-description": 522,
+    "skill": 106949,
+    "skill-metadata": 6762,
+    "agent": 26593,
+    "agent-description": 528,
     "rule": 1899,
-    "all": 222352
+    "all": 247342
   }
 }

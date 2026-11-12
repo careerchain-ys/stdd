@@ -26,7 +26,7 @@ git diff origin/<primary_branch>...HEAD --name-only
 
 以下を特定:
 
-- **Specドキュメント**: `docs/` 配下の `REQUIREMENTS.md`, `TECH_DESIGN.md`
+- **Specドキュメント**: `docs/` 配下の `REQUIREMENTS.md`, `TECH_DESIGN.md`（`docs.lineup: layered` では `API_DESIGN.md` / `SCREEN_DESIGN.md` とテスト設計。以下の TECH_DESIGN.md / TEST_PLAN.md も同じく読み替える）
 - **テスト**: `*.test.ts`, `*.test.tsx`, `e2e/tests/**/*.spec.ts`
 - **実装**: `app/`, `components/`, `lib/`, `actions/`, `domain/` 配下のファイル
 

@@ -19,6 +19,7 @@
 #   traceability.patterns.{test_tag,impl_annotation}    : テストタグ・実装注釈の正規表現
 #   traceability.scan.{tests,impl}       : テスト・実装のスキャン glob
 #   traceability.require_impl_annotation : 実装注釈の欠落を抜け漏れ扱いにするか（既定 false）
+#   docs.layout.*                        : Spec のファイル名（要件・設計・テスト計画の見分けに使う。キーが無ければ既定の名前）
 #
 # 設定が無い / traceability セクションが無い場合は監査をスキップする（exit 0）。
 # 詳細な記述規約は docs/config-driven-authoring.md を参照。
@@ -166,9 +167,38 @@ expand_globs() {
 TEST_FILES=$(expand_globs "$TEST_GLOBS")
 IMPL_FILES=$(expand_globs "$IMPL_GLOBS")
 
-# Spec ファイル（REQUIREMENTS / TECH_DESIGN / TEST_PLAN）
-SPEC_FILES=$(cd "$ROOT" && find . -type f \
-    \( -name REQUIREMENTS.md -o -name TECH_DESIGN.md -o -name TEST_PLAN.md \) \
+# Spec ファイルのファイル名を docs.layout から読む（キーが無ければ既定のファイル名）。
+#   要件     : requirements
+#   設計     : tech_design（single）/ api_design・screen_design（layered）
+#   テスト計画: test_plan（single）/ test_design・api_test_design・screen_test_design（layered）
+layout_basename() {  # $1=docs.layout のキー $2=既定のファイル名
+    local v
+    v=$(awk -v k="$1:" '
+        /^[^[:space:]]/ { indocs = ($1 == "docs:"); inlayout = 0; next }
+        indocs && $1 == "layout:" { inlayout = 1; next }
+        indocs && inlayout && $1 == k { sub(/^[[:space:]]*[^:]*:[[:space:]]*/, ""); print; exit }
+    ' "$CONFIG")
+    v=$(strip_quotes "$v")
+    v=${v##*/}
+    printf '%s\n' "${v:-$2}"
+}
+REQ_NAMES=$(layout_basename requirements REQUIREMENTS.md)
+DESIGN_NAMES=$(layout_basename tech_design TECH_DESIGN.md; layout_basename api_design API_DESIGN.md; layout_basename screen_design SCREEN_DESIGN.md)
+PLAN_NAMES=$(layout_basename test_plan TEST_PLAN.md; layout_basename test_design TEST_DESIGN.md
+    layout_basename api_test_design API_TEST_DESIGN.md; layout_basename screen_test_design SCREEN_TEST_DESIGN.md)
+spec_layer() {  # $1=ファイル名 → req | design | plan（該当しなければ空）
+    if   printf '%s\n' "$REQ_NAMES"    | grep -qxF "$1"; then echo req
+    elif printf '%s\n' "$DESIGN_NAMES" | grep -qxF "$1"; then echo design
+    elif printf '%s\n' "$PLAN_NAMES"   | grep -qxF "$1"; then echo plan
+    fi
+}
+NAME_ARGS=()
+while IFS= read -r n; do
+    [ -z "$n" ] && continue
+    [ "${#NAME_ARGS[@]}" -gt 0 ] && NAME_ARGS+=(-o)
+    NAME_ARGS+=(-name "$n")
+done <<< "$(printf '%s\n%s\n%s\n' "$REQ_NAMES" "$DESIGN_NAMES" "$PLAN_NAMES" | LC_ALL=C sort -u)"
+SPEC_FILES=$(cd "$ROOT" && find . -type f \( "${NAME_ARGS[@]}" \) \
     -not -path '*/node_modules/*' -not -path '*/.git/*' 2>/dev/null | sed 's#^\./##')
 
 # ---------------------------------------------------------------------------
@@ -199,11 +229,8 @@ emit_from_file() {  # $1=relfile $2=layer $3=match-regex(空なら ID_TOKEN 全�
 
 while IFS= read -r f; do
     [ -z "$f" ] && continue
-    case "$f" in
-        *REQUIREMENTS.md) emit_from_file "$f" req "" ;;
-        *TECH_DESIGN.md)  emit_from_file "$f" design "" ;;
-        *TEST_PLAN.md)    emit_from_file "$f" plan "" ;;
-    esac
+    layer=$(spec_layer "${f##*/}")
+    [ -n "$layer" ] && emit_from_file "$f" "$layer" ""
 done <<< "$SPEC_FILES" >> "$RECORDS"
 
 while IFS= read -r f; do
@@ -347,8 +374,8 @@ END {
         else if (req_impl=="true") im="❌"
         else                       im="–"
         printf "| %s | UC | %s | %s | %s | %s |\n", id, d, p, t, im
-        if (!has("design",id)) { gaps[++ng]="[設計漏れ] " id " : REQUIREMENTS(" locs["req",id] ") にあるが TECH_DESIGN で参照なし"; nblock++ }
-        if (!has("plan",id))   { gaps[++ng]="[テスト計画漏れ] " id " : TEST_PLAN に対象 ID の記載なし"; nblock++ }
+        if (!has("design",id)) { gaps[++ng]="[設計漏れ] " id " : REQUIREMENTS(" locs["req",id] ") にあるが設計書（TECH_DESIGN / API_DESIGN / SCREEN_DESIGN）で参照なし"; nblock++ }
+        if (!has("plan",id))   { gaps[++ng]="[テスト計画漏れ] " id " : テスト計画（TEST_PLAN / TEST_DESIGN）に対象 ID の記載なし"; nblock++ }
         if (!has("test",id))   { gaps[++ng]="[テスト実装漏れ] " id " : この ID を持つテストが存在しない"; nblock++ }
         if (!has("impl",id)) {
             if (req_impl=="true") { gaps[++ng]="[実装漏れ] " id " : @stdd 注釈を持つ実装が存在しない"; nblock++ }
@@ -364,7 +391,7 @@ END {
         else if (req_impl=="true") im="❌"
         else                       im="–"
         printf "| %s | FL | – | %s | %s | %s |\n", id, p, t, im
-        if (!has("plan",id)) { gaps[++ng]="[テスト計画漏れ] " id " : TEST_PLAN(§2) に処理フローの記載なし"; nblock++ }
+        if (!has("plan",id)) { gaps[++ng]="[テスト計画漏れ] " id " : テスト計画（TEST_PLAN §2 / API_TEST_DESIGN）に処理フローの記載なし"; nblock++ }
         if (!has("test",id)) { gaps[++ng]="[テスト実装漏れ] " id " : この ID を持つテストが存在しない"; nblock++ }
     }
 
@@ -372,24 +399,24 @@ END {
     for (id in allids) {
         if (startsWith(id, ucp) && !(id in decl_uc)) {
             src=""
-            if (has("design",id)) src=src "TECH_DESIGN(" locs["design",id] ") "
-            if (has("plan",id))   src=src "TEST_PLAN(" locs["plan",id] ") "
+            if (has("design",id)) src=src "design(" locs["design",id] ") "
+            if (has("plan",id))   src=src "test-plan(" locs["plan",id] ") "
             if (has("test",id))   src=src "test(" locs["test",id] ") "
             if (has("impl",id))   src=src "impl(" locs["impl",id] ") "
             gaps[++ng]="[孤児参照] " id " : REQUIREMENTS に未宣言の UC を参照 → " src; nblock++
         }
         if (startsWith(id, flp) && !(id in decl_fl)) {
             src=""
-            if (has("plan",id)) src=src "TEST_PLAN(" locs["plan",id] ") "
+            if (has("plan",id)) src=src "test-plan(" locs["plan",id] ") "
             if (has("test",id)) src=src "test(" locs["test",id] ") "
             if (has("impl",id)) src=src "impl(" locs["impl",id] ") "
-            gaps[++ng]="[孤児参照] " id " : TECH_DESIGN(§4.2) に未宣言の FL を参照 → " src; nblock++
+            gaps[++ng]="[孤児参照] " id " : 設計書（TECH_DESIGN §4.2 / API_DESIGN 章 4）に未宣言の FL を参照 → " src; nblock++
         }
     }
 
     # ID 重複宣言
     for (id in dup_uc) { gaps[++ng]="[ID重複] " id " : REQUIREMENTS に同一 UC が複数宣言 (" locs["req",id] ")"; nblock++ }
-    for (id in dup_fl) { gaps[++ng]="[ID重複] " id " : TECH_DESIGN に同一 FL が複数宣言 (" locs["design",id] ")"; nblock++ }
+    for (id in dup_fl) { gaps[++ng]="[ID重複] " id " : 設計書に同一 FL が複数宣言 (" locs["design",id] ")"; nblock++ }
 
     isort(gaps, ng)
     isort(warns, nw)

@@ -100,6 +100,7 @@ is_spec() {
     base=$(basename "$rel")
     case "$base" in
         REQUIREMENTS.md|TECH_DESIGN.md|TEST_PLAN.md|ARCHITECTURE.md|TABLE_DEFINITION.md|API_SPEC.md|DESIGN.md) return 0 ;;
+        API_DESIGN.md|SCREEN_DESIGN.md|API_TEST_DESIGN.md|SCREEN_TEST_DESIGN.md|TEST_DESIGN.md) return 0 ;;
     esac
     case "$rel" in
         docs/*|*/docs/*) return 0 ;;

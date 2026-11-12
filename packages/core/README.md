@@ -19,7 +19,7 @@ packages/core/
 ```
 
 > spec / PLAN テンプレートは `.claude/skills/documenting-requirements/templates/`（REQUIREMENTS）・
-> `.claude/skills/documenting-tech-specs/templates/`（TECH_DESIGN・TEST_PLAN・common 技術階層）と
+> `.claude/skills/documenting-tech-specs/templates/`（TECH_DESIGN・TEST_PLAN、API_DESIGN・SCREEN_DESIGN と各テスト設計、common 技術階層）と
 > `.claude/skills/documenting-plans/templates/`（PLAN）に集約されている。
 
 ---
@@ -49,20 +49,25 @@ commands:
   test: "npm test"
 
 docs:
+  lineup: "layered"   # single（省略時）: TECH_DESIGN + TEST_PLAN ／ layered: API と画面で設計書を分ける
   layout:
     # common 階層 (プロジェクト全体の俯瞰 spec。任意)
     common_requirements: "docs/common/REQUIREMENTS.md"
     common_architecture: "docs/common/ARCHITECTURE.md"
     # feature 階層 (機能単位の spec)
     requirements: "docs/{{app.id}}/{{feature_path}}/REQUIREMENTS.md"
-    tech_design: "docs/{{app.id}}/{{feature_path}}/TECH_DESIGN.md"
+    api_design: "docs/{{app.id}}/{{feature_path}}/API_DESIGN.md"
+    api_test_design: "docs/{{app.id}}/{{feature_path}}/API_TEST_DESIGN.md"
+    screen_design: "docs/{{app.id}}/{{feature_path}}/SCREEN_DESIGN.md"
+    screen_test_design: "docs/{{app.id}}/{{feature_path}}/SCREEN_TEST_DESIGN.md"
+    test_design: "docs/{{app.id}}/{{feature_path}}/TEST_DESIGN.md"
     plan: "docs/{{app.id}}/{{feature_path}}/plans/{{date}}.md"
 ```
 
 `common_requirements` / `common_architecture` はプロジェクト全体を俯瞰する **common 階層** の spec
 (`REQUIREMENTS.md` の全体版と `TECH_DESIGN.md` の全体版 = `ARCHITECTURE.md`) を指す。任意項目であり、
 common 階層を使わないプロジェクトでは省略してよい。なお `ARCHITECTURE` / `TECH_DESIGN` / `TABLE_DEFINITION` / `API_SPEC` / `TEST_PLAN` / `DESIGN` など技術系の設計書は技術 spec (tech_specs) と総称する。詳細は
-[`docs/stdd-methodology.md`](docs/stdd-methodology.md) §3 を参照。
+[`docs/stdd-methodology.md`](docs/stdd-methodology.md) §3、構成の選び方は [`docs/spec-lineup.md`](docs/spec-lineup.md) を参照。
 
 このまま `apps/web/` に Next.js / Remix / SvelteKit 等を配置すれば動作する。
 複数アプリ構成 (例: `admin` と `web`) は `apps[]` に複数項目を追加する。
