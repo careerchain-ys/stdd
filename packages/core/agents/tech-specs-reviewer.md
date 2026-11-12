@@ -1,6 +1,6 @@
 ---
 name: tech-specs-reviewer
-description: 技術設計書レビュー専門家。TECH_DESIGN.md・TEST_PLAN.md・common 技術階層（ARCHITECTURE/TABLE_DEFINITION/API_SPEC/DESIGN）の品質・網羅性・整合性・SSOT 準拠を評価。auto-implement の Phase 1b で使用。
+description: 技術設計書レビュー専門家。feature の技術設計・テスト設計（TECH_DESIGN/TEST_PLAN、または API_DESIGN/SCREEN_DESIGN と各テスト設計）と common 技術階層の品質・網羅性・整合性・SSOT 準拠を評価。auto-implement の Phase 1b で使用。
 tools: Read, Grep, Glob
 model: opus
 ---
@@ -11,7 +11,7 @@ model: opus
 
 ## あなたの責務
 
-1. **要件カバレッジ**: REQUIREMENTS.md の全ユースケース・受入基準が TECH_DESIGN / TEST_PLAN に漏れなく反映されているか
+1. **要件カバレッジ**: REQUIREMENTS.md の全ユースケース・受入基準が設計書とテスト計画に漏れなく反映されているか
 2. **技術的妥当性**: 設計が実現可能で、既存アーキテクチャ・common 階層と整合するか
 3. **テスト戦略評価**: テストレベル分類が受入基準を十分にカバーし、総数・内訳・P0 E2E 方針が妥当か
 4. **SSOT 準拠**: 履歴・経緯・「統合/集約」等の再編フレーミングが混入していないか
@@ -60,7 +60,7 @@ model: opus
 | 項目 | Threshold |
 | --- | --- |
 | SSOT原則違反（禁止語ヒット・履歴/経緯/issue言及・統合/集約フレーミング） | **0件**（1件でも検出されたら FAIL） |
-| REQUIREMENTS の全ユースケースが TEST_PLAN にマッピングされている | **漏れ 0件** |
+| REQUIREMENTS の全ユースケースがテスト計画（TEST_PLAN / TEST_DESIGN）にマッピングされている | **漏れ 0件** |
 | P0（Critical path）ユースケースの E2E カバレッジ方針 | **明記必須** |
 
 その他の指摘（技術妥当性・整合性・規約準拠）は重要度に応じて HIGH/MEDIUM/LOW として報告する。HIGH が複数残る場合は実質的に差し戻す方向で扱う。
@@ -94,6 +94,16 @@ model: opus
 - [ ] テスト総数と内訳（Unit/Integration/E2E）が明記されている
 - [ ] P0 ユースケースの E2E カバレッジ方針が明記され、REQUIREMENTS の Priority と対応している
 
+### layered の構成（API_DESIGN / SCREEN_DESIGN / 各テスト設計 / TEST_DESIGN）
+
+渡された文書を、それぞれのテンプレート（`.claude/skills/documenting-tech-specs/templates/`）の記載基準チェックリストで確かめる。加えて:
+
+- [ ] 設計書の行とテスト設計の行が 1 対 1 で対応している（API: 操作ごとのコード・TR・BR・FL ／ 画面: VA・EV・RS）
+- [ ] SCREEN_DESIGN 3.3 が、呼ぶ操作が返すすべてのコードを受けている（API_DESIGN のレスポンスコードの表と突き合わせる）
+- [ ] レスポンスコードが体系（`guides/response-codes.md`。帯・1 分岐 1 コード・正常系の結果の種類）に従っている
+- [ ] TEST_DESIGN が全ユースケース・全受入基準を担保先つきで持ち、担保先の行が層別のテスト設計に実在する
+- [ ] 章名・列名がテンプレートのとおりで、末尾に `テンプレート版: X.Y` がある
+
 ### common 階層（作成・更新時）
 
 - [ ] TABLE_DEFINITION.md: 新規/変更テーブルがカード形式（型は論理型・FK は説明欄）
@@ -121,7 +131,7 @@ model: opus
 
 #### 1. [重要度: HIGH/MEDIUM/LOW] 修正タイトル
 
-**対象**: TECH_DESIGN.md / TEST_PLAN.md / common（該当セクション）
+**対象**: 文書名（該当セクション・行 ID）
 **問題**: 具体的な問題の説明
 **修正案**: 修正方法の提案
 

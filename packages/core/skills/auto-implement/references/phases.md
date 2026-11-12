@@ -11,7 +11,7 @@
 | reviewer | 起動する条件 |
 | --- | --- |
 | `requirements-reviewer` | REQUIREMENTS.md（feature / common）を作成・変更したとき |
-| `tech-specs-reviewer` | TECH_DESIGN.md・TEST_PLAN.md・common の技術文書を作成・変更したとき |
+| `tech-specs-reviewer` | feature の技術設計・テスト設計（`docs.lineup` の構成のもの）・common の技術文書を作成・変更したとき |
 | `test-reviewer` | テストを追加・変更し、実装に入る前（`quick` を除く） |
 | `qa-engineer`・`code-reviewer` | Phase 3–4 の PR 前レビューで、`reviewing-changes` の `review-ledger.sh round start` が差分から決める |
 
@@ -22,7 +22,7 @@
 | 同時に起動するもの | Phase |
 | --- | --- |
 | 変更した REQUIREMENTS.md ごと（feature と common） | 1a |
-| feature の TECH_DESIGN.md と TEST_PLAN.md（両者の対応を見るので 1 つにまとめる）と、変更した common の技術文書ごと | 1b |
+| feature の設計書と、対になるテスト設計の組ごと（対応を見るので組で渡す。`single` は TECH_DESIGN.md + TEST_PLAN.md、`layered` は API_DESIGN.md + API_TEST_DESIGN.md、SCREEN_DESIGN.md + SCREEN_TEST_DESIGN.md、TEST_DESIGN.md + REQUIREMENTS.md）と、変更した common の技術文書ごと | 1b |
 | `reviewing-changes` の `round start` が起動を決めた担当のすべて（`code-reviewer` は 3 つの観点に分ける） | 3–4 |
 
 起動する前に、次のスクリプトで起動の形を決める（1 行目が `teams` か `subagents`、2 行目が理由）。
@@ -147,7 +147,10 @@ Requirements Reviewer が ✅ 承認したら（または 3回ループ上限に
 
 **人間レビューゲート①で承認された REQUIREMENTS.md を前提**に、技術設計を作成するフェーズ。
 
-`documenting-tech-specs` skill に従い、TECH_DESIGN.md と TEST_PLAN.md を作成する。
+`documenting-tech-specs` skill に従い、`.stdd.config.yml` の `docs.lineup` の構成で技術 spec を作成する。
+`layered` では skill の writing-procedure §6 の順（API_DESIGN → SCREEN_DESIGN → 層別のテスト設計 → TEST_DESIGN）に書く。
+以下は `single` の場合の内容である。このフェーズ以降の TECH_DESIGN.md / TEST_PLAN.md は、`layered` では設計書（API_DESIGN.md / SCREEN_DESIGN.md）
+とテスト設計（TEST_DESIGN.md と層別のテスト設計）と読み替える。
 
 1. `TECH_DESIGN.md` を作成:
    - 技術設計方針（概要＋対応ユースケース表 / 主要な設計判断 / ロジック設計 / エラーハンドリング戦略）
@@ -161,7 +164,7 @@ Requirements Reviewer が ✅ 承認したら（または 3回ループ上限に
 
 チェック項目:
 
-- 要件カバレッジ（REQUIREMENTS の全ユースケースが TECH_DESIGN §1.1 対応表・TEST_PLAN にマッピングされているか）
+- 要件カバレッジ（REQUIREMENTS の全ユースケースが設計書とテスト計画にマッピングされているか）
 - 技術設計の実現可能性・既存/common 階層との整合性
 - テスト戦略の十分性（テストレベル分類・総数/内訳・P0 E2E 方針）
 - SSOT 準拠（履歴・「統合/集約」フレーミングがないか）
@@ -216,7 +219,7 @@ Tech Specs Reviewer が ✅ 承認したら（または 3回ループ上限に�
 
 ### 実行手順
 
-`test-reviewer` を、作業ツリーを分けて起動し（「reviewer の使い方」の「作業ツリーを分ける」）、作成したテストをレビューさせる。
+`test-reviewer` を、作業ツリーを分けて起動し（「reviewer の使い方」の「作業ツリーを分ける」）、作成したテストをレビューさせる。`docs.lineup: layered` では、テスト計画として TEST_DESIGN.md と層別のテスト設計のパスを渡す。
 
 レビュー観点:
 

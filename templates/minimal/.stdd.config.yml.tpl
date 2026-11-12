@@ -25,11 +25,26 @@ commands:
   # dev: "npm run dev"   # 任意。定義すると QA がブラウザ動作確認（Playwright MCP）を実施。未定義ならスキップ
 
 docs:
+  # 技術 spec のラインナップ（packages/core/docs/spec-lineup.md）。
+  #   layered: バックエンド（API_DESIGN / API_TEST_DESIGN）とフロントエンド（SCREEN_DESIGN / SCREEN_TEST_DESIGN）を分け、
+  #            機能全体の担保は TEST_DESIGN にまとめる。API だけ・画面だけの構成なら片方の 2 行を消す
+  #   single : 機能ごとに TECH_DESIGN と TEST_PLAN の 2 本（layout に tech_design / test_plan を書く）
+  lineup: "layered"
   layout:
     requirements: "docs/{{feature_path}}/REQUIREMENTS.md"
-    tech_design: "docs/{{feature_path}}/TECH_DESIGN.md"
-    test_plan: "docs/{{feature_path}}/TEST_PLAN.md"
+    api_design: "docs/{{feature_path}}/API_DESIGN.md"
+    api_test_design: "docs/{{feature_path}}/API_TEST_DESIGN.md"
+    screen_design: "docs/{{feature_path}}/SCREEN_DESIGN.md"
+    screen_test_design: "docs/{{feature_path}}/SCREEN_TEST_DESIGN.md"
+    test_design: "docs/{{feature_path}}/TEST_DESIGN.md"
     plan: "docs/{{feature_path}}/plans/{{date}}.md"
+
+# レスポンスコード体系（skills/documenting-tech-specs/guides/response-codes.md）。帯の意味と「1 分岐 1 コード」は固定。
+# 機能略号の書き方と共通コードの一覧を変えるときだけ書く。
+# response_codes:
+#   feature_code_pattern: "^[A-Z]{3,4}$"
+#   common_codes:
+#     - { name: VALIDATION_ERROR, code: "1800", http: 422 }
 
 workflow:
   branch_prefix: "claude/"

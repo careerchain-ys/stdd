@@ -111,6 +111,13 @@ feature 階層の役割は次のとおり。
 
 読者: エンジニア、AI エージェント、アーキテクト
 
+### 3.4 設計書のラインナップ
+
+feature の技術 spec の構成は `.stdd.config.yml` の `docs.lineup` で選ぶ。`single`（省略時）は上の `TECH_DESIGN.md` と `TEST_PLAN.md` の 2 本、
+`layered`（新規導入の既定）はバックエンドの `API_DESIGN.md`・`API_TEST_DESIGN.md`、フロントエンドの `SCREEN_DESIGN.md`・`SCREEN_TEST_DESIGN.md`、
+機能全体のテストの担保を持つ `TEST_DESIGN.md` に分ける。`layered` では API の応答の分岐ごとにレスポンスコードを付け、画面設計がすべてのコードを受ける。
+文書の分担・行の ID・レスポンスコード体系・章名と列名の定義は [`spec-lineup.md`](spec-lineup.md) を参照。
+
 ---
 
 ## 4. テスト戦略
@@ -425,7 +432,8 @@ reviewer と qa-engineer は `opus` にする。agent ごとのモデルは `.st
 - `model-selection.md` — subagent と skill のモデルの使い分け（作業の性質ごとのモデル・agent ごとの既定・設定での上書き）
 - `review-process.md` — PR 前レビュー（担当の起動・指摘の 4 項目と処置・実行で証明できた指摘・台帳とラウンド・PR 作成前のゲート）
 - `skill-and-agent.md` — skill と agent の使い分け（subagent にする場面・並行にする条件・STDD の構成・agent を足すときの基準）
+- `spec-lineup.md` — 設計書のラインナップと章立て（single / layered の構成・文書の分担・行の ID・レスポンスコード体系・章名と列名）
 - `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
-- `.claude/skills/documenting-tech-specs/templates/` — 技術 spec テンプレ（feature: `tech-design.md` / `test-plan.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
+- `.claude/skills/documenting-tech-specs/templates/` — 技術 spec テンプレ（feature: `tech-design.md` / `test-plan.md`、layered: `api-design.md` / `screen-design.md` / `api-test-design.md` / `screen-test-design.md` / `test-design.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
 - `.claude/skills/documenting-plans/templates/plan.md` — 実装計画テンプレ
 - `../schema/.stdd.config.schema.json` — プロジェクト設定の JSON Schema

@@ -48,7 +48,7 @@ STDD 導入（既存プロジェクト, step 3-4）・立ち上げ（新規プ�
 
 | 決定ポイント | 論点 | 反映先 |
 | ------------ | ---- | ------ |
-| **spec ファイル構成** | feature 必須（要件 spec: REQUIREMENTS／技術 spec: TECH_DESIGN / TEST_PLAN）・任意（wireframes）と common（技術 spec: TABLE_DEFINITION / API_SPEC / DESIGN）をどう組むか | プロジェクトのテンプレ・運用ルール |
+| **spec ファイル構成** | feature の技術 spec のラインナップ（`single`: TECH_DESIGN / TEST_PLAN ／ `layered`: API_DESIGN・SCREEN_DESIGN と層別のテスト設計・TEST_DESIGN。新規導入の既定は `layered`）・任意（wireframes）と common（技術 spec: TABLE_DEFINITION / API_SPEC / DESIGN）をどう組むか | `.stdd.config.yml` の `docs.lineup`・プロジェクトのテンプレ |
 | **common 固有セクション** | common ARCHITECTURE に足す横断トピック（認証・認可 / RLS・権限 / 通知 / 監査ログ 等） | `docs/common/ARCHITECTURE.md` |
 | **docs.layout パス規約** | 単一/複数アプリ、`feature_path` の切り方、common の置き場 | `.stdd.config.yml` の `docs.layout` |
 | **Priority 基準** | このプロジェクトでの P0/P1/P2 の具体定義（何を Critical とするか） | テンプレ注記 + 決定ログ |
@@ -65,7 +65,7 @@ PLAN が無い文脈（ブラッシュアップ単体実行など）では、プ
 決定に従って、**プロジェクト側**の成果物を更新する（STDD core の `.claude/skills/*/templates/` 本体は壊さない）。
 
 ```
-□ .stdd.config.yml の docs.layout を更新（必要なら common_* を追加/変更）
+□ .stdd.config.yml の docs.lineup / docs.layout を更新（必要なら common_* を追加/変更）。章名・列名を変えるなら docs.structure、レスポンスコードの機能略号・共通コードを変えるなら response_codes に書く
 □ docs/common/ARCHITECTURE.md に固有セクションを追加
 □ プロジェクト側テンプレ（コピーを持つ場合）の不要セクション削除 / 固有セクション追加 / プレースホルダ実値化
 □ プロジェクト側テンプレを持たない場合は、決定ログに「次に作る feature spec へ適用する方針」として明記
@@ -98,6 +98,6 @@ PLAN が無い文脈（ブラッシュアップ単体実行など）では、プ
 
 - **導入ガイド（なぜ/判断基準）**: [guide-for-existing-project.md](../../../packages/core/docs/guide-for-existing-project.md) §step 3-4
 - **導入ドライバー**: [introducing-stdd skill](../introducing-stdd/SKILL.md)
-- **spec テンプレ**: `../documenting-requirements/templates/`（REQUIREMENTS: feature / common） / `../documenting-tech-specs/templates/`（TECH_DESIGN・TEST_PLAN・common 技術階層） / `../documenting-plans/templates/`（PLAN）
+- **spec テンプレ**: `../documenting-requirements/templates/`（REQUIREMENTS: feature / common） / `../documenting-tech-specs/templates/`（TECH_DESIGN・TEST_PLAN、API_DESIGN・SCREEN_DESIGN と各テスト設計、common 技術階層） / `../documenting-plans/templates/`（PLAN）
 - **spec 作成スキル**: [documenting-requirements skill](../documenting-requirements/SKILL.md)（要件）／ [documenting-tech-specs skill](../documenting-tech-specs/SKILL.md)（技術設計）
 - **設定スキーマ**: `packages/core/schema/.stdd.config.schema.json`

@@ -123,7 +123,7 @@ REQUIREMENTS.md作成後、Playwright MCPを使って実装済みUIのスクリ�
 
 ## Phase 4: TECH_DESIGN.md作成
 
-`documenting-tech-specs` skillのテンプレートに従って作成する。章構成は **1.概要 / 2.主要な設計判断(任意) / 3.画面項目定義(画面 feature のみ必須) / 4.ロジック設計(コア) / 5.エラーハンドリング戦略 / 6.非機能要件(任意)**。
+`documenting-tech-specs` skillのテンプレートに従って作成する。`docs.lineup: layered` では、Phase 4 で API_DESIGN.md / SCREEN_DESIGN.md、Phase 4.5 で層別のテスト設計と TEST_DESIGN.md を作る（以下の TECH_DESIGN / TEST_PLAN は読み替える）。章構成は **1.概要 / 2.主要な設計判断(任意) / 3.画面項目定義(画面 feature のみ必須) / 4.ロジック設計(コア) / 5.エラーハンドリング戦略 / 6.非機能要件(任意)**。
 
 > TECH_DESIGN のコアはロジック設計。データモデル / API は common 階層が SSoT（規則 4）。テスト戦略は別ファイル `TEST_PLAN.md`（Phase 4.5）。
 

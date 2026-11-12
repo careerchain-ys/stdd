@@ -165,6 +165,42 @@ sed_i 's/enforce: "warn"/enforce: "block"/' "$D/.stdd.config.yml"
 run "$D" --changed app/untracked.ts; assert_rc "changed untracked blocks under block" 2
 rm -rf "$D"
 
+# 9. layered の構成: API_DESIGN / SCREEN_DESIGN を設計、TEST_DESIGN / API_TEST_DESIGN を計画として読む
+D=$(mktemp -d); mkbase "$D" warn
+sed_i '/tech_design:/d; /test_plan:/d' "$D/.stdd.config.yml"
+sed_i 's#^  layout:#  lineup: "layered"\
+  layout:\
+    api_design: "docs/{{app.id}}/{{feature_path}}/API_DESIGN.md"\
+    screen_design: "docs/{{app.id}}/{{feature_path}}/SCREEN_DESIGN.md"\
+    api_test_design: "docs/{{app.id}}/{{feature_path}}/API_TEST_DESIGN.md"\
+    screen_test_design: "docs/{{app.id}}/{{feature_path}}/SCREEN_TEST_DESIGN.md"\
+    test_design: "docs/{{app.id}}/{{feature_path}}/TEST_DESIGN.md"#' "$D/.stdd.config.yml"
+printf '#### 閲覧 [UC-applies-01]\n#### 作成 [UC-applies-02]\n' > "$D/docs/web/applies/REQUIREMENTS.md"
+printf '| 対応ユースケース | UC-applies-01 |\n#### 夜間集計\n**ID**: FL-applies-01\n' > "$D/docs/web/applies/API_DESIGN.md"
+printf '| 対応ユースケース | UC-applies-02 |\n' > "$D/docs/web/applies/SCREEN_DESIGN.md"
+printf '| UC-applies-01 | P0 |\n| UC-applies-02 | P1 |\n' > "$D/docs/web/applies/TEST_DESIGN.md"
+printf '| AT-01 | FL-applies-01 |\n' > "$D/docs/web/applies/API_TEST_DESIGN.md"
+printf "describe('[UC-applies-01] [UC-applies-02] [FL-applies-01] 一式', () => {})\n" > "$D/e2e/applies.spec.ts"
+run "$D"
+assert_not_contains "layered: no design gap" "[設計漏れ]"
+assert_not_contains "layered: no plan gap" "[テスト計画漏れ]"
+assert_contains "layered: FL declared in API_DESIGN" "| FL-applies-01 | FL | – | ✅ | ✅ |"
+# API_DESIGN から UC を外すと設計漏れになる
+printf '#### 夜間集計\n**ID**: FL-applies-01\n' > "$D/docs/web/applies/API_DESIGN.md"
+run "$D"; assert_contains "layered: design gap when missing" "[設計漏れ] UC-applies-01"
+rm -rf "$D"
+
+# 10. docs.layout で変えたファイル名を設計書として読む（既定の名前は読まない）
+D=$(mktemp -d); mkbase "$D" warn
+sed_i 's#TECH_DESIGN.md"#DESIGN_NOTE.md"#' "$D/.stdd.config.yml"
+printf '#### 閲覧 [UC-applies-01]\n' > "$D/docs/web/applies/REQUIREMENTS.md"
+printf '| UC-applies-01 |\n' > "$D/docs/web/applies/DESIGN_NOTE.md"
+run "$D"; assert_not_contains "custom name: read as design" "[設計漏れ] UC-applies-01"
+rm "$D/docs/web/applies/DESIGN_NOTE.md"
+printf '| UC-applies-01 |\n' > "$D/docs/web/applies/TECH_DESIGN.md"
+run "$D"; assert_contains "custom name: default name not read" "[設計漏れ] UC-applies-01"
+rm -rf "$D"
+
 echo ""
 echo "Total: $((PASS+FAIL))  Pass: $PASS  Fail: $FAIL"
 [ "$FAIL" -eq 0 ]
