@@ -163,3 +163,27 @@ skill / agent / rule の定義は、エージェントが読み込むたびに�
 npm run check:harness-size
 node --test test/harness-size.test.mjs
 ```
+
+---
+
+## 8. 転記せず参照する
+
+件数・一覧・しきい値・手順は、正本の 1 か所だけが持つ。skill・agent・rule の定義もこの規律に従う
+（Spec の文書での規律は [`packages/core/docs/spec-revision.md`](../packages/core/docs/spec-revision.md) §6）。
+
+- **ほかの skill の手順を書き写さない。** 手順はその skill と節を名前で参照する。書き写すと、正本の手順が変わったときに食い違う。
+- **件数・一覧・しきい値を書き写さない。** 文字数の上限は `scripts/harness-size-baseline.json`、設定の既定値は JSON Schema が持つ。
+  定義の本文には値ではなく、値を持つファイルとキーを書く。
+- **ほかの定義の作成状況や数を断定しない。** 「reviewer は 4 本」「この skill はまだ無い」のような文は、定義が増減するたびに偽になる。
+  いまの状況が必要なら、一覧を出すコマンドやファイルを参照する。
+- 導入先に配られない文書（`packages/core/docs/` など）を参照する skill は、要点だけを skill に書き、正本の場所を添える。
+  このときの要点は手順の要約であり、件数や一覧は含めない。
+
+### 8.1 検証
+
+```bash
+# skill・agent・rule・方法論の文書に、件数の句と状態の語が同じ文にある形が無いこと
+bash packages/core/skills/documenting-requirements/scripts/state-claims.sh packages/core/skills packages/core/agents packages/core/rules packages/core/docs
+```
+
+`bash test/state-claims.test.sh` が同じ確認を行う。
