@@ -398,7 +398,7 @@
     },
     "traceability": {
       "type": "object",
-      "description": "ID-based traceability configuration. Assigns stable IDs to requirements (use cases / flows) and threads them through tech design, tests, and implementation so that the requirement -> design -> test -> implementation chain and its gaps can be detected mechanically (by the verifying-consistency skill and the trace-audit.sh scanner). Optional; when omitted, traceability auditing is skipped.",
+      "description": "ID-based traceability configuration. Assigns stable IDs to requirements (use cases / flows) and threads them through tech design, tests, and implementation so that the requirement -> design -> test -> implementation chain and its gaps can be detected mechanically (by the verifying-consistency skill and the trace-audit.sh scanner). Optional; when omitted, traceability auditing is skipped. Under docs.lineup 'layered' the same scanner also cross-checks the tables of the spec documents (requirements -> API design -> screen design -> test designs, and response codes), reading section and column names from skills/documenting-tech-specs/references/doc-structure.json and docs.structure (see packages/core/docs/id-chain.md); this part needs jq and is reported as not performed without it.",
       "additionalProperties": false,
       "properties": {
         "enabled": {
@@ -445,7 +445,7 @@
             "test_tag": {
               "type": "string",
               "minLength": 1,
-              "description": "Regex matching an ID reference inside a test title. Default convention wraps the ID in brackets. Example: '\\\\[((UC|FL)-[a-z0-9]+-[0-9]+)\\\\]'."
+              "description": "Regex matching an ID reference inside a test title. Default convention wraps the ID in brackets. Example: '\\\\[((UC|FL)-[a-z0-9]+-[0-9]+)\\\\]'. The scaffold written by 'stdd init' counts only IDs placed at the start of a test name: '\\\\([[:space:]]*.(\\\\[[A-Z]+-[0-9]+\\\\] *)?\\\\[((UC|FL)-[a-z0-9]+-[0-9]+)\\\\]' (an optional test-design row tag such as [AT-03] may precede the ID)."
             },
             "impl_annotation": {
               "type": "string",

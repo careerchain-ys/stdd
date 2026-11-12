@@ -44,6 +44,7 @@ bash .claude/hooks/trace-audit.sh
 
 - トレーサビリティ行列（ID × 設計 / テスト計画 / テスト / 実装）と抜け漏れ一覧を出力する。
 - 検知する抜け漏れ: 設計漏れ / テスト計画漏れ / テスト実装漏れ / 実装漏れ（`require_impl_annotation` 時）/ 孤児参照 / ID 重複。
+- `docs.lineup: layered` では「設計書の表の突合」も出す（レスポンスコード・行の ID・受入基準。一覧は方法論の `id-chain.md`）。「未実施」「対象 0 件」は合格として扱わない。
 - `traceability.enforce=block` のとき、抜け漏れがあれば非ゼロ終了する（それを NG 判定に用いる）。
 
 ### 2B. 逆方向（テスト/実装起点の改修 → 影響範囲）

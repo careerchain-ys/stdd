@@ -1,0 +1,30 @@
+version: 1
+project:
+  name: "id-chain-fixture"
+  language: "ja"
+  primary_branch: "main"
+apps:
+  - id: app
+    path: "."
+commands:
+  typecheck: "true"
+  test: "true"
+docs:
+  lineup: "layered"
+  layout:
+    requirements: "docs/{{feature_path}}/REQUIREMENTS.md"
+    api_design: "docs/{{feature_path}}/API_DESIGN.md"
+    api_test_design: "docs/{{feature_path}}/API_TEST_DESIGN.md"
+    screen_design: "docs/{{feature_path}}/SCREEN_DESIGN.md"
+    screen_test_design: "docs/{{feature_path}}/SCREEN_TEST_DESIGN.md"
+    test_design: "docs/{{feature_path}}/TEST_DESIGN.md"
+traceability:
+  enabled: true
+  enforce: "block"
+  patterns:
+    test_tag: '\([[:space:]]*.(\[[A-Z]+-[0-9]+\] *)?\[((UC|FL)-[a-z0-9]+-[0-9]+)\]'
+  scan:
+    tests:
+      - "tests/**/*.test.ts"
+    impl:
+      - "src/**"

@@ -319,7 +319,7 @@ STDD は Spec → テスト → 実装の一方向フロー（→ 2）で整合�
 1. **REQUIREMENTS §2.1** — 各ユースケース見出しの直下に ID を書く: `**ID**: UC-applies-01 ／ **Priority**: P0`
 2. **TECH_DESIGN §1.1** 対応ユースケース表に **要件ID 列**を持たせる（設計リンク）。§4.2 の各フローに `**ID**: FL-...` を付与
 3. **TEST_PLAN §1 / §2** の表に **対象ID 列**（UC / FL）を持たせる（テスト計画リンク）
-4. **テストコード** — タイトルに ID を含める（**必須**）: `describe('[UC-applies-01] ...')`。フレームワーク非依存で grep 可・テストレポートにも表示される
+4. **テストコード** — タイトルに ID を含める（**必須**）: `describe('[UC-applies-01] ...')`。フレームワーク非依存で grep 可・テストレポートにも表示される。`stdd init` の雛形は、テスト名の先頭に置いた ID だけを数える（[`id-chain.md`](id-chain.md) §5）
 5. **実装** — 任意で注釈コメント `@stdd UC-applies-01` を付し、実装位置を特定できるようにする
 
 ```mermaid
@@ -364,6 +364,12 @@ STDD は「テスト・実装の改修も必ず Spec 起点で行う」ことを
 - `traceability.scan` — テスト / 実装のスキャン対象 glob
 
 `enforce` は spec-first フックの `workflow.enforce_spec_first` と同じ流儀で、導入初期は `warn`、成熟後に `block` へ引き上げる運用を推奨する。
+
+### 6.6 設計書の表どうしの突合
+
+`docs.lineup: layered` の構成では、`trace-audit.sh` が ID の追跡に加えて設計書の表どうしを突き合わせる。API 設計のレスポンスコードを
+画面設計のレスポンス処理とテスト設計が受けているか、要件の受入基準が統括テスト設計で 1 つずつ担保されているかなどを確かめる。
+検査の一覧と、検査では見つけられないこと（意味の一致など）は [`id-chain.md`](id-chain.md) にある。
 
 ---
 
@@ -448,6 +454,7 @@ reviewer と qa-engineer は `opus` にする。agent ごとのモデルは `.st
 - `model-selection.md` — subagent と skill のモデルの使い分け（作業の性質ごとのモデル・agent ごとの既定・設定での上書き）
 - `review-process.md` — PR 前レビュー（担当の起動・指摘の 4 項目と処置・「直す」の指摘の実行での確認・台帳とラウンド・PR 作成前のゲート）
 - `skill-and-agent.md` — skill と agent の使い分け（subagent にする場面・並行にする条件・STDD の構成・agent を足すときの基準）
+- `id-chain.md` — ID チェーンの突合（要件・設計・テスト設計・レスポンスコードを ID でつなぐ検査の一覧と、検査で見つけられないこと）
 - `spec-lineup.md` — 設計書のラインナップと章立て（single / layered の構成・文書の分担・行の ID・レスポンスコード体系・章名と列名）
 - `spec-revision.md` — 仕様変更への追随（改修の 2 つの入口・依存関係から直す文書を決める・レビューの強さ・変更の伝播・転記せず参照する）
 - `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
