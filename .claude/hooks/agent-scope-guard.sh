@@ -12,7 +12,8 @@
 #
 # 判定:
 #   - 対象は subagent の呼び出しだけ（入力に agent_id があるもの）。メインのエージェントは通す。
-#     agent_type が上の 4 種のどれでもなければ通す（qa-engineer などは対象外）。
+#     agent_type が上の 4 種のどれか、またはその名前に「-」と続けたもの（agent teams のメンバーに付ける
+#     code-reviewer-security など）でなければ通す（qa-engineer などは対象外）。
 #   - 書き込み: 宛先を問わず違反。
 #   - Bash: 1 回の呼び出しで 1 コマンドだけを許す。連結・パイプ・リダイレクト・置換・改行を含めば違反。
 #     残った 1 コマンドが読み取りの許可一覧（下の is_read_only_command）に一致しなければ違反。
@@ -22,8 +23,8 @@
 #   warn は違反を文脈に知らせるだけで、操作は止めない。block は拒否する。
 # 失敗時: 設定が無い・jq が無い・入力が読めないときは通す（フックの故障で作業を止めない）。
 #
-# 限界: 名前を付けて起動した subagent は agent_type に付けた名前が入ることがあり、その場合は対象外になる。
-#   reviewer は名前を付けずに起動する。シンボリックリンクの先は追わない（字面で判定する）。
+# 限界: 名前を付けて起動した subagent・agent teams のメンバーは、agent_type に付けた名前が入ることがある。
+#   reviewer に名前を付けるときは agent の名前で始める（auto-implement の phases.md「起動の仕方」）。シンボリックリンクの先は追わない（字面で判定する）。
 
 command -v jq >/dev/null 2>&1 || exit 0
 hook_input=$(cat)
@@ -35,6 +36,7 @@ AGENT_ID=$(jqr '.agent_id')
 AGENT_TYPE=$(jqr '.agent_type')
 case "$AGENT_TYPE" in
     requirements-reviewer|tech-specs-reviewer|test-reviewer|code-reviewer) ;;
+    requirements-reviewer-*|tech-specs-reviewer-*|test-reviewer-*|code-reviewer-*) ;;
     *) exit 0 ;;
 esac
 

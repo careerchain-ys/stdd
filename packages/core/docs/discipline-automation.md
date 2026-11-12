@@ -84,8 +84,9 @@ Codex が `.codex/hooks.json`（`scripts/build-adapters.mjs` が生成）で、`
 - シェルは、読み取りの許可一覧に完全に一致する 1 コマンドだけを許す。連結・パイプ・リダイレクト・置換を含むものは違反とする。
   先頭のコマンド名だけで許可すると、連結や書き込み用のオプションで規律を抜けられるためである。
 
-名前を付けて起動した subagent では、入力の `agent_type` に付けた名前が入ることがあり、その場合は対象にならない。
-reviewer は名前を付けずに起動する。
+名前を付けて起動した subagent や agent teams のメンバーでは、入力の `agent_type` に付けた名前が入ることがある。
+そのため、agent の名前に「-」と続けた名前（`code-reviewer-security` など）も reviewer として扱う。reviewer に名前を付けるときは
+agent の名前で始める。
 
 ### 3.2 作業場所の突合（`worktree-lock-guard.sh`）
 
@@ -112,7 +113,7 @@ subagent を起動する側（メインのエージェント）が、作業す�
 | --- | --- | --- |
 | 実装の前に Spec とテストを更新する | フック `spec-first-check.sh`。ID による影響範囲の確認は `trace-audit.sh` | 変更が仕様の振る舞いを変えるかどうかは判断を伴う |
 | 要件・設計・テスト・実装に ID を通す | 検査スクリプト `trace-audit.sh`（pre-push・CI） | — |
-| reviewer はファイルを書かない | フック `agent-scope-guard.sh` | 名前を付けて起動した subagent は判定できない（§3.1） |
+| reviewer はファイルを書かない | フック `agent-scope-guard.sh` | agent の名前で始まらない名前を付けて起動した subagent は判定できない（§3.1） |
 | 配る agent に書き込みの道具を持たせない | テスト `test/agent-roles.test.mjs`（[`skill-and-agent.md`](skill-and-agent.md)） | — |
 | subagent は指定された作業ツリーで作業する | フック `worktree-lock-guard.sh` と宣言のスクリプト | 宣言するかどうかは起動する側の手順（`auto-implement` Step 4）に任せる |
 | Red / Green の確認ではテストの対象を絞る | フック `test-scope-guard.sh` | どのテストが対象かの選び方は技術スタックに依存する |

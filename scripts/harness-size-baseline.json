@@ -16,11 +16,11 @@
     "agent:test-reviewer": 8000
   },
   "totals": {
-    "skill": 109169,
-    "skill-metadata": 6317,
-    "agent": 46723,
-    "agent-description": 947,
-    "rule": 1905,
-    "all": 235525
+    "skill": 109002,
+    "skill-metadata": 6248,
+    "agent": 28354,
+    "agent-description": 522,
+    "rule": 1899,
+    "all": 220646
   }
 }

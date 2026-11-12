@@ -4,8 +4,9 @@
 
 ## reviewer の使い方
 
-`requirements-reviewer` / `tech-specs-reviewer` / `test-reviewer` / `code-reviewer` と `qa-engineer` は subagent として起動する。
-書いた本人（メインのセッション）とは別の文脈で、成果物だけを見て判定させるためである。
+`requirements-reviewer` / `tech-specs-reviewer` / `test-reviewer` / `code-reviewer` と `qa-engineer` は、メインのセッションとは
+別の文脈で起動する。書いた本人とは別の目で、成果物だけを見て判定させるためである。書く作業（Spec・テスト・実装）は
+メインのセッションが順に行い、並列にするのはレビューだけである。
 
 | reviewer | 起動する条件 |
 | --- | --- |
@@ -14,6 +15,32 @@
 | `test-reviewer` | テストを追加・変更し、実装に入る前（`quick` を除く） |
 | `qa-engineer` | 実装・テストを変更したとき |
 | `code-reviewer` | 実装のコードを変更したとき（文書だけの変更では起動しない） |
+
+### 起動の仕方（並列が既定）
+
+互いの結果を必要としないレビューは、**既定で同時に起動する**。
+
+| 同時に起動するもの | Phase |
+| --- | --- |
+| 変更した REQUIREMENTS.md ごと（feature と common） | 1a |
+| feature の TECH_DESIGN.md と TEST_PLAN.md（両者の対応を見るので 1 つにまとめる）と、変更した common の技術文書ごと | 1b |
+| `qa-engineer` と、`code-reviewer` の 3 つの観点（Phase 4「観点を分けた並列レビュー」） | 3・4 |
+
+起動する前に、次のスクリプトで起動の形を決める（1 行目が `teams` か `subagents`、2 行目が理由）。
+
+```bash
+# <skill-dir> はこの skill のディレクトリ
+bash <skill-dir>/scripts/review-runner.sh
+```
+
+- **`teams`**: agent teams で起動する。各メンバーは上の reviewer の agent の定義を使い、名前は agent の名前で始める
+  （例: `code-reviewer-security`）。フック `agent-scope-guard.sh` が名前の先頭で reviewer を見分けるためである。
+  メインのセッションが取りまとめ役になり、全員の結果がそろうまで次へ進まない。終わったらメンバーを終了させる。
+- **`subagents`**: 同じ依頼を、1 回の応答の中で複数の subagent として起動する（Codex、または agent teams が無効な環境）。
+- **記録**: 実際にどちらで動いたかを、Step 6 の完了報告と PR description の備考に `レビューの実行: agent teams / subagent` と書く。
+  非対話の実行では `teams` と判定してもチームは作られず、通常の subagent として動くので、判定ではなく実際の形を書く。
+
+### 依頼と判定
 
 - **依頼の内容**: 対象のファイル、基準にする Spec のパス、作業ツリーを渡す。書いたときの判断の理由は渡さない。
 - **判定は原則そのまま受け入れる**: 「厳しすぎる」として NEEDS CHANGES / ⚠️ 要修正 / ❌ Blocked を退けない。退けるときは理由を完了報告に書く。
@@ -221,12 +248,12 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
 
 ## Phase 4: コードレビュー（`full`, `impl-only`のみ）
 
-`code-reviewer` を起動して、コード品質をレビューさせる。Phase 3 と互いに独立しているので、並行に起動してよい。
+`code-reviewer` を起動して、コード品質をレビューさせる。Phase 3 と互いに独立しているので、Phase 3 の `qa-engineer` と同時に起動する。
 
-### 観点を分けた並行レビュー
+### 観点を分けた並列レビュー
 
-1 体の reviewer は、一度に 1 種類の問題に注意が偏りやすい。認証・認可・外部からの入力・データアクセスに触れる変更や、
-複数の層にまたがる変更では、`code-reviewer` を観点ごとに分けて並行に起動する。小さな変更は 1 体で全観点を見る。
+1 体の reviewer は、一度に 1 種類の問題に注意が偏りやすい。そこで `code-reviewer` は、変更の大きさにかかわらず、
+次の 3 つの観点に分けて同時に起動する（起動の形は「reviewer の使い方」の「起動の仕方」）。
 
 | 観点 | 見る範囲 |
 | --- | --- |
@@ -237,7 +264,7 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
 - 依頼文で観点を 1 つだけ渡し、ほかの観点は見ないよう伝える。観点が重ならないようにするためである。
 - 結果はメインのセッションが統合する。判定は観点ごとの判定のうち最も悪いものとし、同じ箇所への指摘はまとめる。
 - 差し戻しの後は、NEEDS CHANGES 以下だった観点をもう一度起動する。
-- 指摘を互いに確かめ合わせたいときは、ユーザーが選べば agent teams で同じ分け方をしてもよい（`skill-and-agent.md` §2）。
+- agent teams で起動したときは、メンバーどうしで同じ箇所への指摘を確かめ合わせてよい。
 
 チェック項目:
 
@@ -304,7 +331,7 @@ PRのdescriptionには以下を含める:
 - 対応issue番号（`Closes #<issue番号>`）。**GitHub issue 起点のときのみ**。issue 以外の入力では、代わりに対象タスクのサマリを記載する。Phase 4.8 で起票した issue には `Closes` を付けない。
 - 実行モード
 - 各フェーズの実行結果サマリ
-- 備考に、Phase 4.8 の `triage` が出力した「開発フィードバック: …」の 1 行
+- 備考に、Phase 4.8 の `triage` が出力した「開発フィードバック: …」の 1 行と、`レビューの実行: agent teams / subagent` の 1 行
 - 緊急モードのブランチでは、冒頭に「## 緊急モード」の節（`create-pr` の Description テンプレート）
 
 PR を作成したら、`create-pr` §5 のとおり工程テレメトリを投稿する。`quick` / `spec-only` モードのようにコードレビューを

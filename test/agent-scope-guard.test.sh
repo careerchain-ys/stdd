@@ -30,6 +30,9 @@ run_hook $H "$(hook_input NotebookEdit "{\"notebook_path\":\"$B/src/a.ipynb\"}" 
 P=$(jq -cn --arg c $'*** Begin Patch\n*** Update File: docs/app/x/REQUIREMENTS.md\n*** End Patch' '{command:$c}')
 run_hook $H "$(hook_input apply_patch "$P" requirements-reviewer "$B")" "$B"; expect_deny "apply_patch も見る"
 run_hook $H "$(bash_in "git diff main" code-reviewer "$B")" "$B"; expect_silent "読み取りのシェルは通す"
+run_hook $H "$(edit "$B/src/app.ts" code-reviewer-security "$B")" "$B"; expect_deny "agent の名前で始まるチームのメンバーも見る"
+run_hook $H "$(bash_in "node -e 1" tech-specs-reviewer-common "$B")" "$B"; expect_deny "メンバーのシェルも見る"
+run_hook $H "$(edit "$B/src/app.ts" code-reviewers "$B")" "$B"; expect_silent "「-」で続かない似た名前は対象外"
 
 echo "[Bash の許可一覧]"
 for c in "ls docs" "cat docs/app/x/REQUIREMENTS.md" "grep -rn 'UC-' docs" "grep -n 'end\$' a.md" "git log --oneline -20" \

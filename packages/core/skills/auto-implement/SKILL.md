@@ -123,14 +123,14 @@ subagent には分けない。subagent に任せるのは、書いた経緯を�
 | メインのセッション | `documenting-tech-specs` | 1b 技術設計 |
 | メインのセッション | `documenting-plans` | 1.5 PLAN |
 | メインのセッション | [references/implementation.md](references/implementation.md) | 2 テスト・実装 |
-| subagent | `requirements-reviewer` / `tech-specs-reviewer` | 1a / 1b のレビュー |
-| subagent | `test-reviewer` | 2.5 テストレビュー |
-| subagent | `qa-engineer` | 3 QA（全件のテスト・整合性の監査・動作確認） |
-| subagent | `code-reviewer` | 4 コードレビュー |
+| 別の文脈（並列） | `requirements-reviewer` / `tech-specs-reviewer` | 1a / 1b のレビュー |
+| 別の文脈（並列） | `test-reviewer` | 2.5 テストレビュー |
+| 別の文脈（並列） | `qa-engineer` | 3 QA（全件のテスト・整合性の監査・動作確認） |
+| 別の文脈（並列） | `code-reviewer` | 4 コードレビュー |
 | メインのセッション | Figma の更新・`recording-dev-feedback`・`create-pr` | 4.5・4.8・5 |
 
 - reviewer には、対象のファイルと基準の Spec のパスを渡し、書いたときの判断の理由は渡さない。
-- QA とコードレビューは互いに独立しているので、並行に起動してよい。
+- 互いの結果を必要としないレビュー（QA とコードレビューの観点ごと、文書ごと）は、既定で同時に起動する。agent teams が使えれば既定でそれを使う（phases.md「起動の仕方」）。
 - **人間レビューゲートを尊重する**: Phase 1a（要件）と Phase 1b（技術設計）は、reviewer の承認の後に**ユーザーの確認**を求めて止まる（詳細は phases.md）。
 - 長い会話になるので、進捗は PLAN とコミットに残す。会話が圧縮されても、ファイルから続きを再開できるようにする。
 
@@ -179,6 +179,7 @@ subagent には分けない。subagent に任せるのは、書いた経緯を�
 | QA | OK / SKIP | |
 | コードレビュー | OK / SKIP | |
 | Figma更新 | OK / SKIP | |
+| レビューの実行 | agent teams / subagent | |
 | フィードバックの棚卸し | OK / SKIP | 起票・再発・上限で起票しなかった件数 |
 | PR作成 | OK | |
 | 工程テレメトリ | OK / SKIP | |
@@ -191,7 +192,7 @@ subagent には分けない。subagent に任せるのは、書いた経緯を�
 
 ## 注意事項
 
-- subagent は通常の委譲で起動し（Codex は `multi_agent`）、agent teams は前提にしない。並行の条件は `skill-and-agent.md` §2
+- 書く作業は agent teams を使わず、メインのセッションで順に進める（基準は `skill-and-agent.md` §2）
 - reviewer は対象の変更があるときだけ起動する（条件は phases.md）
 - 広い検索・ログの要約は `models.mechanical` のモデルの subagent に任せる（`packages/core/docs/model-selection.md`）
 - Worktreeベースの開発フローに従う
