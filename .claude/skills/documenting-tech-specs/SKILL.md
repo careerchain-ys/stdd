@@ -15,6 +15,8 @@ STDD（Spec and Test Driven Development）方法論に従って、技術系の�
 
 ## Quick Start
 
+書き始める前に [guides/writing-procedure.md](guides/writing-procedure.md)（前提・読むもの・追記か新規か・書かないもの）を確かめる。
+
 ### 新機能の技術設計を作成する場合
 
 REQUIREMENTS.md（要件）が確定している前提で:

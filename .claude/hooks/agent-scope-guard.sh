@@ -1,21 +1,20 @@
 #!/bin/bash
-# PreToolUse Hook: 設計書を書く・レビューする subagent の操作を、担当の範囲に制限する。
+# PreToolUse Hook: レビューする subagent の操作を、読み取りに制限する。
 # 登録: Claude は Edit / Write / MultiEdit / NotebookEdit と Bash（settings.json）、
 #       Codex は apply_patch|Edit|Write と Bash（.codex/hooks.json）。
 #
-# 規律（agents/*-writer.md・*-reviewer.md）:
-#   - writer（requirements-writer / tech-specs-writer / plan-writer）は、担当する設計書の場所だけを編集する。
+# 規律（agents/*-reviewer.md）:
 #   - reviewer（requirements-reviewer / tech-specs-reviewer / test-reviewer / code-reviewer）はファイルを書かない。
-#   - どちらも、シェルは読み取りの用途にだけ使う。
-#   文章で書いた規律は agent が増えるほど守られにくくなるため、ここで機械的に確かめる
+#   - シェルは読み取りの用途にだけ使う。
+#   書いた本人とは別の目で見る役割なので、指摘は結果として返し、直すのは呼び出し元に任せる。
+#   tools の指定だけでは Bash 経由の書き込みを防げないため、ここで機械的に確かめる
 #   （方針は docs/discipline-automation.md）。
 #
 # 判定:
 #   - 対象は subagent の呼び出しだけ（入力に agent_id があるもの）。メインのエージェントは通す。
-#     agent_type が上の 7 種のどれでもなければ通す（implementer・qa-engineer などは対象外）。
-#   - 書き込み: 宛先が「docs.layout の各テンプレートが指すディレクトリ」の内側か。
-#     テンプレートの {{...}} は任意の文字列として扱う（例: docs/{{feature_path}}/REQUIREMENTS.md → docs/*/*）。
-#     reviewer の書き込みは宛先を問わず違反。
+#     agent_type が上の 4 種のどれか、またはその名前に「-」と続けたもの（agent teams のメンバーに付ける
+#     code-reviewer-security など）でなければ通す（qa-engineer などは対象外）。
+#   - 書き込み: 宛先を問わず違反。
 #   - Bash: 1 回の呼び出しで 1 コマンドだけを許す。連結・パイプ・リダイレクト・置換・改行を含めば違反。
 #     残った 1 コマンドが読み取りの許可一覧（下の is_read_only_command）に一致しなければ違反。
 #     前方一致で許すと、連結や書き込み用のオプションで抜けられるため、完全一致で判定する。
@@ -24,8 +23,8 @@
 #   warn は違反を文脈に知らせるだけで、操作は止めない。block は拒否する。
 # 失敗時: 設定が無い・jq が無い・入力が読めないときは通す（フックの故障で作業を止めない）。
 #
-# 限界: 名前を付けて起動した subagent は agent_type に付けた名前が入ることがあり、その場合は対象外になる。
-#   writer / reviewer は名前を付けずに起動する。シンボリックリンクの先は追わない（字面で判定する）。
+# 限界: 名前を付けて起動した subagent・agent teams のメンバーは、agent_type に付けた名前が入ることがある。
+#   reviewer に名前を付けるときは agent の名前で始める（auto-implement の phases.md「起動の仕方」）。シンボリックリンクの先は追わない（字面で判定する）。
 
 command -v jq >/dev/null 2>&1 || exit 0
 hook_input=$(cat)
@@ -36,8 +35,8 @@ AGENT_ID=$(jqr '.agent_id')
 [ -z "$AGENT_ID" ] && exit 0
 AGENT_TYPE=$(jqr '.agent_type')
 case "$AGENT_TYPE" in
-    requirements-writer|tech-specs-writer|plan-writer) ROLE=writer ;;
-    requirements-reviewer|tech-specs-reviewer|test-reviewer|code-reviewer) ROLE=reviewer ;;
+    requirements-reviewer|tech-specs-reviewer|test-reviewer|code-reviewer) ;;
+    requirements-reviewer-*|tech-specs-reviewer-*|test-reviewer-*|code-reviewer-*) ;;
     *) exit 0 ;;
 esac
 
@@ -77,38 +76,6 @@ case "$MODE" in
     *) MODE=warn ;;
 esac
 
-# docs: セクション配下の layout の値（パスのテンプレート）を 1 行ずつ出す
-yaml_layout_values() {
-    awk '
-        /^[^[:space:]]/ { indocs = ($1 == "docs:") ; next }
-        indocs && /^[[:space:]]+[A-Za-z_]+:[[:space:]]*[^[:space:]#]/ {
-            line = $0
-            sub(/^[[:space:]]*[A-Za-z_]+:[[:space:]]*/, "", line)
-            sub(/[[:space:]]+#.*$/, "", line)
-            print line
-        }
-    ' "$CONFIG"
-}
-
-# テンプレートを「ディレクトリの glob」に変換する（{{...}} → *、末尾のファイル名を落とす）
-DOC_GLOBS=""
-while IFS= read -r raw; do
-    t=$(strip_quotes "$raw")
-    [ -z "$t" ] && continue
-    t=$(printf '%s' "$t" | sed -E 's/\{\{[^}]*\}\}/*/g')
-    case "$t" in
-        */) dir="${t%/}" ;;
-        */*) dir="${t%/*}" ;;
-        *) continue ;;
-    esac
-    dir="${dir#./}"
-    [ -z "$dir" ] && continue
-    DOC_GLOBS="$DOC_GLOBS
-$dir/*"
-done <<EOF
-$(yaml_layout_values)
-EOF
-
 # --- パスの扱い ---
 
 # 字面で正規化する（. と .. を畳む。シンボリックリンクは追わない）
@@ -125,34 +92,6 @@ normalize_abs() {
     printf '%s' "${out:-/}"
 }
 
-# 宛先をその作業ツリーのルートからの相対パスにする（別の作業ツリーでも、そのツリーのルートを基準にする）
-relative_to_tree() {
-    local abs="$1" dir top
-    dir="${abs%/*}"
-    while [ -n "$dir" ] && [ ! -d "$dir" ]; do dir="${dir%/*}"; done
-    top=$(git -C "${dir:-/}" rev-parse --show-toplevel 2>/dev/null)
-    if [ -n "$top" ]; then
-        case "$abs" in
-            "$top"/*) printf '%s' "${abs#"$top"/}"; return ;;
-        esac
-    fi
-    printf '%s' "$abs"
-}
-
-in_doc_area() {
-    local rel="$1" g
-    while IFS= read -r g; do
-        [ -z "$g" ] && continue
-        # shellcheck disable=SC2254
-        case "$rel" in
-            $g) return 0 ;;
-        esac
-    done <<EOF
-$DOC_GLOBS
-EOF
-    return 1
-}
-
 # --- 違反の通知 ---
 
 violation() {
@@ -167,23 +106,16 @@ violation() {
     exit 0
 }
 
-ESCALATE="範囲外の変更が必要なら、ここでは行わず、完了報告に書いて呼び出し元に依頼してください。"
-
 # --- 書き込みの判定 ---
 
 check_write_target() {
-    local p="$1" abs rel
+    local p="$1" abs
     case "$p" in
         /*) abs="$p" ;;
         *) abs="$INPUT_CWD/$p" ;;
     esac
     abs=$(normalize_abs "$abs")
-    if [ "$ROLE" = "reviewer" ]; then
-        violation "$AGENT_TYPE はファイルを書き換えない担当ですが、$abs を編集しようとしています。指摘はレビュー結果として返してください。"
-    fi
-    rel=$(relative_to_tree "$abs")
-    in_doc_area "$rel" && return 0
-    violation "$AGENT_TYPE が担当範囲の外（$rel）を編集しようとしています。writer が編集できるのは .stdd.config.yml の docs.layout が指す設計書の場所だけです。$ESCALATE"
+    violation "$AGENT_TYPE はファイルを書き換えない担当ですが、$abs を編集しようとしています。指摘はレビュー結果として返してください。"
 }
 
 case "$TOOL" in

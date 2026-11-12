@@ -114,11 +114,10 @@ TEST_PLAN.md の「テスト戦略」セクションと照合する。
 **推奨**: 修正案
 **コード例**: 問題のあるテストと修正後を並べる（例: `expect(result).toBeDefined()` だけのテストを、`result.success` が false でエラーメッセージが「必須項目です」であることの検証に直す）
 
-### Generator への差し戻し指示（判定が PASS 未満の場合のみ）
+### 修正の依頼（判定が PASS 未満の場合のみ）
 
-NEEDS CHANGES / CRITICAL ISSUES のときは末尾に必ず明記する（Team Lead がそのまま implementer に渡す）。
+NEEDS CHANGES / CRITICAL ISSUES のときは末尾に必ず明記する（呼び出し元はこれに沿って修正する）。
 
-- **修正対象 Generator**: implementer
 - **修正必須項目**: 上記「改善が必要な点」のうち、判定基準（Hard Threshold）を割っている項目すべて
 - **修正不要な指摘**: LOW / 任意改善として明示的に区別する
 - **再レビュー時の確認ポイント**: 修正反映を確認すべきテストファイル・行・期待されるアサーション形状
@@ -126,7 +125,7 @@ NEEDS CHANGES / CRITICAL ISSUES のときは末尾に必ず明記する（Team L
 
 ## 判定基準（Hard Threshold）
 
-以下の **すべて** を満たす場合のみ PASS。1 つでも下回れば NEEDS CHANGES 以下とし、implementer に差し戻す。
+以下の **すべて** を満たす場合のみ PASS。1 つでも下回れば NEEDS CHANGES 以下とする。
 
 | 項目 | PASS の Threshold |
 | --- | --- |

@@ -35,7 +35,7 @@ workflow:
   branch_prefix: "claude/"
   enforce_spec_first: "warn"   # off | warn | block — 実装編集時に Spec→テスト→実装 の順序を促す PreToolUse フック
   # 以下 3 つも off | warn | block。操作を止める前に、まず warn で誤検知が無いかを確かめる
-  enforce_agent_scope: "warn"     # writer / reviewer の subagent の編集範囲とシェルの用途を制限する
+  enforce_agent_scope: "warn"     # reviewer の subagent の書き込みとシェルの用途を制限する
   enforce_worktree_lock: "warn"   # subagent の作業先を、宣言した作業ツリーと突き合わせる
   enforce_test_scope: "warn"      # 対象を絞らない commands.test の全件実行を知らせる
   worktree:
@@ -84,7 +84,7 @@ emergency_mode:
 
 # subagent と skill のモデルの使い分け（packages/core/docs/model-selection.md）。Claude Code 向けのみ。
 # 値はモデルの別名（inherit / opus / sonnet / haiku / fable）。モデルの ID は書かない。
-# agent の既定は opus（plan-writer と qa-engineer は sonnet）。変えたら stdd init を実行し直す。
+# agent の既定は opus。変えたら stdd init を実行し直す。
 # models:
 #   agents:
 #     code-reviewer: fable    # 影響の大きい変更のレビューで上げる例

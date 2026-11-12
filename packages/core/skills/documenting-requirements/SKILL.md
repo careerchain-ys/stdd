@@ -14,6 +14,8 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
 
 ## Quick Start
 
+書き始める前に [guides/writing-procedure.md](guides/writing-procedure.md)（読むもの・追記か新規か・書かないもの）を確かめる。
+
 ### 新機能の要件定義書を作成する場合
 
 1. **REQUIREMENTS.md を作成**

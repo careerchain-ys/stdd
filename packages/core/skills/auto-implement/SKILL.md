@@ -1,9 +1,9 @@
 ---
 name: auto-implement
 description: |-
-  実装したい課題（GitHub issue / 自由記述の要望 / 既存ドキュメント / URL 等、あらゆる入力）を起点として、まずユーザーへのヒアリングで対象を確定し、Spec 作成（要件→技術設計）→PLAN 作成→実装（STDD）→QA→コードレビュー→Figma 更新→PR 作成までを専門エージェント（Requirements Writer / Tech Specs Writer / Implementer / QA Engineer / Code Reviewer 等）にオーケストレーションして自動実行する。
+  実装したい課題（GitHub issue / 自由記述の要望 / 既存ドキュメント / URL 等、あらゆる入力）を起点として、まずユーザーへのヒアリングで対象を確定し、Spec 作成（要件→技術設計）→PLAN 作成→実装（STDD）→QA→コードレビュー→Figma 更新→PR 作成までを、メインのセッションが skill を順に使って進める。レビューと QA は独立した reviewer の subagent に任せる。
 when_to_use: |-
-  「auto implement」「自動実装」「これを実装して」「PR まで作って」「Agent Teams で実装」「issue から実装」「#123 を実装して」など、課題・要望（issue に限らず自由記述やドキュメントでも可）を起点とした包括的な自動実装の依頼があったとき。入力が曖昧でも、最初のヒアリングで対象を具体化してから進める。
+  「auto implement」「自動実装」「これを実装して」「PR まで作って」「issue から実装」「#123 を実装して」など、課題・要望（issue に限らず自由記述やドキュメントでも可）を起点とした包括的な自動実装の依頼があったとき。入力が曖昧でも、最初のヒアリングで対象を具体化してから進める。
 allowed-tools: Bash, Read, Write, Edit, Grep, Glob, Agent
 ---
 
@@ -101,45 +101,38 @@ devcontainer up --workspace-folder ../worktree-<instance-id> --override-config .
 
 以降の作業はすべてworktree内のdevcontainerで実行する。
 
-作業ツリーで作業するときは、専門エージェントに依頼する前に、作業する作業ツリーを宣言する。宣言すると、
-フック `worktree-lock-guard.sh` がエージェントの書き込み先と実行先を宣言と突き合わせる（宣言しなければ確かめない）。
+作業ツリーで作業するときは、subagent を起動する前に、作業する作業ツリーを宣言する。宣言すると、
+フック `worktree-lock-guard.sh` が subagent の書き込み先と実行先を宣言と突き合わせる（宣言しなければ確かめない）。
 
 ```bash
 # <skill-dir> はこの skill のディレクトリ（Claude は .claude/skills/auto-implement、Codex は .agents/skills/auto-implement）
 bash <skill-dir>/scripts/worktree-lock.sh lock --root <作業ツリーの絶対パス>
 ```
 
-エージェントに一時ディレクトリを使わせるときは `--allow <ディレクトリ>` を足す。作業を終えたら `unlock` で外す。
+subagent に一時ディレクトリを使わせるときは `--allow <ディレクトリ>` を足す。作業を終えたら `unlock` で外す。
 
 ## Step 5: フェーズ実行
 
-このスキルは **Team Lead（オーケストレーター）** として動作し、専門エージェントにタスクを依頼しながら開発フロー全体を統括する。
+Spec の作成・実装・修正は、このスキルを使っているメインのセッションが行う。会話の経緯を踏まえて順に進める作業なので、
+subagent には分けない。subagent に任せるのは、書いた経緯を見ていない目でのレビューと、長い出力の隔離だけである
+（基準は STDD 方法論の `packages/core/docs/skill-and-agent.md`）。
 
-### チーム編成
+| 担当 | 使うもの | 対象の Phase |
+| --- | --- | --- |
+| メインのセッション | `documenting-requirements`・`generating-wireframes` | 1a 要件 |
+| メインのセッション | `documenting-tech-specs` | 1b 技術設計 |
+| メインのセッション | `documenting-plans` | 1.5 PLAN |
+| メインのセッション | [references/implementation.md](references/implementation.md) | 2 テスト・実装 |
+| 別の文脈（並列） | `requirements-reviewer` / `tech-specs-reviewer` | 1a / 1b のレビュー |
+| 別の文脈（並列） | `test-reviewer` | 2.5 テストレビュー |
+| 別の文脈（並列） | `qa-engineer` | 3 QA（全件のテスト・整合性の監査・動作確認） |
+| 別の文脈（並列） | `code-reviewer` | 4 コードレビュー |
+| メインのセッション | Figma の更新・`recording-dev-feedback`・`create-pr` | 4.5・4.8・5 |
 
-```
-Team Lead（オーケストレーター）      ← このスキル自身
- ├→ Requirements Writer   : REQUIREMENTS.md 作成（要件: What & Why）
- ├→ Requirements Reviewer : REQUIREMENTS.md の品質・網羅性・SSOT をレビュー
- ├→ Tech Specs Writer    : TECH_DESIGN.md + TEST_PLAN.md 作成（技術設計: How / common 技術階層も担当）
- ├→ Tech Specs Reviewer  : 技術設計・テスト戦略の品質・整合性・SSOT をレビュー
- ├→ Plan Writer          : タスク分解・実装計画（PLANドキュメント）を作成
- ├→ Implementer          : テスト作成 → 実装（STDDフロー）
- ├→ Test Reviewer        : テスト戦略準拠・形骸的テスト検出・テストコード品質レビュー
- ├→ Build Error Resolver : ビルド・型エラーの段階的修正（エラー発生時に自動起動）
- ├→ QA Engineer          : Playwright MCP動作確認・テスト実行・整合性チェック・simplify
- ├→ Code Reviewer        : PRレビュー・コード品質・セキュリティチェック
- ├→ Penetration Tester   : 攻撃者視点での脆弱性検証・エクスプロイト試行
- └→ Figma Updater        : UIキャプチャ→Figmaファイル更新（Team Leadが直接実行）
-```
-
-**Team Leadの役割**:
-
-- 各フェーズで対応するエージェントに作業を依頼する
-- エージェントの成果物を受け取り、次のフェーズに引き渡す
-- 問題が発生した場合は適切なエージェントに修正を依頼し、最大3回の修正ループを管理する
-- **人間レビューゲートを尊重する**: Phase 1a（要件）と Phase 1b（技術設計）はエージェントレビュー承認後に**ユーザー（人間）のレビュー**を仰ぐ。ユーザーの承認を得るまで次フェーズに進まない（詳細は phases.md）
-- 全フェーズの完了後にPRを作成し、ユーザーに報告する
+- reviewer には、対象のファイルと基準の Spec のパスを渡し、書いたときの判断の理由は渡さない。
+- 互いの結果を必要としないレビュー（QA とコードレビューの観点ごと、文書ごと）は、既定で同時に起動する。agent teams が使えれば既定でそれを使う（phases.md「起動の仕方」）。
+- **人間レビューゲートを尊重する**: Phase 1a（要件）と Phase 1b（技術設計）は、reviewer の承認の後に**ユーザーの確認**を求めて止まる（詳細は phases.md）。
+- 長い会話になるので、進捗は PLAN とコミットに残す。会話が圧縮されても、ファイルから続きを再開できるようにする。
 
 各フェーズの詳細な手順は [references/phases.md](references/phases.md) を参照。
 各 Phase の開始と終了では工程の記録（`pr-telemetry.sh mark`）を付ける（phases.md「工程の記録」）。
@@ -154,7 +147,6 @@ Team Lead（オーケストレーター）      ← このスキル自身
 | Phase 2.5 | テストレビュー         | ✓    |           | ✓         |       |
 | Phase 3   | QA                     | ✓    |           | ✓         |       |
 | Phase 4   | コードレビュー         | ✓    |           | ✓         |       |
-| Phase 4.3 | ペネトレーションテスト | ✓    |           | ✓         |       |
 | Phase 4.5 | Figma更新              | ✓    |           | ✓         |       |
 | Phase 4.8 | フィードバックの棚卸し | ✓    | ✓         | ✓         | ✓     |
 | Phase 5   | PR作成                 | ✓    | ✓         | ✓         | ✓     |
@@ -186,8 +178,8 @@ Team Lead（オーケストレーター）      ← このスキル自身
 | 実装 | OK / SKIP | |
 | QA | OK / SKIP | |
 | コードレビュー | OK / SKIP | |
-| ペネトレーションテスト | OK / SKIP | |
 | Figma更新 | OK / SKIP | |
+| レビューの実行 | agent teams / subagent | |
 | フィードバックの棚卸し | OK / SKIP | 起票・再発・上限で起票しなかった件数 |
 | PR作成 | OK | |
 | 工程テレメトリ | OK / SKIP | |
@@ -200,8 +192,8 @@ Team Lead（オーケストレーター）      ← このスキル自身
 
 ## 注意事項
 
-- 専門エージェントへの並列委譲（サブエージェント）機能を用いる（Claude Code: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` / Codex: `multi_agent`）
-- コスト管理のため、各Teammateは該当フェーズでのみ起動する
+- 書く作業は agent teams を使わず、メインのセッションで順に進める（基準は `skill-and-agent.md` §2）
+- reviewer は対象の変更があるときだけ起動する（条件は phases.md）
 - 広い検索・ログの要約は `models.mechanical` のモデルの subagent に任せる（`packages/core/docs/model-selection.md`）
 - Worktreeベースの開発フローに従う
 - AGENTS.md / CLAUDE.mdのすべてのルールを遵守する

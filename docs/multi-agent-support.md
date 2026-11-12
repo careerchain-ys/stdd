@@ -26,7 +26,7 @@ Codex CLI は 2026 年時点で大半のギャップを埋めており、特に 
 | `.stdd.config.yml`（実行時参照） | 変更不要（両者が読む共有 SSoT） | 完全 | ゼロ |
 | hooks（`spec-first-check.sh` 等） | Hooks（`.codex/hooks.json` / `config.toml [hooks]`・`PreToolUse` あり） | 機構は完全 | 小 |
 | rules（`.claude/rules/*` 自動読込） | AGENTS.md（repo root 既存・nested / override 対応） | 完全 | 小 |
-| agents 9 体（`*.md` + `tools:` allowlist） | Subagents（`.codex/agents/*.toml`・`developer_instructions`） | 部分 | 中 |
+| agents 5 体（reviewer 4 体と qa-engineer。`*.md` + `tools:` allowlist） | Subagents（`.codex/agents/*.toml`・`developer_instructions`） | 部分 | 中 |
 | `.mcp.json`（JSON） | `[mcp_servers.*]`（`config.toml`・TOML） | 完全 | 小 |
 | `settings.json`（`permissions.allow` 等） | `config.toml`（`approval_policy` + `sandbox_mode` + OS sandbox） | 部分 | 小 |
 | plugin.json / `.claude/commands` | プラグインは skills 束として吸収 / commands は未使用 | — | ゼロ |
@@ -49,7 +49,7 @@ Claude agent の `tools:` allowlist に相当する per-agent ツール制限は
 | Claude agent の `tools:` | Codex subagent | 意味 |
 | --- | --- | --- |
 | `Read, Grep, Glob`（reviewer 系 5 体） | `sandbox_mode = "read-only"` | 書込み不可を OS 強制 |
-| `+ Edit, Write, Bash`（implementer 等） | `sandbox_mode = "workspace-write"` | 書込み可 |
+| `+ Edit, Write` を含むもの（現在は配布していない） | `sandbox_mode = "workspace-write"` | 書込み可 |
 | `mcp__playwright`（qa-engineer） | `mcp_servers = ["playwright"]` | MCP 限定 |
 
 ## 3. あるべき姿（Core + Adapter）
@@ -95,8 +95,8 @@ packages/core/            ← 単一 SSoT（エージェント非依存）
 - 正典は MD（人間可読・現状資産）。Codex 用に TOML を生成する。
 - 変換: 本文 → `developer_instructions`、frontmatter `name` / `description` → 同名、
   `model` → `model`、`tools:` → `sandbox_mode`（§2.1 のマッピング）、`mcp__*` → `mcp_servers`。
-- オーケストレーション（auto-implement 等 3 skill）の「Team Lead が専門エージェントへ委譲」という記述は
-  自然言語ベースで両者に通じる。`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` は Claude 専用 env として Adapter に閉じる。
+- auto-implement は、メインのセッションが skill を順に使い、reviewer だけを subagent に任せる形である
+  （`packages/core/docs/skill-and-agent.md`）。委譲の記述は自然言語なので両者に通じ、Claude の agent teams は使わない。
 
 ### 4.3 hooks
 
@@ -139,9 +139,8 @@ packages/core/            ← 単一 SSoT（エージェント非依存）
 
 （`.agents/skills` の discover 可否は Phase 0 で解決 → 両配置必須。§7 参照）
 
-1. subagent 編成の移植方式: Codex の `multi_agent` は GA・有効だが、format は TOML で per-agent tools allowlist が無い。
-   auto-implement の 9 体を TOML 変換して移すのを基本とし、限定環境向けに「単一エージェントが各ペルソナの
-   `developer_instructions` を順に adopt」する縮退モードを併設するか要判断。
+1. subagent 編成の移植方式（解決）: 書く作業はメインのセッションが skill で行い、agent は reviewer と qa-engineer の
+   5 体に絞った。Codex にも同じ 5 体を TOML 変換して配る（`packages/core/docs/skill-and-agent.md`）。
 2. skills 共有の最適化: 二重 install を基本としつつ、symlink `.agents/skills → .claude/skills` を
    Codex が辿れるか（辿れれば配布を一元化できる）を Phase 2 で検証する。
 3. ドキュメントのパスドリフト是正（Phase 4 で対応済み）: `packages/claude-code/` 等の未実現パス参照を `plugin-separation-policy.md` / `packages/core/README.md` から除去し、`README.md` / `AGENTS.md` を Core+Adapter・dual-agent 前提に更新。

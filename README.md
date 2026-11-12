@@ -40,6 +40,13 @@ claude                        # ② Claude Code（または codex）を起動
 進捗は `docs/common/plans/`（新規=`stdd-bootstrap.md` / 既存=`stdd-introduction.md`）に保持され、セッションを跨いで再開できます。
 新規 / 既存が明確な場合は、ルーターを介さず `starting-new-with-stdd` / `introducing-stdd` を直接指名しても構いません。
 
+### 以前の版から更新するとき
+
+`npx @careerchain/stdd init` を再実行すると、配布から外れたファイルは、編集していなければ削除され、編集していれば残して報告されます。
+要件・技術設計・PLAN の writer と `implementer` の agent は配布をやめ、メインのセッションが skill を使って書く形に変わりました
+（[`skill-and-agent.md`](packages/core/docs/skill-and-agent.md)）。編集していて残った `requirements-writer` / `tech-specs-writer` /
+`plan-writer` / `implementer` の定義は `auto-implement` から呼ばれないので、不要なら削除してください。
+
 ---
 
 ## ディレクトリ構成

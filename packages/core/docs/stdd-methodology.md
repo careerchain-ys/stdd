@@ -342,6 +342,7 @@ STDD は「テスト・実装の改修も必ず Spec 起点で行う」ことを
 - 開発プロセス自体の課題を作業のたびに集め、定期的に効果を測って改善する（→ 8）
 - 局面に応じて適用の強さを選ぶ。速さが必要なときはユーザーが明示して緊急モードを使い、あとで通常の工程で見直す（→ 9）
 - 規律を足すときは、それを確かめる自動化（フック・検査スクリプト・skill の手順）を一緒に用意する（→ 10）
+- 書く作業はメインのセッションが skill を使って行い、subagent はレビュー・長い出力の隔離・並行作業・道具の制限に限って使う（→ 12）
 - 並行して作業するときは、1 つのセッションにつき 1 つの作業ツリーを使い、着手前にほかの作業ツリーや作成中の PR との重なりを確かめる。共有している作業ツリーでは、変更を退避・破棄するコマンド（`git stash` など）を使わない（→ [`parallel-work.md`](parallel-work.md)）
 - 判断が要る作業は性能の高いモデルで行い、検索・要約などの機械的な作業は軽いモデルの subagent に任せる（→ 11）
 
@@ -363,7 +364,7 @@ Spec・テスト・実装の一貫性を保つ仕組みも、使ううちに足�
 
 STDD は既定で品質を優先しており、そのぶん開発の速度は落ちる。障害対応のように速さを優先すべき場面のために、
 **緊急モード**を用意する。緊急モードはユーザーが着手時に明示したときだけ入り（AI が自分の判断で切り替えることはしない）、
-専門エージェントによる分業・レビューの回数・品質ゲートの合格を必須にしない。Spec → テスト → 実装の順序は守り、
+reviewer によるレビュー・品質ゲートの合格を必須にしない。Spec → テスト → 実装の順序は守り、
 PR 本文に緊急モードで作ったことを明記する（`choosing-work-mode`）。
 
 あわせて、要件が頻繁に変わる段階やゼロから作る段階のように、STDD をそのまま当てると負担が大きい局面と、その判断の目安を
@@ -378,7 +379,7 @@ PR 本文に緊急モードで作ったことを明記する（`choosing-work-mo
 規律には理由を残す。操作を止める検査は数を絞り、既定は警告にして、誤検知が無いことを確かめてから止める設定に上げる。
 
 エージェントが繰り返す間違いは、指示を足すのではなく、構造・型・lint・テスト・文書の順にできるだけ上の段で塞ぐ
-（`correcting-repeated-mistakes`）。あわせて、subagent の編集範囲の制限・作業ツリーの突合・全件テストの抑止のフックを用意する。詳細は
+（`correcting-repeated-mistakes`）。あわせて、reviewer の書き込みの制限・作業ツリーの突合・全件テストの抑止のフックを用意する。詳細は
 [`discipline-automation.md`](discipline-automation.md) を参照。
 
 ---
@@ -387,12 +388,22 @@ PR 本文に緊急モードで作ったことを明記する（`choosing-work-mo
 
 要件・技術設計の作成、コードの編集、レビューのように判断が要る作業は性能の高いモデルで行い、広い範囲の検索やログの要約の
 ような機械的な作業は軽いモデルの subagent に任せる。STDD が配る agent は役割ごとに既定のモデルを決め、判断が中心の
-writer・reviewer・implementer は `opus`、手順が決まっている plan-writer・qa-engineer は `sonnet` にする。agent ごとのモデルは `.stdd.config.yml` の `models` で上書きできる（Claude Code 向けのみ）。詳細は
+reviewer と qa-engineer は `opus` にする。agent ごとのモデルは `.stdd.config.yml` の `models` で上書きできる（Claude Code 向けのみ）。詳細は
 [`model-selection.md`](model-selection.md) を参照。
 
 ---
 
-## 12. 関連ドキュメント
+## 12. skill と agent の使い分け
+
+作業は、既定ではメインのセッションが skill を使って行う。要件・技術設計・PLAN・テスト・実装を書く作業は、ユーザーとの
+やりとりと前の成果物に依存して順に進むので、subagent に分けない。subagent にするのは、書いた経緯を見ていない目での
+レビュー・長い出力の隔離・独立した作業の並行・道具の制限の 4 つの場面に限る。STDD が配る agent は reviewer 4 つと
+`qa-engineer` で、どれもファイルを書かない。レビューは観点ごと・文書ごとに既定で並列に起動し、agent teams が使えるなら
+既定でそれを使う。ファイルが重ならない機能の開発のような、レビュー以外の並行は条件を満たすときに行う。詳細は [`skill-and-agent.md`](skill-and-agent.md) を参照。
+
+---
+
+## 13. 関連ドキュメント
 
 - `guide-for-existing-project.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
 - `guide-for-new-project.md` — 新規プロジェクトの STDD 立ち上げ手順（最初から順行）
@@ -401,6 +412,7 @@ writer・reviewer・implementer は `opus`、手順が決まっている plan-wr
 - `discipline-automation.md` — 規律の自動化（規律を足すときの方針・フックの一覧と限界）
 - `parallel-work.md` — 並行作業の規律（1 セッション 1 作業ツリー・重なりの検出・共有作業ツリーで使わないコマンド）
 - `model-selection.md` — subagent と skill のモデルの使い分け（作業の性質ごとのモデル・agent ごとの既定・設定での上書き）
+- `skill-and-agent.md` — skill と agent の使い分け（subagent にする場面・並行にする条件・STDD の構成・agent を足すときの基準）
 - `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
 - `.claude/skills/documenting-tech-specs/templates/` — 技術 spec テンプレ（feature: `tech-design.md` / `test-plan.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
 - `.claude/skills/documenting-plans/templates/plan.md` — 実装計画テンプレ

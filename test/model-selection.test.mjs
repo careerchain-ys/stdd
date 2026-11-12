@@ -23,15 +23,11 @@ function aliasesIn(source, re) {
 
 // 章 packages/core/docs/model-selection.md §2 の表と同じ。変えるときは章と一緒に変える。
 const EXPECTED_MODELS = {
-  "requirements-writer": "opus",
-  "tech-specs-writer": "opus",
-  implementer: "opus",
   "requirements-reviewer": "opus",
   "tech-specs-reviewer": "opus",
   "test-reviewer": "opus",
   "code-reviewer": "opus",
-  "plan-writer": "sonnet",
-  "qa-engineer": "sonnet",
+  "qa-engineer": "opus",
 };
 
 test("配布する agent の既定のモデルが章 §2 の表どおり（Claude 向けの生成物も同じ）", async () => {
