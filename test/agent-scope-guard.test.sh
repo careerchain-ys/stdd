@@ -47,6 +47,28 @@ for c in "git log && rm -rf src" "git log & node -e 1" "cat a | sort -o b" "echo
 done
 run_hook $H "$(bash_in "node -e 1" tech-specs-reviewer "$R")" "$R"; expect_warn "warn では知らせるだけ"
 
+echo "[作業ツリーが分かれているとき]"
+W="$B/.claude/worktrees/rev"
+git -C "$B" worktree add -q --detach "$W" >/dev/null 2>&1
+export CLAUDE_PROJECT_DIR="$B"
+run_hook $H "$(bash_in "node -e 1" code-reviewer "$W")" "$W"; expect_silent "分離されていれば Bash は通す"
+run_hook $H "$(bash_in "npm test src/a.test.ts && echo ok > repro.txt" test-reviewer-unit "$W")" "$W"; expect_silent "分離されていれば連結やリダイレクトも通す"
+run_hook $H "$(edit "$W/repro.test.ts" code-reviewer "$W")" "$W"; expect_silent "分離先への Write は通す"
+run_hook $H "$(edit "repro/new/x.test.ts" code-reviewer "$W")" "$W"; expect_silent "分離先のまだ無いディレクトリへの Write も通す"
+run_hook $H "$(edit "$TMP_ROOT/outside/x.txt" code-reviewer "$W")" "$W"; expect_silent "どの作業ツリーでもない場所への Write は通す"
+run_hook $H "$(edit "$B/src/app.ts" code-reviewer "$W")" "$W"; expect_deny "元の作業ツリーへの Write は違反"
+expect_out_contains "メッセージに自分の作業ツリーが入る" "$W"
+run_hook $H "$(edit "$B/new/dir/x.ts" code-reviewer "$W")" "$W"; expect_deny "元の作業ツリーのまだ無いディレクトリも違反"
+run_hook $H "$(edit "$W/../../../src/app.ts" code-reviewer "$W")" "$W"; expect_deny ".. で元の作業ツリーへ戻る書き込みも違反"
+P=$(jq -cn --arg c "*** Begin Patch
+*** Add File: $B/docs/a.md
+*** End Patch" '{command:$c}')
+run_hook $H "$(hook_input apply_patch "$P" code-reviewer "$W")" "$W"; expect_deny "apply_patch も元の作業ツリーは違反"
+run_hook $H "$(bash_in "node -e 1" code-reviewer "$B")" "$B"; expect_deny "cwd が元の作業ツリーなら読み取りのみのまま"
+unset CLAUDE_PROJECT_DIR
+run_hook $H "$(bash_in "node -e 1" code-reviewer "$W")" "$W"; expect_deny "CLAUDE_PROJECT_DIR が無ければ読み取りのみのまま（Bash）"
+run_hook $H "$(edit "$W/repro.test.ts" code-reviewer "$W")" "$W"; expect_deny "CLAUDE_PROJECT_DIR が無ければ読み取りのみのまま（Write）"
+
 echo "[フェイルオープン]"
 N="$TMP_ROOT/noconfig"; mkdir -p "$N"; ( cd "$N" && git init -q )
 run_hook $H "$(edit "$N/src/a.ts" code-reviewer "$N")" "$N"; expect_silent "設定が無ければ通す"

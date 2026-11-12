@@ -34,3 +34,22 @@ test("どの agent も書き込みの道具を持たない", async () => {
     assert.deepEqual(found, [], `${a.file}: 書く作業は skill に書く（skill-and-agent.md §4）`);
   }
 });
+
+// シェルは実行して確かめる役割だけが持つ（skill-and-agent.md §4）。
+// code-reviewer・test-reviewer は自分の作業ツリーで再現を実行し、qa-engineer は全件のテストを実行する。
+const SHELL_AGENTS = new Set(["code-reviewer.md", "test-reviewer.md", "qa-engineer.md"]);
+
+test("Bash を持てるのは code-reviewer・test-reviewer・qa-engineer だけ", async () => {
+  for (const a of await agents()) {
+    if (SHELL_AGENTS.has(a.file)) continue;
+    assert.ok(!a.tools.includes("Bash"), `${a.file}: 文書のレビューにシェルは要らない（skill-and-agent.md §4）`);
+  }
+});
+
+test("シェルを持つ reviewer は自分の作業ツリーで動く（isolation: worktree）", async () => {
+  for (const f of ["code-reviewer.md", "test-reviewer.md"]) {
+    const md = await fs.readFile(path.join(agentsDir, f), "utf8");
+    const fm = md.match(/^---\n([\s\S]*?)\n---/)[1];
+    assert.match(fm, /^isolation: worktree$/m, `${f}: 再現はレビューされる作業ツリーの外で実行する（agent-scope-guard.sh）`);
+  }
+});

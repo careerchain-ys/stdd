@@ -48,7 +48,8 @@ Claude agent の `tools:` allowlist に相当する per-agent ツール制限は
 
 | Claude agent の `tools:` | Codex subagent | 意味 |
 | --- | --- | --- |
-| `Read, Grep, Glob`（reviewer 系 5 体） | `sandbox_mode = "read-only"` | 書込み不可を OS 強制 |
+| 書き込みの道具を持たないもの（全 5 体。`Bash` を持つ `test-reviewer`・`code-reviewer`・`qa-engineer` を含む） | `sandbox_mode = "read-only"` | 書込み不可を OS 強制 |
+| `isolation: worktree`（`test-reviewer`・`code-reviewer`） | 出力しない（Codex に作業ツリーを分ける設定が無い） | Codex の reviewer は読み取りのみで動き、再現を付けられない指摘は「未確認」になる（`packages/core/docs/skill-and-agent.md` §5） |
 | `+ Edit, Write` を含むもの（現在は配布していない） | `sandbox_mode = "workspace-write"` | 書込み可 |
 | `mcp__playwright`（qa-engineer） | `mcp_servers = ["playwright"]` | MCP 限定 |
 
