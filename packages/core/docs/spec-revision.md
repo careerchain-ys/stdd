@@ -66,6 +66,7 @@ STDD 方法論（[`stdd-methodology.md`](stdd-methodology.md)）の一章。要�
 - 破壊的な変更は、着手の前に影響範囲を添えてユーザーの承認を取る。改修の対象には、すでに動いている実装とデータがある。
 - どの段階にしたかは、メインのセッションが差分を見て決め、判断と根拠を報告に書く。書けないなら軽い段階を選ばない。
 - reviewer の割り当ては新規作成と同じである（要件は `requirements-reviewer`、設計書とテスト設計は組ごとに `tech-specs-reviewer`、テストは `test-reviewer`）。
+  指摘の処置は PR 前レビューと同じ物差し（4 項目と確信の段階から「直す・起票・見送り可」を導く。[`review-process.md`](review-process.md)）で決める。
 
 ## 5. 変更の伝播
 

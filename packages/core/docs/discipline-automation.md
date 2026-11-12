@@ -87,6 +87,7 @@ STDD の規律の多くは、規約・skill・agent の定義に文章として�
 | `worktree-lock-guard.sh` | subagent は指定された作業ツリーの中で作業する | `workflow.enforce_worktree_lock`（`warn`） | 作業ツリーを宣言したセッションの subagent の編集とシェル |
 | `test-scope-guard.sh` | Red / Green の確認ではテストの対象を絞る。全件は QA の工程・pre-push・CI が受け持つ | `workflow.enforce_test_scope`（`warn`） | 対象を絞らない `commands.test` の実行 |
 | `pre-push-check.sh` | push の前にテスト・ビルド・トレーサビリティ監査を通す | `traceability.enforce` ほか | `git push` |
+| `review-gate.sh` | PR はレビューを通してから作る（[`review-process.md`](review-process.md) §7 の 3 条件） | `workflow.enforce_review_gate`（`warn`） | `gh pr create` |
 | `work-mode-prompt.sh` | 緊急モードはユーザーが明示したときだけ入る | `emergency_mode` | ユーザーの発言 |
 
 各フックの判定の詳細と限界は、スクリプトの冒頭のコメントが正本である。登録は Claude が `.claude/settings.json`、
@@ -140,7 +141,7 @@ subagent を起動する側（メインのエージェント）が、作業す�
 | 実装の前に Spec とテストを更新する | フック `spec-first-check.sh`。ID による影響範囲の確認は `trace-audit.sh` | 変更が仕様の振る舞いを変えるかどうかは判断を伴う |
 | 要件・設計・テスト・実装に ID を通す | 検査スクリプト `trace-audit.sh`（pre-push・CI） | — |
 | reviewer はレビューされる作業ツリーを書き換えない | フック `agent-scope-guard.sh` と、統合のときの `git status --porcelain`・HEAD の突合 | 分離されたシェルからの絶対パスでの書き込みはフックでは防げず、突合で検出する。agent の名前で始まらない名前を付けて起動した subagent は判定できない（§3.1） |
-| reviewer の High 以上の指摘には再現を付ける | 統合のときにメインのセッションが再現を実行し直す（`auto-implement` の phases.md） | 再現として十分かは判断を伴う |
+| reviewer の「直す」に当たりうるテストとコードの指摘には再現を付ける | 統合のときにメインのセッションが再現を実行し直す（`auto-implement` の phases.md） | 再現として十分かは判断を伴う |
 | 配る agent に書き込みの道具を持たせない | テスト `test/agent-roles.test.mjs`（[`skill-and-agent.md`](skill-and-agent.md)） | — |
 | subagent は指定された作業ツリーで作業する | フック `worktree-lock-guard.sh` と宣言のスクリプト | 宣言するかどうかは起動する側の手順（`auto-implement` Step 4）に任せる |
 | Red / Green の確認ではテストの対象を絞る | フック `test-scope-guard.sh` | どのテストが対象かの選び方は技術スタックに依存する |
@@ -151,6 +152,7 @@ subagent を起動する側（メインのエージェント）が、作業す�
 | agent のモデルは別名で書き、判断が中心の agent は既定で下げない | `build-adapters.mjs` の検査（別名以外で失敗）、導入時の設定の検査（`stdd init`）、`test/model-selection.test.mjs`（[`model-selection.md`](model-selection.md)） | どの作業を軽いモデルに任せるかは判断を伴う |
 | 緊急モードはユーザーが明示したときだけ入る | フック `work-mode-prompt.sh` と宣言のスクリプト（[`work-modes-and-limits.md`](work-modes-and-limits.md)） | — |
 | 変更の安全性が依存する事実を、実行で確かめてからマージする | skill の手順（`assessing-change-impact`）。Spec 側の影響は `trace-audit.sh --changed` | どの事実が根拠になるか、どこまで確かめるかは判断を伴う。確かめたスクリプトは可能ならテストとして残し、以降はテストが確かめる |
+| PR はレビューを通してから作る | フック `review-gate.sh` と `review-ledger.sh gate`（[`review-process.md`](review-process.md) §9） | `gh pr create` 以外の方法で作る PR は確かめられない |
 | 繰り返す間違いは、指示を足さずに上の段で塞ぐ | skill の手順（`correcting-repeated-mistakes`）。入力は開発フィードバックの再発コメントと工程テレメトリ | どの段で塞げるかは判断を伴う。塞いだ後はその段の検査が確かめる |
 
 ## 5. 規律を足すときの手順

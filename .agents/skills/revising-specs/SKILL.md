@@ -75,7 +75,7 @@ allowed-tools: Read, Grep, Glob, Bash, Edit, Write, Agent, Skill, AskUserQuestio
 
 - 判断の基準は行数ではなく、意味が変わるかどうか。1 行でも意味が変わるなら、自動検査だけで通さない。
 - どの段階にしたかは差分を見て決め、判断と根拠を §7 の報告に書く。書けないなら軽い段階を選ばない。
-- reviewer の割り当て・起動の仕方・指摘の扱いは `auto-implement` の `references/phases.md`（Phase 1a・1b）と同じ。
+- reviewer の割り当て・起動の仕方・指摘の処置（4 項目から「直す・起票・見送り可」を導く）は `auto-implement` の `references/phases.md`（「reviewer の使い方」と Phase 1a・1b）と同じ。
 
 ## 5. 依存の順に直す
 
@@ -94,7 +94,7 @@ allowed-tools: Read, Grep, Glob, Bash, Edit, Write, Agent, Skill, AskUserQuestio
 
 ## 6. テストと実装
 
-文書を直し終えたら、`auto-implement` を `impl-only` で使い、テスト（Red）→ 実装（Green）→ QA → レビュー → PR へ進める。
+文書を直し終えたら、`auto-implement` を `impl-only` で使い、テスト（Red）→ 実装（Green）→ PR 前レビュー（`reviewing-changes`）→ PR へ進める。
 実装中に新しい欠陥が見つかったら、1 件ずつ止めて差し戻さず、見つかったものをまとめてから §2 に戻る。
 
 ## 7. 報告
