@@ -59,6 +59,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 | 緊急モードのスクリプトとフックの検証 | `bash test/work-mode.test.sh`（申し出の記録・宣言・解除と、pre-push の緩和を確かめる） |
 | 規律のフックの検証 | `bash test/agent-scope-guard.test.sh` / `bash test/worktree-lock.test.sh` / `bash test/test-scope-guard.test.sh`（reviewer の書き込みの制限・作業ツリーの突合・全件テストの抑止を確かめる） |
 | agent の役割の検査 | `node --test test/agent-roles.test.mjs`（配る agent が書き込みの道具を持たないか。基準は `packages/core/docs/skill-and-agent.md`） |
+| モデルの使い分けの検査 | `node --test test/model-selection.test.mjs`（agent の既定が章 §2 の表どおり・Codex の生成物にモデルが無い・別名の一覧が生成器と導入コマンドと schema で一致することを確かめる。設定の上書きの振る舞いは `packages/stdd` の `npm test`） |
 | skill / agent の文字数の検査 | `npm run check:harness-size`（1 本あたりの上限と総量の基準値。規約は `docs/config-driven-authoring.md` §7。スクリプトのテストは `node --test test/harness-size.test.mjs`） |
 | 生成物のドリフト検査          | `npm run check:adapters`（`.claude/` `.agents/` `.codex/` が `packages/core/` と一致するか検査）                          |
 

@@ -195,6 +195,15 @@ async function runInit(args: string[]): Promise<void> {
   if (result.claude) printSkips(result.claude, ".claude/");
   if (result.codex) printSkips(result.codex, "");
 
+  if (result.models) {
+    console.log("");
+    if (result.models.applied.length > 0) {
+      console.log(`  agent のモデル（.stdd.config.yml の models.agents。Claude のみ）: ${result.models.applied.join(", ")}`);
+    }
+    if (result.models.unknown.length > 0) {
+      console.log(`  ⚠ models.agents に配布物に無い agent があります（無視しました）: ${result.models.unknown.join(", ")}`);
+    }
+  }
   if (result.exclusions.detected.length > 0) {
     console.log("");
     console.log(`  ℹ 削除された配布物を検出したので、復活させずに ${result.exclusions.file} へ記録しました:`);

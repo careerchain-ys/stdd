@@ -193,5 +193,6 @@ subagent には分けない。subagent に任せるのは、書いた経緯を�
 
 - subagent は通常の委譲で起動し（Codex は `multi_agent`）、agent teams は前提にしない。並行の条件は `skill-and-agent.md` §2
 - reviewer は対象の変更があるときだけ起動する（条件は phases.md）
+- 広い検索・ログの要約は `models.mechanical` のモデルの subagent に任せる（`packages/core/docs/model-selection.md`）
 - Worktreeベースの開発フローに従う
 - AGENTS.md / CLAUDE.mdのすべてのルールを遵守する

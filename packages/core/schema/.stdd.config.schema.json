@@ -425,6 +425,24 @@
         }
       }
     },
+    "models": {
+      "type": "object",
+      "description": "Model selection for Claude Code only (packages/core/docs/model-selection.md). Values are model aliases, never model IDs. Codex outputs are not affected. Optional.",
+      "additionalProperties": false,
+      "properties": {
+        "agents": {
+          "type": "object",
+          "description": "Per-agent model override, keyed by agent name (e.g. qa-engineer). Applied to the 'model' line of .claude/agents/<name>.md when 'stdd init' runs. Agents not listed keep the shipped default (see model-selection.md §2).",
+          "propertyNames": { "pattern": "^[a-z0-9][a-z0-9-]*$" },
+          "additionalProperties": { "$ref": "#/$defs/modelAlias" }
+        },
+        "mechanical": {
+          "$ref": "#/$defs/modelAlias",
+          "default": "haiku",
+          "description": "Model passed to subagents that skills delegate mechanical work to (wide search, summarizing logs). 'inherit' means pass no model (use the main conversation's model)."
+        }
+      }
+    },
     "plugins": {
       "type": "array",
       "description": "Plugins loaded in addition to core skills/agents. Each entry may be a short string id or an object with options.",
@@ -453,6 +471,13 @@
           }
         ]
       }
+    }
+  },
+  "$defs": {
+    "modelAlias": {
+      "type": "string",
+      "enum": ["inherit", "opus", "sonnet", "haiku", "fable"],
+      "description": "Claude Code model alias. 'inherit' uses the main conversation's model. Model IDs are not allowed because they go stale when new models ship."
     }
   }
 }

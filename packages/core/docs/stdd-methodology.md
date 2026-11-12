@@ -335,8 +335,9 @@ STDD は「テスト・実装の改修も必ず Spec 起点で行う」ことを
 - 開発プロセス自体の課題を作業のたびに集め、定期的に効果を測って改善する（→ 8）
 - 局面に応じて適用の強さを選ぶ。速さが必要なときはユーザーが明示して緊急モードを使い、あとで通常の工程で見直す（→ 9）
 - 規律を足すときは、それを確かめる自動化（フック・検査スクリプト・skill の手順）を一緒に用意する（→ 10）
-- 書く作業はメインのセッションが skill を使って行い、subagent はレビュー・長い出力の隔離・並行作業・道具の制限に限って使う（→ 11）
+- 書く作業はメインのセッションが skill を使って行い、subagent はレビュー・長い出力の隔離・並行作業・道具の制限に限って使う（→ 12）
 - 並行して作業するときは、1 つのセッションにつき 1 つの作業ツリーを使い、着手前にほかの作業ツリーや作成中の PR との重なりを確かめる。共有している作業ツリーでは、変更を退避・破棄するコマンド（`git stash` など）を使わない（→ [`parallel-work.md`](parallel-work.md)）
+- 判断が要る作業は性能の高いモデルで行い、検索・要約などの機械的な作業は軽いモデルの subagent に任せる（→ 11）
 
 ---
 
@@ -375,7 +376,16 @@ PR 本文に緊急モードで作ったことを明記する（`choosing-work-mo
 
 ---
 
-## 11. skill と agent の使い分け
+## 11. subagent と skill のモデルの使い分け
+
+要件・技術設計の作成、コードの編集、レビューのように判断が要る作業は性能の高いモデルで行い、広い範囲の検索やログの要約の
+ような機械的な作業は軽いモデルの subagent に任せる。STDD が配る agent は役割ごとに既定のモデルを決め、判断が中心の
+reviewer は `opus`、手順が決まっている qa-engineer は `sonnet` にする。agent ごとのモデルは `.stdd.config.yml` の `models` で上書きできる（Claude Code 向けのみ）。詳細は
+[`model-selection.md`](model-selection.md) を参照。
+
+---
+
+## 12. skill と agent の使い分け
 
 作業は、既定ではメインのセッションが skill を使って行う。要件・技術設計・PLAN・テスト・実装を書く作業は、ユーザーとの
 やりとりと前の成果物に依存して順に進むので、subagent に分けない。subagent にするのは、書いた経緯を見ていない目での
@@ -385,7 +395,7 @@ PR 本文に緊急モードで作ったことを明記する（`choosing-work-mo
 
 ---
 
-## 12. 関連ドキュメント
+## 13. 関連ドキュメント
 
 - `guide-for-existing-project.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
 - `guide-for-new-project.md` — 新規プロジェクトの STDD 立ち上げ手順（最初から順行）
@@ -393,6 +403,7 @@ PR 本文に緊急モードで作ったことを明記する（`choosing-work-mo
 - `work-modes-and-limits.md` — 作業モードと適用限界（緊急モード・STDD が向かない局面と判断の目安）
 - `discipline-automation.md` — 規律の自動化（規律を足すときの方針・フックの一覧と限界）
 - `parallel-work.md` — 並行作業の規律（1 セッション 1 作業ツリー・重なりの検出・共有作業ツリーで使わないコマンド）
+- `model-selection.md` — subagent と skill のモデルの使い分け（作業の性質ごとのモデル・agent ごとの既定・設定での上書き）
 - `skill-and-agent.md` — skill と agent の使い分け（subagent にする場面・並行にする条件・STDD の構成・agent を足すときの基準）
 - `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
 - `.claude/skills/documenting-tech-specs/templates/` — 技術 spec テンプレ（feature: `tech-design.md` / `test-plan.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
