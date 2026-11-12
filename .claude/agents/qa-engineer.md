@@ -2,7 +2,7 @@
 name: qa-engineer
 description: QAエンジニア。テスト実行・整合性チェック・コード品質検証・Playwright MCP によるブラウザ動作確認を行う。auto-implementのPhase 3で使用。
 tools: Read, Grep, Glob, Bash, mcp__playwright
-model: opus
+model: inherit
 ---
 
 # QA Engineer Specialist

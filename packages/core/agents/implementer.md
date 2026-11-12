@@ -2,7 +2,7 @@
 name: implementer
 description: STDD実装専門家。Specに基づきテスト作成→実装をRed-Greenフローで実行。auto-implementのPhase 2で使用。
 tools: Read, Grep, Glob, Edit, Write, Bash
-model: opus
+model: inherit
 ---
 
 # Implementer Specialist

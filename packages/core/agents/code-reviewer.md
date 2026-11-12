@@ -2,7 +2,7 @@
 name: code-reviewer
 description: コードレビュー専門家。AGENTS.md / CLAUDE.md規約準拠・品質・セキュリティ・レスポンシブを評価。コード作成・修正後およびauto-implementのPhase 4で使用。
 tools: Read, Grep, Glob
-model: opus
+model: inherit
 ---
 
 # Code Review Specialist

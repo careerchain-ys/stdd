@@ -33,10 +33,26 @@ async function planClaudeView() {
     managedDirs.push(dst);
     for (const rel of await listFilesRel(src)) {
       const s = path.join(src, rel);
-      outputs.push({ abs: path.join(dst, rel), content: await fs.readFile(s), mode: await modeOf(s) });
+      const content = await fs.readFile(s);
+      if (d === "agents" && rel.endsWith(".md")) assertModelAlias(content.toString("utf8"), rel);
+      outputs.push({ abs: path.join(dst, rel), content, mode: await modeOf(s) });
     }
   }
   return { outputs, managedDirs };
+}
+
+/**
+ * agent の model は Claude Code の別名だけを許す（packages/core/docs/model-selection.md）。
+ * モデルの ID は新しいモデルが出るたびに古くなるため書かない。導入先の上書き（models.agents）も同じ値の集合。
+ */
+const MODEL_ALIASES = ["inherit", "opus", "sonnet", "haiku", "fable"];
+
+function assertModelAlias(md, rel) {
+  const { data } = parseFrontmatter(md);
+  if (data.model === undefined) throw new Error(`agent frontmatter に model がありません（既定は inherit）: ${rel}`);
+  if (!MODEL_ALIASES.includes(data.model.trim())) {
+    throw new Error(`agent の model はモデルの別名（${MODEL_ALIASES.join(" / ")}）で書く: ${rel}: ${data.model}`);
+  }
 }
 
 async function planCodexView() {

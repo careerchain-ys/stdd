@@ -2,7 +2,7 @@
 name: requirements-writer
 description: 要件定義書（REQUIREMENTS.md）作成専門家。issue や前方設計から feature / common 階層の REQUIREMENTS.md を作成。auto-implement の Phase 1a で使用。
 tools: Read, Grep, Glob, Edit, Write
-model: opus
+model: inherit
 ---
 
 # Requirements Writer Specialist

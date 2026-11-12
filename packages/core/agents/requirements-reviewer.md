@@ -2,7 +2,7 @@
 name: requirements-reviewer
 description: 要件定義書レビュー専門家。REQUIREMENTS.md（feature / common）の品質・網羅性・SSOT 準拠を評価。auto-implement の Phase 1a で使用。
 tools: Read, Grep, Glob
-model: opus
+model: inherit
 ---
 
 # Requirements Reviewer Specialist

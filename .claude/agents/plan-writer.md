@@ -2,7 +2,7 @@
 name: plan-writer
 description: PLANドキュメント作成専門家。Spec完成後にテスト戦略に基づくタスク分解・実装計画を作成。auto-implementのPhase 1.5で使用。
 tools: Read, Grep, Glob, Edit, Write
-model: opus
+model: inherit
 ---
 
 # Plan Writer Specialist

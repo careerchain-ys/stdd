@@ -202,5 +202,6 @@ Team Lead（オーケストレーター）      ← このスキル自身
 
 - 専門エージェントへの並列委譲（サブエージェント）機能を用いる（Claude Code: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` / Codex: `multi_agent`）
 - コスト管理のため、各Teammateは該当フェーズでのみ起動する
+- 広い検索・ログの要約は `models.mechanical` のモデルの subagent に任せる（`packages/core/docs/model-selection.md`）
 - Worktreeベースの開発フローに従う
 - AGENTS.md / CLAUDE.mdのすべてのルールを遵守する

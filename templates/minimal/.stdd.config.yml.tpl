@@ -82,4 +82,12 @@ emergency_mode:
   enabled: true
   request_ttl_minutes: 120    # ユーザーの申し出を宣言に使える時間（分）
 
+# subagent と skill のモデルの使い分け（packages/core/docs/model-selection.md）。Claude Code 向けのみ。
+# 値はモデルの別名（inherit / opus / sonnet / haiku / fable）。モデルの ID は書かない。
+# agent の既定は inherit（メインの会話と同じモデル）。変えたら stdd init を実行し直す。
+# models:
+#   agents:
+#     qa-engineer: sonnet
+#   mechanical: haiku         # 機械的な作業を subagent に任せるときのモデル（既定 haiku）
+
 plugins: []
