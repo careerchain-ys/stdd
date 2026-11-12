@@ -23,3 +23,12 @@ and are licensed under their respective licenses.
    Source:   Anthropic (公式 Claude Code skill)
    Notes:    本リポジトリ発足時のスナップショットに含まれる。MVP リリース時の
              同梱可否は Phase 2 で再判断する（v2.0 以降にプラグイン化検討）。
+
+2. pstack（考え方の取り込み）
+   Location: packages/core/skills/assessing-change-impact/
+             packages/core/skills/correcting-repeated-mistakes/
+   License:  MIT License
+   Source:   https://github.com/cursor/plugins/tree/main/pstack
+             Copyright (c) 2026 Lauren Tan
+   Notes:    pstack の skill `blast-radius` と `correct` の考え方を、STDD の工程に
+             合わせて日本語で書き直したもの。原文は含まない。
