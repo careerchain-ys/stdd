@@ -85,7 +85,7 @@ CI の権限の都合などで拾い直しだけが動かないと、閉じた�
 **PR を作った直後に、PR ごとの工程の記録を PR コメントとして投稿する。** レビューを省いた PR でも投稿する
 （投稿されない PR が特定の種類に偏ると、集計の結論が歪む）。
 
-項目は、レビュー工程の進め方に依存しない最小限にしている。
+項目は最小限にしている。`review.findings` 以下の項目は PR 前レビューの台帳（`reviewing-changes`）から読み、台帳が無ければ `null` にする。
 
 | 項目 | 内容 | 出所 |
 | --- | --- | --- |
@@ -93,7 +93,7 @@ CI の権限の都合などで拾い直しだけが動かないと、閉じた�
 | `size` | 変更ファイル数・追加行数・削除行数・コミット数 | `gh pr view` |
 | `duration_min.lead_time` | 最初の記録か最初のコミットから、投稿までの分 | 工程の記録と git |
 | `duration_min.steps` | 工程（`spec` / `plan` / `test` / `implement` / `qa` / `review`）ごとの分 | 工程の記録（`pr-telemetry.sh mark`） |
-| `review.rounds` | レビューの回数 | 工程の記録、または申告 |
+| `review.rounds` | レビューの回数 | 工程の記録と台帳のラウンド数の大きいほう、または申告 |
 | `review.findings` | PR 前レビューの台帳の指摘の件数と処置の内訳（`total` / `fix` / `file` / `may_defer` / `unconfirmed`）。台帳が無ければ `null` | `review-ledger.sh summary`（[`review-process.md`](review-process.md)） |
 | `review.independent` | 別のモデルでレビューしたか（`true` / `false` / ラウンドで混在なら `"mixed"`） | 同上 |
 | `review.unconfirmed` | 実行で確かめられず「未確認」になったテスト・コードの「直す」の指摘の、担当ごとの件数 | 同上 |

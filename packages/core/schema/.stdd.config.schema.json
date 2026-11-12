@@ -560,7 +560,7 @@
     },
     "telemetry": {
       "type": "object",
-      "description": "Per-PR process telemetry posted as a PR comment right after PR creation (create-pr skill, script skills/create-pr/scripts/pr-telemetry.sh). Holds size, durations, review rounds / exemption, feedback triage counts and, from schema version 2, the pre-PR review ledger summary (findings by action, independence, unproven findings per role). Optional.",
+      "description": "Per-PR process telemetry posted as a PR comment right after PR creation (create-pr skill, script skills/create-pr/scripts/pr-telemetry.sh). Holds size, durations, review rounds / exemption, feedback triage counts and, from schema version 2, the pre-PR review ledger summary (findings by action, independence, unconfirmed findings per role). Optional.",
       "additionalProperties": false,
       "properties": {
         "enabled": {

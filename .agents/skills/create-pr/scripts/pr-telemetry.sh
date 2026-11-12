@@ -42,7 +42,7 @@ while [ $# -gt 0 ]; do
     case "$1" in
         --root) ROOT="${2:-}"; shift 2 ;;
         --repo) REPO="${2:-}"; shift 2 ;;
-        --help|-h) sed -n '2,35p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --help|-h) sed -n '2,33p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *)
             if [ -z "$CMD" ]; then CMD="$1"; else ARGS+=("$1"); fi
             shift ;;

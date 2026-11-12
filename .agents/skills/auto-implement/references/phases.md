@@ -75,7 +75,7 @@ bash <skill-dir>/scripts/review-runner.sh
 
   担当は `requirements`（1a）・`tech-specs`（1b）・`test`（2.5）。Phase 3–4 は台帳に記録する（`reviewing-changes`）。
 - **直すのはメインのセッション**: 処置が「直す」の指摘を直し、直した後の全体を同じ reviewer にもう一度見せる（差分だけでなく、別の指摘が出ないかを確かめさせる）。
-- **3 回で止める**: Phase 1a / 1b / 2.5 の差し戻しは最大 3 回（Phase 3–4 の PR 前レビューには上限を設けない）。超えたら現状をコミット・push して draft PR を作り、残った「直す」の指摘を PR description に書く。
+- **3 回で止める**: Phase 1a / 1b / 2.5 の差し戻しは最大 3 回（Phase 3–4 の PR 前レビューには上限を設けない）。超えたら現状をコミット・push して draft PR を作り、残った「直す」の指摘を PR description に書く。PR 前レビューを通していないので、`gh pr create` には理由を前置する（例: `STDD_REVIEW_GATE_SKIP_REASON="Phase 1b の差し戻しが 3 回を超えた draft" gh pr create --draft ...`）。
 
 ## 人間レビューゲート（必読）
 

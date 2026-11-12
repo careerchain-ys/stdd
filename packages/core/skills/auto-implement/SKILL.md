@@ -184,7 +184,7 @@ subagent には分けない。subagent に任せるのは、書いた経緯を�
 
 ## エラーハンドリング
 
-- Spec とテストの各フェーズ（1a / 1b / 2.5）で3回の修正ループを超えた場合、そのフェーズで停止し、現状をコミット・pushしてdraft PRを作成する
+- Spec とテストの各フェーズ（1a / 1b / 2.5）で3回の修正ループを超えた場合、そのフェーズで停止し、現状をコミット・pushしてdraft PRを作成する（PR 前レビューのゲートは通らないので、`STDD_REVIEW_GATE_SKIP_REASON` に理由を前置して作る）
 - PR descriptionに未解決の問題を記載し、手動対応を依頼する
 - PR 前レビュー（Phase 3–4）のラウンドには上限を設けない。同じ論点の指摘が繰り返すときはユーザーに判断を仰ぐ（`reviewing-changes` の `references/fixing.md`）
 
