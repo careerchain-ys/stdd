@@ -38,6 +38,10 @@ docs:
     screen_test_design: "docs/{{feature_path}}/SCREEN_TEST_DESIGN.md"
     test_design: "docs/{{feature_path}}/TEST_DESIGN.md"
     plan: "docs/{{feature_path}}/plans/{{date}}.md"
+  # 転記の検査（skills/documenting-requirements/scripts/state-claims.sh）の語彙。既定の語彙を変えるときだけ書く。
+  # state_claims:
+  #   nouns: ["機能", "画面", "テーブル"]   # 件数の句で数える成果物の名詞
+  #   words: ["未作成", "実装済み"]         # ほかの文書の作成状況を断定する語
 
 # レスポンスコード体系（skills/documenting-tech-specs/guides/response-codes.md）。帯の意味と「1 分岐 1 コード」は固定。
 # 機能略号の書き方と共通コードの一覧を変えるときだけ書く。

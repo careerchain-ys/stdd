@@ -145,6 +145,25 @@
           "default": "single",
           "description": "Line-up of the feature-tier technical specs. 'single' (default; existing installs): one TECH_DESIGN.md and one TEST_PLAN.md per feature. 'layered' (default for new installs): backend and frontend are designed separately — API_DESIGN.md + API_TEST_DESIGN.md, SCREEN_DESIGN.md + SCREEN_TEST_DESIGN.md, and the feature-wide TEST_DESIGN.md. A backend-only or frontend-only feature set may omit one side. See packages/core/docs/spec-lineup.md."
         },
+        "state_claims": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Vocabulary of the copy-instead-of-reference check (skills/documenting-requirements/scripts/state-claims.sh). The check reports a sentence only when it contains both a count phrase (a number with an artifact noun, e.g. '3 画面') and a status word (e.g. '未作成'), i.e. a document asserting how many other documents exist or what state they are in. A list given here replaces the default list for project.language (ja / en). Optional. See packages/core/docs/spec-revision.md §6.",
+          "properties": {
+            "nouns": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "minItems": 1,
+              "description": "Artifact nouns counted in a count phrase (e.g. ['機能', '画面', 'テーブル']). Do not add nouns for business data (rows, records): sentences about data states would then be reported."
+            },
+            "words": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "minItems": 1,
+              "description": "Words asserting the current state of other artifacts (e.g. ['未作成', '実装済み'])."
+            }
+          }
+        },
         "structure": {
           "type": "object",
           "description": "Overrides of section names, table column names, table row labels, and row-ID prefixes of spec documents. Defaults per language are in skills/documenting-tech-specs/references/doc-structure.json; checkers read the override first. Keys are the language-independent identifiers used in that file. Example: { api_design: { sections: { operations: 'エンドポイント' }, tables: { response_codes: { columns: { condition: '条件' } } } } }.",
