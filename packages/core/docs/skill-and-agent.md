@@ -91,6 +91,8 @@ subagent はそれぞれ自分の文脈を使い、セッションの使用量�
 - **絶対の言い方には範囲と理由を添える。** 「必ず」「禁止」とだけ書いた指示は、想定していない場面にも一律に効く。
   どの場面で・なぜそうするかを書く。例外なく守らせたいものは文章ではなくフックや検査にする
   （[`discipline-automation.md`](discipline-automation.md)）。
+- **複数の agent に共通する規律は部品にする。** 姿勢・報告の書式・編集の範囲のように同じ文面になるものは、
+  agent ごとに書き写さず `packages/core/agents/_shared/` の部品にして差し込む（`docs/config-driven-authoring.md` §10）。
 - skill の説明（`description` と `when_to_use`）は、すべてのセッションで常に読み込まれる。skill を足すときは、
   既存の skill の `references/` に置けないかを先に検討する（文字数の基準は `docs/config-driven-authoring.md` §7）。
 

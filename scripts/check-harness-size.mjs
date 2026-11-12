@@ -10,7 +10,7 @@
 // 種別（読み込まれる時機が違うので分けて数える）:
 //   skill              skill の本体（SKILL.md 全体）。skill の起動時に読まれる
 //   skill-metadata     skill の description + when_to_use。全セッションで常に読まれる
-//   agent              agent の定義（.md 全体）。agent の起動時にシステムプロンプトへ載る
+//   agent              agent の定義（.md 全体。共通の部品を差し込んだ後の文字数）。agent の起動時にシステムプロンプトへ載る
 //   agent-description  agent の description。全セッションで常に読まれる
 //   rule               rules/*.md。全セッションで常に読まれる
 //   all                skills / agents / rules 配下の .md の合計（references/ や templates/ を含む）
@@ -26,6 +26,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { SHARED_DIR, expandAll } from "./lib/shared-parts.mjs";
 
 export const BASELINE_REL = path.join("scripts", "harness-size-baseline.json");
 export const KINDS = ["skill", "skill-metadata", "agent", "agent-description", "rule", "all"];
@@ -98,11 +100,25 @@ export async function measure(root) {
     items.push({ id: `skill-metadata:${e.name}`, kind: "skill-metadata", size: charCount(meta) });
   }
 
+  // agent は起動時に読まれる量で数えるので、部品（_shared/）を差し込んだ後の本文を測る。
+  // 部品のファイルそのものは agent として数えず、all（書いた量）にだけ入る。
   const agentsDir = path.join(core, "agents");
+  const sharedDir = path.join(agentsDir, SHARED_DIR);
+  const agentSources = [];
+  const partEntries = [];
   for (const abs of await listFiles(agentsDir)) {
     if (!abs.endsWith(".md")) continue;
-    const name = path.basename(abs, ".md");
     const text = await fs.readFile(abs, "utf8");
+    if (path.dirname(abs) === sharedDir) partEntries.push({ name: path.basename(abs), text });
+    else if (!abs.startsWith(sharedDir + path.sep)) agentSources.push({ rel: path.relative(agentsDir, abs), text });
+  }
+  const resolved = agentSources.length > 0 ? expandAll(agentSources, partEntries) : { expanded: new Map(), errors: [] };
+  if (resolved.errors.length > 0) {
+    throw new Error(`agent の部品を解決できない（npm run build:adapters で詳細を確かめる）: ${resolved.errors[0]}`);
+  }
+  for (const { rel } of agentSources) {
+    const name = path.basename(rel, ".md");
+    const text = resolved.expanded.get(rel);
     items.push({ id: `agent:${name}`, kind: "agent", size: charCount(text) });
     items.push({
       id: `agent-description:${name}`,
@@ -246,7 +262,13 @@ async function main(argv) {
     console.error(`harness のサイズ検査 NG: 台帳を読めない: ${baselineAbs}`);
     return 1;
   }
-  const measured = await measure(root);
+  let measured;
+  try {
+    measured = await measure(root);
+  } catch (err) {
+    console.error(`harness のサイズ検査 NG: ${err.message}`);
+    return 1;
+  }
 
   if (argv.includes("--update-baseline") || argv.includes("--accept-growth")) {
     const next = updatedBaseline(measured, baseline, { growth: argv.includes("--accept-growth") });

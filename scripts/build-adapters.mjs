@@ -11,14 +11,55 @@
 // 使い方:
 //   node scripts/build-adapters.mjs           生成物を core から再生成する
 //   node scripts/build-adapters.mjs --check    生成物が core と一致するか検査（CI 用・不一致で exit 1）
+//   node scripts/build-adapters.mjs --root <dir>  対象のリポジトリを指定する（テスト用）
+//
+// agent の定義は、共通の部品（packages/core/agents/_shared/<id>.md）を差し込んでから生成する
+// （scripts/lib/shared-parts.mjs。規約は docs/config-driven-authoring.md §10）。部品の参照が壊れていれば
+// 生成も検査も失敗する。部品そのものは生成物に出さない。
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { SHARED_DIR, expandAll } from "./lib/shared-parts.mjs";
+
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(scriptDir, "..");
+const args = process.argv.slice(2);
+const CHECK = args.includes("--check");
+const rootIndex = args.indexOf("--root");
+if (rootIndex !== -1 && (args[rootIndex + 1] === undefined || args[rootIndex + 1].startsWith("--"))) {
+  console.error("[build-adapters] 失敗: --root にディレクトリを指定してください");
+  process.exit(1);
+}
+const repoRoot = rootIndex === -1 ? path.resolve(scriptDir, "..") : path.resolve(args[rootIndex + 1]);
 const coreRoot = path.join(repoRoot, "packages", "core");
-const CHECK = process.argv.includes("--check");
+
+// ---- agent の部品の解決 ----------------------------------------------------
+
+let agentsCache = null;
+
+/** agent の定義（packages/core/agents/*.md）に部品を差し込んだ結果。参照が壊れていれば例外にする。 */
+async function expandedAgents() {
+  if (agentsCache) return agentsCache;
+  const agentsSrc = path.join(coreRoot, "agents");
+  const agents = [];
+  for (const rel of await listFilesRel(agentsSrc)) {
+    if (rel.startsWith(`${SHARED_DIR}/`) || !rel.endsWith(".md")) continue;
+    agents.push({ rel, text: await fs.readFile(path.join(agentsSrc, rel), "utf8") });
+  }
+  const partEntries = [];
+  for (const rel of await listFilesRel(path.join(agentsSrc, SHARED_DIR))) {
+    partEntries.push({ name: rel, text: await fs.readFile(path.join(agentsSrc, SHARED_DIR, rel), "utf8") });
+  }
+  const result = expandAll(agents, partEntries);
+  if (result.errors.length > 0) {
+    throw new Error(
+      `agent の部品を解決できません（${result.errors.length} 件。docs/config-driven-authoring.md §10）\n` +
+        result.errors.map((e) => `  - ${e}`).join("\n"),
+    );
+  }
+  agentsCache = result;
+  return result;
+}
 
 // ---- ビュー定義 ------------------------------------------------------------
 // outputs: 生成物 1 ファイル分 { abs, content(Buffer), mode }
@@ -32,9 +73,13 @@ async function planClaudeView() {
     const dst = path.join(repoRoot, ".claude", d);
     managedDirs.push(dst);
     for (const rel of await listFilesRel(src)) {
+      if (d === "agents" && rel.startsWith(`${SHARED_DIR}/`)) continue;
       const s = path.join(src, rel);
-      const content = await fs.readFile(s);
-      if (d === "agents" && rel.endsWith(".md")) assertModelAlias(content.toString("utf8"), rel);
+      let content = await fs.readFile(s);
+      if (d === "agents" && rel.endsWith(".md")) {
+        assertModelAlias(content.toString("utf8"), rel);
+        content = Buffer.from((await expandedAgents()).expanded.get(rel));
+      }
       outputs.push({ abs: path.join(dst, rel), content, mode: await modeOf(s) });
     }
   }
@@ -72,9 +117,10 @@ async function planCodexView() {
   const agentsSrc = path.join(coreRoot, "agents");
   const agentsDst = path.join(repoRoot, ".codex", "agents");
   managedDirs.push(agentsDst);
+  const { expanded } = await expandedAgents();
   for (const rel of await listFilesRel(agentsSrc)) {
-    if (!rel.endsWith(".md")) continue;
-    const md = await fs.readFile(path.join(agentsSrc, rel), "utf8");
+    if (rel.startsWith(`${SHARED_DIR}/`) || !rel.endsWith(".md")) continue;
+    const md = expanded.get(rel);
     const toml = agentMdToToml(md, rel);
     outputs.push({ abs: path.join(agentsDst, rel.replace(/\.md$/, ".toml")), content: Buffer.from(toml), mode: 0o644 });
   }
@@ -321,14 +367,20 @@ async function main() {
       );
       process.exit(1);
     }
-    console.log("[build-adapters] OK: 生成物は packages/core と一致しています。");
+    console.log(`[build-adapters] OK: 生成物は packages/core と一致しています（${partsSummary()}）。`);
     return;
   }
   console.log(
     drift.length === 0
-      ? "[build-adapters] 変更なし（生成物は最新）。"
-      : `[build-adapters] 再生成しました（${drift.length} 件更新）。`,
+      ? `[build-adapters] 変更なし（生成物は最新。${partsSummary()}）。`
+      : `[build-adapters] 再生成しました（${drift.length} 件更新。${partsSummary()}）。`,
   );
+}
+
+/** 読んだ量を報告に併記する（docs/config-driven-authoring.md §9）。 */
+function partsSummary() {
+  const s = agentsCache?.stats;
+  return s ? `agent ${s.agents} 本・部品 ${s.parts} 個・差し込み ${s.insertions} か所` : "agent 未読";
 }
 
 main().catch((err) => {

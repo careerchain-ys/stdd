@@ -215,3 +215,25 @@ test("リポジトリの台帳はいまの定義で合格する", () => {
   const out = execFileSync(process.execPath, [SCRIPT], { encoding: "utf8" });
   assert.match(out, /harness のサイズ検査 OK/);
 });
+
+test("agent は部品を差し込んだ後の文字数で数え、部品は all にだけ入る", async () => {
+  const root = await makeRoot();
+  const agents = path.join(root, "packages", "core", "agents");
+  await fs.mkdir(path.join(agents, "_shared"), { recursive: true });
+  await fs.writeFile(path.join(agents, "x.md"), "---\nname: x\ndescription: 担当\n---\n役割\n<!-- shared: p -->\n");
+  await fs.writeFile(path.join(agents, "_shared", "p.md"), "部品の本文\n");
+  const m = await measure(root);
+  assert.equal(m.counts.agent, 1, "部品を agent として数えない");
+  const x = m.items.find((it) => it.id === "agent:x");
+  assert.equal(x.size, charCount("---\nname: x\ndescription: 担当\n---\n役割\n部品の本文\n"));
+  assert.ok(!m.items.some((it) => it.id === "agent:p"));
+});
+
+test("部品の参照が壊れていれば、例外で止まらず不合格を表示する", async () => {
+  const root = await makeRoot();
+  await fs.writeFile(path.join(root, "packages", "core", "agents", "x.md"), "---\nname: x\ndescription: 担当\n---\n<!-- shared: missing -->\n");
+  await freshBaseline(root).catch(() => writeBaseline(root, { limits: LIMITS, over_limit: {}, totals: {} }));
+  const r = run(root);
+  assert.equal(r.rc, 1);
+  assert.match(r.out, /harness のサイズ検査 NG: agent の部品を解決できない.*部品 missing が無い/);
+});
