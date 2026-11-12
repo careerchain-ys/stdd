@@ -56,6 +56,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 | トレーサビリティ監査スクリプトの検証 | `bash test/trace-audit.test.sh`（`packages/core/hooks/trace-audit.sh` の順方向 gap 検知・逆方向影響範囲の振る舞いテスト）        |
 | 設計書の表の突合の検証 | `bash test/trace-tables.test.sh`（layered の設計書一式を 1 か所ずつ壊し、レスポンスコード・行の ID・受入基準の突合が不合格にすることと、テンプレートの例文を読めることを確かめる） |
 | フィードバックの仕組みのスクリプトの検証 | `bash test/dev-feedback.test.sh` / `bash test/pr-telemetry.test.sh` / `bash test/collect.test.sh`（偽の `gh` と `jq` で、起票・再発・見送り・テレメトリの投稿と集計の振る舞いを確かめる） |
+| PR 前レビューの台帳とゲートの検証 | `bash test/review-gate.test.sh`（担当の決定・処置の導出・ゲートの 3 条件と、`gh pr create` の直前のフック） |
 | 並行作業の重なりの検出の検証 | `bash test/work-overlap.test.sh`（ほかの作業ツリー・作成中の PR との重なりの検出を確かめる） |
 | 緊急モードのスクリプトとフックの検証 | `bash test/work-mode.test.sh`（申し出の記録・宣言・解除と、pre-push の緩和を確かめる） |
 | 規律のフックの検証 | `bash test/agent-scope-guard.test.sh` / `bash test/worktree-lock.test.sh` / `bash test/test-scope-guard.test.sh`（reviewer の書き込みの制限・作業ツリーの突合・全件テストの抑止を確かめる） |
@@ -64,6 +65,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 | モデルの使い分けの検査 | `node --test test/model-selection.test.mjs`（agent の既定が章 §2 の表どおり・Codex の生成物にモデルが無い・別名の一覧が生成器と導入コマンドと schema で一致することを確かめる。設定の上書きの振る舞いは `packages/stdd` の `npm test`） |
 | skill / agent の文字数の検査 | `npm run check:harness-size`（1 本あたりの上限と総量の基準値。規約は `docs/config-driven-authoring.md` §7。スクリプトのテストは `node --test test/harness-size.test.mjs`） |
 | 設計書の構造定義の検査 | `node --test test/doc-structure.test.mjs`（テンプレートの章名・列名・版の宣言が `documenting-tech-specs/references/doc-structure.json` と一致するか） |
+| 改修の伝播と転記の検査の検証 | `bash test/spec-propagation.test.sh` / `bash test/state-claims.test.sh`（依存関係から直す文書を出すこと・古い記述の残りの検出・転記の検出と、STDD 自身の skill・agent・規約に転記が無いことを確かめる） |
 | 生成物のドリフト検査          | `npm run check:adapters`（`.claude/` `.agents/` `.codex/` が `packages/core/` と一致するか検査）                          |
 
 > **Core + Adapter**: skill / agent / hook / spec-first ルールの SSoT は `packages/core/{skills,agents,hooks,rules}` です。`scripts/build-adapters.mjs`（`npm run build:adapters`）がこれを各エージェントのネイティブ形式へ生成します — Claude ビュー `.claude/`、Codex ビュー `.agents/skills`・`.codex/`（agents は TOML、hooks は `.codex/hooks.json` + 共有スクリプト）。生成物は committed です。**編集は必ず `packages/core/` 側で行い**、`.claude/` 等の生成物を直接編集しないでください（`npm run check:adapters` がドリフトを検出します）。下流への導入は `stdd init --agent claude|codex|both` が担います。
@@ -134,9 +136,11 @@ stdd 本体（ドキュメント・テンプレート）は監査スクリプト
 | フィードバックの収集と改善のループ | `packages/core/docs/feedback-loop.md` |
 | 作業モードと適用限界 | `packages/core/docs/work-modes-and-limits.md` |
 | 規律の自動化 | `packages/core/docs/discipline-automation.md` |
+| PR 前レビュー | `packages/core/docs/review-process.md` |
 | 並行作業の規律 | `packages/core/docs/parallel-work.md` |
 | skill と agent の使い分け | `packages/core/docs/skill-and-agent.md` |
 | 設計書のラインナップと章立て | `packages/core/docs/spec-lineup.md` |
+| 仕様変更への追随 | `packages/core/docs/spec-revision.md` |
 | ID チェーンの突合 | `packages/core/docs/id-chain.md` |
 | skill / agent / hook / rule の SSoT | `packages/core/{skills,agents,hooks,rules}/`      |
 | 要件テンプレート      | `packages/core/skills/documenting-requirements/templates/`             |

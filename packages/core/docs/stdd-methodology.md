@@ -171,8 +171,8 @@ flowchart TD
     Green[実装 — テストを通す最小限のコード]
     GreenCheck{Green 確認<br/>テスト全件パス}
     Refactor["リファクタ<br/>必要に応じて"]
+    CodeReview{PR 前レビュー<br/>ゲート 3 条件}
     PR[PR 作成]
-    CodeReview{コードレビュー}
     Merge([マージ])
 
     Start --> Req
@@ -191,43 +191,61 @@ flowchart TD
     Green --> GreenCheck
     GreenCheck -- FAIL --> Green
     GreenCheck -- PASS --> Refactor
-    Refactor --> PR
-    PR --> CodeReview
+    Refactor --> CodeReview
     CodeReview -- 修正 --> Green
-    CodeReview -- 承認 --> Merge
+    CodeReview -- 合格 --> PR
+    PR --> Merge
 ```
 
 ワイヤーフレーム生成は UI を持つ機能のみ。テスト作成は Unit → Integration → E2E の順で進める。
 
 ### 5.2 既存機能への追加 / 変更
 
-変更であっても起点は Spec であり、REQUIREMENTS.md の更新から始めて下流へ伝播させる (→ 2)。
+変更であっても起点は Spec である (→ 2)。ただし作成済みの機能では、新規開発と同じ全工程を通すのではなく、
+**変わる文書だけを、漏らさずに直す**。下の文書は上の文書に忠実に書かれているので、上の文書の 1 文が古いまま残ると、
+すべての検査が通ったまま古い記述に従った実装になるためである。
+
+- 入口は 2 つある。要件が変わった場合と、実装中に設計の欠陥が見つかった場合である。後者は、欠陥がどの文書に属するかを先に決める。
+- 直す文書は人に列挙させず、`docs.lineup` と `docs.layout` から引いた文書間の依存関係で候補を出し、1 件ずつ直すか決める。
+- 変わった決定は ID と変更前の語の両方で探し、同じ修正の文をすべての文書に当て、直し終えたら同じ検索で古い記述の残りが無いことを確かめる。
+- レビューの強さは変更の重さで 3 段階から選ぶ（自動検査だけ・まとめて 1 回・文書ごと）。自動検査だけで通すのは、意味を変えない追随に限る。
+- 件数・一覧・しきい値は正本の文書だけが持ち、ほかの文書は参照する（転記しない）。
+
+手順は `revising-specs`、詳細は [`spec-revision.md`](spec-revision.md) を参照。
 
 ```mermaid
 flowchart TD
-    Start([既存機能の変更着手])
-    Req[REQUIREMENTS.md 更新<br/>ユースケース追加 / 変更 + Priority]
-    StakeholderReview{ステークホルダー<br/>レビュー}
-    Tech[TECH_DESIGN.md / TEST_PLAN.md 更新<br/>テーブル・API 変更は common にも反映]
-    ArchReview{アーキテクト<br/>レビュー}
-    Plan[PLAN ドキュメント作成 / 更新<br/>タスク詳細を Test Strategy に基づき確定]
+    R([要件が変わった])
+    E([実装中に設計の欠陥が見つかった])
+    Owner{欠陥はどの文書に属するか}
+    Kind[変更の種類を決める]
+    Targets[依存関係から直す文書の候補を出す<br/>ID と変更前の語で探す]
+    Strength[レビューの強さを選ぶ<br/>自動検査だけ / まとめて 1 回 / 文書ごと]
+    Fix[依存の順に文書を直す<br/>同じ修正の文をすべてに当てる]
+    Residual{同じ検索で<br/>古い記述が 0 件か}
     Red[テスト作成 / 更新 — Red 状態]
     Green[実装 — Green 状態]
     Verify[検証<br/>テスト全件パス]
+    PreReview{PR 前レビュー<br/>ゲート 3 条件}
     PR[PR 作成]
     Merge([マージ])
 
-    Start --> Req
-    Req --> StakeholderReview
-    StakeholderReview -- 修正必要 --> Req
-    StakeholderReview -- 承認 --> Tech
-    Tech --> ArchReview
-    ArchReview -- 修正必要 --> Tech
-    ArchReview -- 承認 --> Plan
-    Plan --> Red
+    R --> Kind
+    E --> Owner
+    Owner -- 要件の誤り --> Kind
+    Owner -- 設計書・テスト設計の誤り --> Targets
+    Owner -- 実装だけの誤り --> Red
+    Kind --> Targets
+    Targets --> Strength
+    Strength --> Fix
+    Fix --> Residual
+    Residual -- 残っている --> Fix
+    Residual -- 0 件 --> Red
     Red --> Green
     Green --> Verify
-    Verify --> PR
+    Verify --> PreReview
+    PreReview -- 修正 --> Green
+    PreReview -- 合格 --> PR
     PR --> Merge
 ```
 
@@ -237,6 +255,14 @@ flowchart TD
 （ライブラリの実装、実行のタイミング、データの形）を調べる。変更の安全性が依存している事実を 1〜2 個に絞り、
 説明を書くだけでなく、実際にコードを動かして確かめる。確かめたスクリプトは、可能ならテストとして残す
 （`assessing-change-impact`）。
+
+### 5.2.2 PR 前レビュー
+
+レビューは PR を作る前に回す。差分から担当を決めて並列に起動し、指摘ごとに発生条件・頻度・影響・影響先を書かせ、
+処置（直す・起票・見送り可）はスクリプトが表から決め、処置が「直す」の指摘が 0 件になったら進む。重大度は使わない。テストとコードの「直す」の指摘は、実行で確かめたもの（確信の段階 4 以上）だけを数える。
+止める場所は PR を作る直前の 1 か所で、確かめる条件は 3 つ（レビューされている・直すべき指摘が残っていない・
+指摘が記録から漏れていない）に絞る。テストと機械検査は CI に任せる（`reviewing-changes`）。詳細は
+[`review-process.md`](review-process.md) を参照。
 
 ### 5.3 Red-Green-Refactor サイクル (1 タスク単位)
 
@@ -352,6 +378,7 @@ STDD は「テスト・実装の改修も必ず Spec 起点で行う」ことを
 - 仕様レビューを最優先する。実装前に Spec を凍結し、後工程の手戻りを最小化する
 - セッション開始時にスコープを確認する。大きな機能は複数の PLAN に分割する
 - 要件・テスト・実装に ID を貫通させ、抜け漏れと影響範囲を機械的に検知できる状態を保つ（→ 6）
+- 件数・一覧・しきい値は正本の文書だけに書き、ほかの文書は参照する。作成済みの機能の改修では、直す文書を依存関係から決めて漏らさない（→ 5.2）
 - 開発プロセス自体の課題を作業のたびに集め、定期的に効果を測って改善する（→ 8）
 - 局面に応じて適用の強さを選ぶ。速さが必要なときはユーザーが明示して緊急モードを使い、あとで通常の工程で見直す（→ 9）
 - 規律を足すときは、それを確かめる自動化（フック・検査スクリプト・skill の手順）を一緒に用意する（→ 10）
@@ -411,7 +438,7 @@ reviewer と qa-engineer は `opus` にする。agent ごとのモデルは `.st
 作業は、既定ではメインのセッションが skill を使って行う。要件・技術設計・PLAN・テスト・実装を書く作業は、ユーザーとの
 やりとりと前の成果物に依存して順に進むので、subagent に分けない。subagent にするのは、書いた経緯を見ていない目での
 レビュー・長い出力の隔離・独立した作業の並行・道具の制限の 4 つの場面に限る。STDD が配る agent は reviewer 4 つと
-`qa-engineer` で、どれもレビューされる作業ツリーを書き換えない。`test-reviewer`・`code-reviewer` は自分の作業ツリーで再現を実行し、High 以上の指摘に再現のコマンドと出力を付ける。レビューは観点ごと・文書ごとに既定で並列に起動し、agent teams が使えるなら
+`qa-engineer` で、どれもレビューされる作業ツリーを書き換えない。`test-reviewer`・`code-reviewer` は自分の作業ツリーで再現を実行し、処置が「直す」に当たりうる指摘に再現のコマンドと出力を付ける。レビューは観点ごと・文書ごとに既定で並列に起動し、agent teams が使えるなら
 既定でそれを使う。ファイルが重ならない機能の開発のような、レビュー以外の並行は条件を満たすときに行う。詳細は [`skill-and-agent.md`](skill-and-agent.md) を参照。
 
 ---
@@ -425,9 +452,11 @@ reviewer と qa-engineer は `opus` にする。agent ごとのモデルは `.st
 - `discipline-automation.md` — 規律の自動化（規律を足すときの方針・フックの一覧と限界）
 - `parallel-work.md` — 並行作業の規律（1 セッション 1 作業ツリー・重なりの検出・共有作業ツリーで使わないコマンド）
 - `model-selection.md` — subagent と skill のモデルの使い分け（作業の性質ごとのモデル・agent ごとの既定・設定での上書き）
+- `review-process.md` — PR 前レビュー（担当の起動・指摘の 4 項目と処置・「直す」の指摘の実行での確認・台帳とラウンド・PR 作成前のゲート）
 - `skill-and-agent.md` — skill と agent の使い分け（subagent にする場面・並行にする条件・STDD の構成・agent を足すときの基準）
 - `id-chain.md` — ID チェーンの突合（要件・設計・テスト設計・レスポンスコードを ID でつなぐ検査の一覧と、検査で見つけられないこと）
 - `spec-lineup.md` — 設計書のラインナップと章立て（single / layered の構成・文書の分担・行の ID・レスポンスコード体系・章名と列名）
+- `spec-revision.md` — 仕様変更への追随（改修の 2 つの入口・依存関係から直す文書を決める・レビューの強さ・変更の伝播・転記せず参照する）
 - `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
 - `.claude/skills/documenting-tech-specs/templates/` — 技術 spec テンプレ（feature: `tech-design.md` / `test-plan.md`、layered: `api-design.md` / `screen-design.md` / `api-test-design.md` / `screen-test-design.md` / `test-design.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
 - `.claude/skills/documenting-plans/templates/plan.md` — 実装計画テンプレ

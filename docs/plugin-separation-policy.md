@@ -91,7 +91,7 @@ git worktree + devcontainer を用いたマルチ環境並列開発向けのプ�
 9. `starting-new-with-stdd`
 10. `tailoring-spec-format`
 11. `create-pr`
-12. `review-pr-with-agents`
+12. `reviewing-changes` — PR 前レビュー（担当の起動・指摘の台帳・PR 作成前のゲート。git と `gh` だけを使う）
 13. `kaizen`
 14. `software-architecture`
 15. `recording-dev-feedback` — 開発フィードバックの起票（GitHub issue と `gh` を前提にするが、技術スタックには依存しない。`feedback.enabled` で無効化できる）
@@ -99,6 +99,7 @@ git worktree + devcontainer を用いたマルチ環境並列開発向けのプ�
 17. `choosing-work-mode` — 作業モード（通常 / 緊急）の選択・宣言・解除（git だけを使う。`emergency_mode.enabled` で無効化できる）
 18. `assessing-change-impact` — 変更の安全性が依存する事実を実行で確かめる（pstack の `blast-radius` から。MIT）
 19. `correcting-repeated-mistakes` — 繰り返す間違いを構造・型・lint・テスト・文書の順で塞ぐ（pstack の `correct` から。MIT）
+20. `revising-specs` — 作成済みの機能の改修（直す文書を `docs.lineup` と `docs.layout` の依存関係から決め、ID と変更前の語で伝播を確かめる）
 
 これらの skill 内に含まれる下流プロジェクト固有値（`user_app` / `admin_app` / `develop` 等のサンプル値）は、
 Phase 1 で Handlebars 変数（`{{apps[].path}}` / `{{project.primary_branch}}` 等）に置換する。

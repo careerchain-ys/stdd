@@ -74,6 +74,11 @@
             "type": "command",
             "command": ".claude/hooks/test-scope-guard.sh",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/review-gate.sh",
+            "timeout": 30
           }
         ]
       },

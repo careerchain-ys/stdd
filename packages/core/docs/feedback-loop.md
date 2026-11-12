@@ -85,7 +85,7 @@ CI の権限の都合などで拾い直しだけが動かないと、閉じた�
 **PR を作った直後に、PR ごとの工程の記録を PR コメントとして投稿する。** レビューを省いた PR でも投稿する
 （投稿されない PR が特定の種類に偏ると、集計の結論が歪む）。
 
-項目は、レビュー工程の進め方に依存しない最小限にしている。
+項目は最小限にしている。`review.findings` 以下の項目は PR 前レビューの台帳（`reviewing-changes`）から読み、台帳が無ければ `null` にする。
 
 | 項目 | 内容 | 出所 |
 | --- | --- | --- |
@@ -93,7 +93,10 @@ CI の権限の都合などで拾い直しだけが動かないと、閉じた�
 | `size` | 変更ファイル数・追加行数・削除行数・コミット数 | `gh pr view` |
 | `duration_min.lead_time` | 最初の記録か最初のコミットから、投稿までの分 | 工程の記録と git |
 | `duration_min.steps` | 工程（`spec` / `plan` / `test` / `implement` / `qa` / `review`）ごとの分 | 工程の記録（`pr-telemetry.sh mark`） |
-| `review.rounds` | レビューの回数 | 工程の記録、または申告 |
+| `review.rounds` | レビューの回数 | 工程の記録と台帳のラウンド数の大きいほう、または申告 |
+| `review.findings` | PR 前レビューの台帳の指摘の件数と処置の内訳（`total` / `fix` / `file` / `may_defer` / `unconfirmed`）。台帳が無ければ `null` | `review-ledger.sh summary`（[`review-process.md`](review-process.md)） |
+| `review.independent` | 別のモデルでレビューしたか（`true` / `false` / ラウンドで混在なら `"mixed"`） | 同上 |
+| `review.unconfirmed` | 実行で確かめられず「未確認」になったテスト・コードの「直す」の指摘の、担当ごとの件数 | 同上 |
 | `review.exempt` | レビューをしなかった理由の区分（`typo_format_only` / `link_fix_only` / `regenerate_only` / `user_waived`）。緊急モードの PR は、レビューの有無に関わらず `emergency`（[`work-modes-and-limits.md`](work-modes-and-limits.md)） | 申告 |
 | `feedback` | 棚卸しの結果（起票数・再発コメント数・上限で起票しなかった数） | `dev-feedback.sh` の記録 |
 
@@ -106,8 +109,9 @@ CI の権限の都合などで拾い直しだけが動かないと、閉じた�
 - **投稿したら読み直して確かめる。** コマンドが成功しても、PR から読めるとは限らない。
 - **PR コメントは自己申告で、署名はない。** 集計ではリポジトリのメンバーのコメントだけを読むが、偽造を防ぐ仕組みではない。
   傾向を読む材料として扱い、判断の根拠にするときは PR を開いて確かめる。
-- **レビュー工程に固有の指標**（指摘の出所、レビュー担当ごとの所要、修正が新しい欠陥を生んだ割合など）は含めていない。
-  レビュー工程の設計を決めたプロジェクトが、`schema` の版を上げて項目を足す。
+- **レビュー工程に固有の指標**は、PR 前レビュー（[`review-process.md`](review-process.md)）の台帳から読めるもの
+  （指摘の件数と処置の内訳・独立性・未確認の件数）だけを `schema` の版 2 で足した。レビュー担当ごとの所要や、
+  修正が新しい欠陥を生んだ割合などは含めていない。版 1 の記録も集計では読める。
 
 ## 6. 定期の集計と効果測定
 

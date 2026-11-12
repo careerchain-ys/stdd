@@ -21,8 +21,9 @@
 # 緊急モードかを確かめる。緊急モードの枝では --exempt emergency を必須にし、そうでない枝では使わせない。
 # --exempt emergency のときは、PR 本文に「緊急モード」の見出しがあることも確かめる。
 #
-# 項目はレビュー工程の進め方に依存しない最小限にしてある: 規模・所要時間・レビューの回数と免除・
-# フィードバックの棚卸しの件数。値が測れなかった項目は null（0 とは区別する）。
+# 項目: 規模・所要時間・レビューの回数と免除・フィードバックの棚卸しの件数。schema 2 で、PR 前レビューの台帳
+# （reviewing-changes/scripts/review-ledger.sh）の集計（指摘の処置の内訳・独立性・実行で確かめられなかった指摘の
+# 担当ごとの件数）を足した。値が測れなかった項目は null（0 とは区別する）。
 #
 # 記録の置き場は作業ツリーの外（git の共通ディレクトリ配下の stdd-telemetry/<ブランチ>.tsv）なので、
 # コミットにも差分にも入らない。行の形式は <epoch>\t<kind>\t<arg>（recording-dev-feedback の
@@ -41,7 +42,7 @@ while [ $# -gt 0 ]; do
     case "$1" in
         --root) ROOT="${2:-}"; shift 2 ;;
         --repo) REPO="${2:-}"; shift 2 ;;
-        --help|-h) sed -n '2,35p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --help|-h) sed -n '2,33p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *)
             if [ -z "$CMD" ]; then CMD="$1"; else ARGS+=("$1"); fi
             shift ;;
@@ -83,8 +84,9 @@ STEPS="spec plan test implement qa review"
 EXEMPT_KINDS="typo_format_only link_fix_only regenerate_only user_waived emergency"
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 WORK_MODE="$SCRIPT_DIR/../../choosing-work-mode/scripts/work-mode.sh"
+REVIEW_LEDGER="$SCRIPT_DIR/../../reviewing-changes/scripts/review-ledger.sh"
 MARKER="<!-- stdd-telemetry -->"
-SCHEMA="stdd-telemetry/1"
+SCHEMA="stdd-telemetry/2"
 
 now_epoch() { printf '%s' "${STDD_NOW:-$(date +%s)}"; }
 
@@ -161,6 +163,14 @@ EOF
 $(summarize_events "$f")
 EOF
     fi
+    # PR 前レビューの台帳（reviewing-changes）の集計。ラウンド数は工程の記録と台帳の多いほう
+    local ledger="null" lr
+    if [ -f "$REVIEW_LEDGER" ]; then
+        ledger=$(bash "$REVIEW_LEDGER" --root "$ROOT" summary --json 2>/dev/null) || ledger="null"
+        [ -n "$ledger" ] || ledger="null"
+        lr=$(printf '%s' "$ledger" | sed -n 's/^{"rounds":\([0-9]*\).*/\1/p')
+        [ -n "$lr" ] && [ "$lr" -gt "$rounds" ] && rounds="$lr"
+    fi
     [ -n "$rounds_override" ] && rounds="$rounds_override"
 
     local emergency=no
@@ -194,8 +204,17 @@ EOF
     local exempt_json="null"
     [ -n "$exempt" ] && exempt_json=$(json_str "$exempt")
 
-    printf '{"schema":"%s","pr":%s,"head_sha":"%s","base":%s,"size":{"files":%s,"additions":%s,"deletions":%s,"commits":%s},"duration_min":{"lead_time":%s,"steps":%s},"review":{"rounds":%s,"exempt":%s},"feedback":%s}\n' \
-        "$SCHEMA" "$pr" "$head" "$(json_str "$base")" "$files" "$add" "$del" "$commits" "$lead" "$steps" "$rounds" "$exempt_json" "$fb"
+    # 台帳が無ければ findings / independent / unconfirmed は null（0 とは区別する）
+    local findings="null" independent="null" unconfirmed="null"
+    if [ "$ledger" != "null" ]; then
+        findings=$(printf '%s' "$ledger" | sed -n 's/.*"findings":\({[^}]*}\).*/\1/p')
+        independent=$(printf '%s' "$ledger" | sed -n 's/.*"independent":\([^,]*\),.*/\1/p')
+        unconfirmed=$(printf '%s' "$ledger" | sed -n 's/.*"unconfirmed":\({[^}]*}\).*/\1/p')
+    fi
+
+    printf '{"schema":"%s","pr":%s,"head_sha":"%s","base":%s,"size":{"files":%s,"additions":%s,"deletions":%s,"commits":%s},"duration_min":{"lead_time":%s,"steps":%s},"review":{"rounds":%s,"exempt":%s,"findings":%s,"independent":%s,"unconfirmed":%s},"feedback":%s}\n' \
+        "$SCHEMA" "$pr" "$head" "$(json_str "$base")" "$files" "$add" "$del" "$commits" "$lead" "$steps" "$rounds" "$exempt_json" \
+        "${findings:-null}" "${independent:-null}" "${unconfirmed:-null}" "$fb"
 }
 
 comment_body() {

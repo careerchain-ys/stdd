@@ -13,8 +13,7 @@
 | `requirements-reviewer` | REQUIREMENTS.md（feature / common）を作成・変更したとき |
 | `tech-specs-reviewer` | feature の技術設計・テスト設計（`docs.lineup` の構成のもの）・common の技術文書を作成・変更したとき |
 | `test-reviewer` | テストを追加・変更し、実装に入る前（`quick` を除く） |
-| `qa-engineer` | 実装・テストを変更したとき |
-| `code-reviewer` | 実装のコードを変更したとき（文書だけの変更では起動しない） |
+| `qa-engineer`・`code-reviewer` | Phase 3–4 の PR 前レビューで、`reviewing-changes` の `review-ledger.sh round start` が差分から決める |
 
 ### 起動の仕方（並列が既定）
 
@@ -24,7 +23,7 @@
 | --- | --- |
 | 変更した REQUIREMENTS.md ごと（feature と common） | 1a |
 | feature の設計書と、対になるテスト設計の組ごと（対応を見るので組で渡す。`single` は TECH_DESIGN.md + TEST_PLAN.md、`layered` は API_DESIGN.md + API_TEST_DESIGN.md、SCREEN_DESIGN.md + SCREEN_TEST_DESIGN.md、TEST_DESIGN.md + REQUIREMENTS.md）と、変更した common の技術文書ごと | 1b |
-| `qa-engineer` と、`code-reviewer` の 3 つの観点（Phase 4「観点を分けた並列レビュー」） | 3・4 |
+| `reviewing-changes` の `round start` が起動を決めた担当のすべて（`code-reviewer` は 3 つの観点に分ける） | 3–4 |
 
 起動する前に、次のスクリプトで起動の形を決める（1 行目が `teams` か `subagents`、2 行目が理由）。
 
@@ -52,26 +51,38 @@ bash <skill-dir>/scripts/review-runner.sh
 - **起動の前後で確かめる**: 起動の前に、レビューされる作業ツリーの `git status --porcelain` と `git rev-parse HEAD` を控え、
   結果を統合する前に同じものを取り直して一致を確かめる。変わっていたら、その reviewer の結果を使わずに変更を戻して起動し直す
   （フックは分離されたシェルからの絶対パスでの書き込みを防げない。`agent-scope-guard.sh` の冒頭）。
-- **High 以上の指摘は再現し直す**: 指摘に書かれた再現のコマンドを、メインのセッションが自分で実行する。再現しない指摘は捨て、
-  再現のコマンドが無い High 以上の指摘は「未確認」として扱う（判定の根拠にしない）。
+- **「直す」の指摘は実行し直して確かめる**: 処置が「直す」に当たる指摘は、reviewer が書いた再現のコマンドを、メインのセッションが
+  もう一度実行して失敗を確かめる。確かめられたものだけを確信の段階 4 として扱い、確かめられないものは「未確認」として別に並べる
+  （終わりの条件に数えない）。
 - **分けられないとき**: Codex（`.codex/agents/` に作業ツリーを分ける設定が無い）や、作業ツリーを分けずに動く agent teams の
-  メンバーでは、フックが読み取りのみに制限する。そのときの High 以上の指摘は、メインのセッションが再現を試みてから扱う。
+  メンバーでは、フックが読み取りのみに制限する。そのときは reviewer が書いた再現の手順を、メインのセッションが、レビューする
+  コミットから作った使い捨ての作業ツリー（`git worktree add --detach <一時ディレクトリ> <SHA>`）で実行する。
 
 `requirements-reviewer`・`tech-specs-reviewer` は文書のレビューなので、作業ツリーを分けず、シェルも持たない。
 
 ### 依頼と判定
 
-- **依頼の内容**: 対象のファイル、基準にする Spec のパス、作業ツリーのパス、対象のコミットの SHA を渡す。書いたときの判断の理由は渡さない。
-- **判定は原則そのまま受け入れる**: 「厳しすぎる」として NEEDS CHANGES / ⚠️ 要修正 / ❌ Blocked を退けない。退けるときは理由を完了報告に書く。
-- **直すのはメインのセッション**: reviewer の出力の末尾の「修正の依頼」に沿って直し、直した後の全体を同じ reviewer にもう一度見せる（差分だけでなく、別の基準を割っていないかを確かめさせる）。
-- **3 回で止める**: 各 Phase の差し戻しは最大 3 回。超えたら現状をコミット・push して draft PR を作り、どの reviewer がどの基準で止めたかを PR description に書く。
+- **依頼の内容**: 対象のファイル、基準にする Spec のパス、作業ツリーのパス、対象のコミットの SHA、報告の書式
+  （`reviewing-changes` の `references/reporting.md`）を渡す。書いたときの判断の理由は渡さない。
+- **判定はスクリプトが決める**: reviewer は指摘ごとに 4 項目と確信の段階を書き、重大度や総合判定は書かない。メインのセッションが
+  指摘ごとに処置を導き、**処置が「直す」の指摘が 0 件なら次へ進む**（「起票」は issue を作る。「見送り可」は進む妨げにしない）。
+  4 項目は上げられるが、下げられない。
+
+  ```bash
+  # <reviewing-changes> は reviewing-changes skill のディレクトリ。台帳には記録しない
+  bash <reviewing-changes>/scripts/review-ledger.sh derive --role <担当> --frequency <頻度> --impact <影響> --target "<影響先>" --evidence <段階>
+  ```
+
+  担当は `requirements`（1a）・`tech-specs`（1b）・`test`（2.5）。Phase 3–4 は台帳に記録する（`reviewing-changes`）。
+- **直すのはメインのセッション**: 処置が「直す」の指摘を直し、直した後の全体を同じ reviewer にもう一度見せる（差分だけでなく、別の指摘が出ないかを確かめさせる）。
+- **3 回で止める**: Phase 1a / 1b / 2.5 の差し戻しは最大 3 回（Phase 3–4 の PR 前レビューには上限を設けない）。超えたら現状をコミット・push して draft PR を作り、残った「直す」の指摘を PR description に書く。PR 前レビューを通していないので、`gh pr create` には理由を前置する（例: `STDD_REVIEW_GATE_SKIP_REASON="Phase 1b の差し戻しが 3 回を超えた draft" gh pr create --draft ...`）。
 
 ## 人間レビューゲート（必読）
 
-Spec 工程は reviewer のレビューだけで自動承認せず、**節目で必ずユーザー（人間）の確認を仰ぐ**。`requirements-reviewer` / `tech-specs-reviewer` が ✅ 承認を出しても、それは**人間レビューに進める状態になった**という意味であり、フロー全体の承認ではない。
+Spec 工程は reviewer のレビューだけで自動承認せず、**節目で必ずユーザー（人間）の確認を仰ぐ**。reviewer のレビューで「直す」の指摘が 0 件になっても、それは**人間レビューに進める状態になった**という意味であり、フロー全体の承認ではない。
 
-- **ゲート①（要件）**: Phase 1a で `requirements-reviewer` が ✅ 承認したら、REQUIREMENTS.md の要点をユーザーに提示し、**承認を求めて停止**する。ユーザーが承認するまで Phase 1b に進まない。
-- **ゲート②（技術設計）**: Phase 1b で `tech-specs-reviewer` が ✅ 承認したら、TECH_DESIGN.md / TEST_PLAN.md の要点をユーザーに提示し、**承認を求めて停止**する。ユーザーが承認するまで Phase 1.5 に進まない。
+- **ゲート①（要件）**: Phase 1a で `requirements-reviewer` の「直す」の指摘が 0 件になったら、REQUIREMENTS.md の要点をユーザーに提示し、**承認を求めて停止**する。ユーザーが承認するまで Phase 1b に進まない。
+- **ゲート②（技術設計）**: Phase 1b で `tech-specs-reviewer` の「直す」の指摘が 0 件になったら、TECH_DESIGN.md / TEST_PLAN.md の要点をユーザーに提示し、**承認を求めて停止**する。ユーザーが承認するまで Phase 1.5 に進まない。
 - ユーザーから修正指示が出た場合は、メインのセッションが直し、reviewer のレビュー → 人間ゲートを再度通す。
 - ユーザーの指示で人間ゲートをスキップする運用（完全自動）も可能だが、**既定は停止して確認**とする。
 
@@ -92,8 +103,7 @@ bash <create-pr>/scripts/pr-telemetry.sh mark <step> end     # Phase を出る�
 | 1.5 PLAN 作成 | `plan` |
 | 2 実装のうちテスト作成（Red の確認まで）と 2.5 テストレビュー | `test` |
 | 2 実装のうち実装（Green） | `implement` |
-| 3 QA | `qa` |
-| 4 コードレビュー（**差し戻しの 1 往復ごとに start / end を付ける**。往復の数がレビュー回数になる） | `review` |
+| 3–4 PR 前レビュー（**ラウンドごとに start / end を付ける**。`reviewing-changes` §2・§5） | `review` |
 
 - 記録は作業ツリーの外に書かれ、コミットには入らない。記録に失敗しても作業は止めない。
 - 記録の無い Phase は「測れない」として集計から外れる（0 分とは扱われない）。
@@ -127,17 +137,15 @@ bash <create-pr>/scripts/pr-telemetry.sh mark <step> end     # Phase を出る�
 
 ### 判定と差し戻しループ（reviewer）
 
-Requirements Reviewer の **Hard Threshold（SSOT 違反 0件）** を1件でも下回った場合は必ず ⚠️ 要修正 となる。
+指摘ごとに処置を導く（「reviewer の使い方」の「依頼と判定」）。SSOT 原則の違反は必ず指摘になる。
 
-- **⚠️ 要修正**: 出力末尾の「修正の依頼」に沿ってメインのセッションが直し、再度 `requirements-reviewer` に見せる。**最大3回**ループ。
-- **✅ 承認**: **人間レビューゲート①**へ進む。
+- **「直す」が残る**: メインのセッションが直し、再度 `requirements-reviewer` に見せる。**最大3回**ループ。
+- **「直す」が 0 件**: **人間レビューゲート①**へ進む。
 - **3回ループ後も未解消**: 現状をコミットし、未解消の指摘を保持したまま人間レビューゲート①へ進み、ユーザー判断を仰ぐ。
-
-HIGH/MEDIUM の指摘がある場合は Hard Threshold とは別に判断する。HIGH が複数残っていれば実質的に差し戻す方向で扱う。
 
 ### 🧑 人間レビューゲート①（要件）
 
-Requirements Reviewer が ✅ 承認したら（または 3回ループ上限に達したら）、**ユーザーに REQUIREMENTS.md の確認を求めて停止する**。
+「直す」の指摘が 0 件になったら（または 3回ループ上限に達したら）、**ユーザーに REQUIREMENTS.md の確認を求めて停止する**。
 
 - REQUIREMENTS.md の要点（ユースケース一覧・Priority・主要な受入基準・スコープ外・未解消の指摘があればそれ）を簡潔に提示する
 - 「この要件で技術設計に進んでよいか」をユーザーに確認する
@@ -173,15 +181,15 @@ Requirements Reviewer が ✅ 承認したら（または 3回ループ上限に
 
 ### 判定と差し戻しループ（reviewer）
 
-Tech Specs Reviewer の **Hard Threshold（SSOT 違反 0件 / ユースケースマッピング漏れ 0件 / P0 E2E 方針明記）** を1件でも下回った場合は必ず ⚠️ 要修正 となる。
+指摘ごとに処置を導く（「reviewer の使い方」の「依頼と判定」）。SSOT 原則の違反・ユースケースの対応づけの漏れ・P0 の E2E 方針の欠落は必ず指摘になる。
 
-- **⚠️ 要修正**: 出力末尾の「修正の依頼」に沿ってメインのセッションが直し、再度 `tech-specs-reviewer` に見せる。**最大3回**ループ。
-- **✅ 承認**: **人間レビューゲート②**へ進む。
+- **「直す」が残る**: メインのセッションが直し、再度 `tech-specs-reviewer` に見せる。**最大3回**ループ。
+- **「直す」が 0 件**: **人間レビューゲート②**へ進む。
 - **3回ループ後も未解消**: 現状をコミットし、未解消の指摘を保持したまま人間レビューゲート②へ進み、ユーザー判断を仰ぐ。
 
 ### 🧑 人間レビューゲート②（技術設計）
 
-Tech Specs Reviewer が ✅ 承認したら（または 3回ループ上限に達したら）、**ユーザーに TECH_DESIGN.md / TEST_PLAN.md の確認を求めて停止する**。
+「直す」の指摘が 0 件になったら（または 3回ループ上限に達したら）、**ユーザーに TECH_DESIGN.md / TEST_PLAN.md の確認を求めて停止する**。
 
 - 技術設計の要点（主要な設計判断・ロジック設計の概略・テスト総数と内訳・P0 E2E 方針・未解消の指摘があればそれ）を簡潔に提示する
 - 「この技術設計で PLAN 作成・実装に進んでよいか」をユーザーに確認する
@@ -207,7 +215,7 @@ Tech Specs Reviewer が ✅ 承認したら（または 3回ループ上限に�
 [implementation.md](implementation.md) の手順で、PLANドキュメント（存在する場合）に従いメインのセッションが実装する。
 
 1. **テスト作成（Red）**（`quick`モードではスキップ可）: テストを書き、書いたテストだけを実行して失敗を確かめ、コミットする。
-   **`quick`モード以外では、ここで Phase 2.5（テストレビュー）に進み**、承認されてから実装に戻る。
+   **`quick`モード以外では、ここで Phase 2.5（テストレビュー）に進み**、「直す」の指摘が 0 件になってから実装に戻る。
 2. **実装（Green）**: 対象のテストを通す実装をし、`commands.typecheck` を通してコミットする。ビルド・型のエラーもここで直す。
 
 ## Phase 2.5: テストレビュー（`full`, `impl-only`のみ）
@@ -232,92 +240,41 @@ Tech Specs Reviewer が ✅ 承認したら（または 3回ループ上限に�
 
 ### 判定結果の扱い
 
-Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テスト 0件 / TEST_PLAN.md整合 / P0 E2E完全カバー / 受入基準テスト網羅）を1項目でも下回った場合は必ず NEEDS CHANGES 以下となる。
+指摘ごとに処置を導く（「reviewer の使い方」の「依頼と判定」）。テストの指摘で処置が「直す」のものは、実行で確かめたもの
+（確信の段階 4 以上）だけを数え、確かめられないものは「未確認」として別に並べる。
 
-- **PASS**: Phase 2のステップ2（実装）に戻って作業を継続。
-- **NEEDS CHANGES**: 出力末尾の「修正の依頼」に沿ってメインのセッションがテストを直す → 再コミット → `test-reviewer` に再レビューさせる。**最大3回**ループ。
-- **CRITICAL ISSUES**: Spec の受入基準がまったく検証されていない等の重大な問題。テストを直し、必要なら TEST_PLAN.md（Phase 1b）や受入基準（Phase 1a）に戻って見直す。
+- **「直す」が 0 件**: Phase 2のステップ2（実装）に戻って作業を継続。
+- **「直す」が残る**: メインのセッションがテストを直す → 再コミット → `test-reviewer` に再レビューさせる。**最大3回**ループ。
+  受入基準がまったく検証されていないなど、テスト設計から誤っているときは、TEST_PLAN.md（Phase 1b）や受入基準（Phase 1a）に戻って見直す。
 
-3回の修正ループ後も問題が解消されない場合は、現状のテストをコミットして Phase 2 のステップ2に進み、未解消の Hard Threshold 違反項目を PR description に明記する。
+3回の修正ループ後も問題が解消されない場合は、現状のテストをコミットして Phase 2 のステップ2に進み、残った「直す」の指摘を PR description に明記する。
 
-## Phase 3: QA（`full`, `impl-only`のみ）
+## Phase 3–4: PR 前レビュー（`full`, `impl-only`のみ）
 
-`qa-engineer` を起動して、品質を確認させる。全件のテストや監査の長い出力は qa-engineer の中で読み、結果の要約だけを受け取る。
-PASS の根拠は、qa-engineer が実行して得た結果に限る（レポートの「実行した」と「推測」を分けて読む）。
+実装を終えたら、PR を作る前に `reviewing-changes` skill の手順でレビューを回す。QA（`qa-engineer`）とコードレビュー
+（`code-reviewer` の 3 つの観点）は、この skill が差分から起動する担当の一部として、同じラウンドで並列に起動する。
+差分に Spec やテストがあれば、その reviewer も同じラウンドで起動する。`code-reviewer` と `test-reviewer` は
+作業ツリーを分けて起動する（「reviewer の使い方」の「作業ツリーを分ける」）。
 
-1. **ユニットテスト実行**: `.stdd.config.yml` の `apps[]` を読み、各アプリについて `apps[].path` ディレクトリで `commands.test` を実行する（apps[] の数だけ繰り返す）。
-
-   ```bash
-   # 例（実際の値は .stdd.config.yml に従う）
-   cd <apps[].path> && <commands.test>
-   ```
-
-2. **E2Eテスト実行**（関連テストがある場合）:
-
-   ```bash
-   cd e2e && npm run test
-   ```
-
-3. **整合性チェック**: `verifying-consistency` skill と同等のチェックを実施。特に **ID ベース・トレーサビリティ監査**（`bash .claude/hooks/trace-audit.sh`）で要件⇄設計⇄テスト⇄実装の抜け漏れを機械検知し、テスト/実装起点の変更は `--changed` で影響範囲・追跡不能変更を確認する（`traceability.enforce=block` なら抜け漏れは修正必須）
-
-4. **コード品質チェック**: `simplify` skill と同等のレビューを実施
-
-5. **動作確認（Playwright MCP）**: `commands.dev` が定義され UI を持つ場合、dev サーバを起動し Playwright MCP（`mcp__playwright__*`）で主要ユースケースのハッピーパスをブラウザ操作で確認する（主要要素の存在・console エラーなし・画面遷移）。`commands.dev` 未定義 / UIなし / Playwright MCP 利用不可ならスキップする。詳細は QA Engineer の Phase 6 を参照。
-
-問題がある場合:
-
-- ビルド・型のエラー、テストの失敗、ロジックの問題は、メインのセッションが直す
-- 修正→QAを最大3回繰り返す
-
-## Phase 4: コードレビュー（`full`, `impl-only`のみ）
-
-`code-reviewer` を、作業ツリーを分けて起動し（「reviewer の使い方」の「作業ツリーを分ける」）、コード品質をレビューさせる。Phase 3 と互いに独立しているので、Phase 3 の `qa-engineer` と同時に起動する。
-
-### 観点を分けた並列レビュー
-
-1 体の reviewer は、一度に 1 種類の問題に注意が偏りやすい。そこで `code-reviewer` は、変更の大きさにかかわらず、
-次の 3 つの観点に分けて同時に起動する（起動の形は「reviewer の使い方」の「起動の仕方」）。
-
-| 観点 | 見る範囲 |
-| --- | --- |
-| セキュリティ | OWASP Top 10、認証・認可、入力の検証、秘密情報の扱い |
-| 性能とエラー処理 | 不要な繰り返しやデータの取得、エラーハンドリング |
-| 規約と品質 | `AGENTS.md` / `CLAUDE.md` の規約、責務の分け方、フォーム・レスポンシブ（UI の変更時） |
-
-- 依頼文で観点を 1 つだけ渡し、ほかの観点は見ないよう伝える。観点が重ならないようにするためである。
-- 結果はメインのセッションが統合する。判定は観点ごとの判定のうち最も悪いものとし、同じ箇所への指摘はまとめる。
-- 差し戻しの後は、NEEDS CHANGES 以下だった観点をもう一度起動する。
-- agent teams で起動したときは、メンバーどうしで同じ箇所への指摘を確かめ合わせてよい。
-
-チェック項目:
-
-- `AGENTS.md / CLAUDE.md` のコーディング規約準拠（存在する場合のみ。snake_case禁止、!演算子禁止、asキャスト禁止等）
-- セキュリティ（OWASP Top 10）
-- パフォーマンス
-- レスポンシブ対応
-- 適切なエラーハンドリング
+- Phase 1a / 1b で承認した Spec を、その後変更していなければ、`round start --skip requirements=Phase 1a で承認済み` の
+  ように理由を付けて外す。
+- 指摘の処置（直す・起票・見送り可・未確認）は台帳のスクリプトが決める。
+- 全件のテスト・トレーサビリティ監査・動作確認（Playwright MCP。`commands.dev` が定義され UI を持つ場合）は、
+  横断の担当（`qa-engineer`）が必要に応じて行い、結果を指摘として返す。ローカルでの完走はゲートの条件にしない（CI に任せる）。
+- ラウンドの数に上限は設けない。終え方は `reviewing-changes` の `references/fixing.md`。
+- ゲートを通ったら、`review-ledger.sh summary` の出力を Phase 5 の PR description の備考に貼る。
 
 ### 既存の機能を改修したとき
 
-既存のコード（このブランチより前からあるファイル）の振る舞いを変えたときは、Phase 3・4 と同時に、メインのセッションが
+既存のコード（このブランチより前からあるファイル）の振る舞いを変えたときは、PR 前レビューと同時に、メインのセッションが
 `assessing-change-impact` で差分の外の壊れ方を確かめる。次のどれかに当たるときに使う。
 
 - 公開している関数・API・型・テーブルの形、既定値、例外の型、呼ばれる順序を変えた
 - 複数の機能から使われている共通の部品を変えた
 - ライブラリの更新、設定、実行のタイミング（非同期・キャッシュ・トランザクション）に関わる変更をした
 
-確かめた結果（確信の段階）は PR description に書き、確かめたスクリプトをテストとして残したときは Phase 3 の QA に含める。
+確かめた結果（確信の段階）は PR description に書き、確かめたスクリプトをテストとして残したときは PR 前レビューの横断の担当に伝える。
 新しいファイルだけの追加や、文書だけの変更では使わない。
-
-### 判定と差し戻しループ
-
-Code Reviewer の **Hard Threshold**（Critical 0件 / High 0件 / Medium ≤2件 / OWASP Critical/High 0件 / `AGENTS.md / CLAUDE.md` 絶対ルール違反 0件（存在する場合のみ評価） / `.claude/docs/coding-conventions.md` 全項目準拠（存在する場合のみ評価））を1項目でも下回った場合は必ず NEEDS CHANGES 以下となる。
-
-- **✅ PASS**: 次の Phase に進む。
-- **⚠️ NEEDS CHANGES**: 出力末尾の「修正の依頼」に沿ってメインのセッションが直し、再度 `code-reviewer` に見せる。**最大3回**ループ。
-- **❌ Blocked**: セキュリティ脆弱性が実証可能 or アーキテクチャ崩壊レベル。最優先で直す。3回ループで解消しなければ draft PR を作成し、PR description で **Blocked 理由** を明示する。
-
-3回の修正ループ後も問題が解消されない場合は、現状をコミットして次の Phase に進むが、未解消の Hard Threshold 違反項目を PR description に明記する。
 
 ## Phase 4.5: Figmaデザイン更新（`full`, `impl-only`のみ）
 
@@ -359,13 +316,15 @@ UI変更を伴う実装の場合、対象のSpecドキュメント（REQUIREMENT
 
 ## Phase 5: PR作成（全モード）
 
-すべてのコミットをpushし、`create-pr` skill と同等のフローでPRを作成する。
+すべてのコミットをpushし、`create-pr` skill と同等のフローでPRを作成する。`gh pr create` の直前に、PR 前レビューの
+ゲート（`reviewing-changes` §6）を通す。PR 前レビューを行わないモード（`quick` / `spec-only`）では、
+`STDD_REVIEW_GATE_SKIP_REASON="<モードと理由>"` を前置して作る。
 
 PRのdescriptionには以下を含める:
 
 - 対応issue番号（`Closes #<issue番号>`）。**GitHub issue 起点のときのみ**。issue 以外の入力では、代わりに対象タスクのサマリを記載する。Phase 4.8 で起票した issue には `Closes` を付けない。
 - 実行モード
-- 各フェーズの実行結果サマリ
+- 各フェーズの実行結果サマリ（PR 前レビューは `review-ledger.sh summary` の出力）
 - 備考に、Phase 4.8 の `triage` が出力した「開発フィードバック: …」の 1 行と、`レビューの実行: agent teams / subagent` の 1 行
 - 緊急モードのブランチでは、冒頭に「## 緊急モード」の節（`create-pr` の Description テンプレート）
 

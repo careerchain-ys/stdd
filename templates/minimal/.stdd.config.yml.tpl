@@ -38,6 +38,10 @@ docs:
     screen_test_design: "docs/{{feature_path}}/SCREEN_TEST_DESIGN.md"
     test_design: "docs/{{feature_path}}/TEST_DESIGN.md"
     plan: "docs/{{feature_path}}/plans/{{date}}.md"
+  # 転記の検査（skills/documenting-requirements/scripts/state-claims.sh）の語彙。既定の語彙を変えるときだけ書く。
+  # state_claims:
+  #   nouns: ["機能", "画面", "テーブル"]   # 件数の句で数える成果物の名詞
+  #   words: ["未作成", "実装済み"]         # ほかの文書の作成状況を断定する語
 
 # レスポンスコード体系（skills/documenting-tech-specs/guides/response-codes.md）。帯の意味と「1 分岐 1 コード」は固定。
 # 機能略号の書き方と共通コードの一覧を変えるときだけ書く。
@@ -53,6 +57,7 @@ workflow:
   enforce_agent_scope: "warn"     # reviewer の subagent の書き込みとシェルの用途を制限する
   enforce_worktree_lock: "warn"   # subagent の作業先を、宣言した作業ツリーと突き合わせる
   enforce_test_scope: "warn"      # 対象を絞らない commands.test の全件実行を知らせる
+  enforce_review_gate: "warn"     # gh pr create の直前に PR 前レビューの 3 条件を確かめる
   worktree:
     enabled: false
   devcontainer:
@@ -92,6 +97,16 @@ feedback:
 
 telemetry:
   enabled: true
+
+# PR 前レビュー（packages/core/docs/review-process.md）。担当の起動条件と、指摘の種別・範囲の判定に使う。
+# すべて任意で、省略すればスクリプトの既定値を使う。値は拡張正規表現（triggers は always / never も書ける）。
+# review:
+#   harness_paths: '^(\.claude|\.agents|\.codex|\.stdd)/|^(AGENTS|CLAUDE)\.md$|^\.stdd\.config\.yml$'
+#   global_paths: '(^|/)docs/common/|(^|/)(shared|common)/'
+#   global_words: '認証|認可|権限|テナント'
+#   triggers:
+#     test: '(^|/)(tests?|__tests__|e2e)/|[._-](test|spec)\.[A-Za-z0-9]+$'
+#     code: '^src/'
 
 # 緊急モード（packages/core/docs/work-modes-and-limits.md）。ユーザーが「緊急モード」と明示したときだけ入り、
 # 分業・レビューの回数・品質ゲートの合格を必須にしない（Spec → テスト → 実装の順序は守る）。

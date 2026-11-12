@@ -166,12 +166,36 @@ node --test test/harness-size.test.mjs
 
 ---
 
-## 8. 検査スクリプトの作法
+## 8. 転記せず参照する
+
+件数・一覧・しきい値・手順は、正本の 1 か所だけが持つ。skill・agent・rule の定義もこの規律に従う
+（Spec の文書での規律は [`packages/core/docs/spec-revision.md`](../packages/core/docs/spec-revision.md) §6）。
+
+- **ほかの skill の手順を書き写さない。** 手順はその skill と節を名前で参照する。書き写すと、正本の手順が変わったときに食い違う。
+- **件数・一覧・しきい値を書き写さない。** 文字数の上限は `scripts/harness-size-baseline.json`、設定の既定値は JSON Schema が持つ。
+  定義の本文には値ではなく、値を持つファイルとキーを書く。
+- **ほかの定義の作成状況や数を断定しない。** 「reviewer は 4 本」「この skill はまだ無い」のような文は、定義が増減するたびに偽になる。
+  いまの状況が必要なら、一覧を出すコマンドやファイルを参照する。
+- 導入先に配られない文書（`packages/core/docs/` など）を参照する skill は、要点だけを skill に書き、正本の場所を添える。
+  このときの要点は手順の要約であり、件数や一覧は含めない。
+
+### 8.1 検証
+
+```bash
+# skill・agent・rule・方法論の文書に、件数の句と状態の語が同じ文にある形が無いこと
+bash packages/core/skills/documenting-requirements/scripts/state-claims.sh packages/core/skills packages/core/agents packages/core/rules packages/core/docs
+```
+
+`bash test/state-claims.test.sh` が同じ確認を行う。
+
+---
+
+## 9. 検査スクリプトの作法
 
 検査スクリプト（フック・`scripts/` の検査・`trace-audit.sh` など）は、誤って合格を出すと誰も気づかない。
 不合格を出す誤りは利用者がすぐ気づくが、合格を出す誤りは、壊れたまま信頼され続ける。次の作法はこれを防ぐためにある。
 
-### 8.1 ルール
+### 9.1 ルール
 
 - **走査の対象が 0 件のときに合格としない。** 対象が見つからないのは、パスや名前の設定の誤りであることが多い。
   「対象 0 件」と表示し、合格の表示（「抜け漏れなし」など）を出さない。前提の道具（`jq` など）が無くて実施できないときも、
@@ -188,7 +212,7 @@ node --test test/harness-size.test.mjs
 - **環境の差で結果を変えない。** macOS の bash 3.2 と BSD の awk・sed でも、Linux の GNU の道具でも同じ結果になるように書く
   （連想配列・`sed -i`・awk の拡張機能を使わない）。
 
-### 8.2 検証
+### 9.2 検証
 
 ```bash
 bash test/trace-audit.test.sh
