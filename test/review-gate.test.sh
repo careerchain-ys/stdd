@@ -93,7 +93,17 @@ echo "[台帳への記録]"
 D="$TMP_ROOT/derive"
 L round start --independent yes
 L add --id R1-cq-1 --role code-quality --trigger "空の入力" --frequency 常時 --impact 支障 --target src/a.ts --evidence 3
-assert_rc "コードの担当の指摘は、実行で確かめていなければ（段 3 以下）台帳に載せない" 1
+assert_contains "コードの担当の「直す」は、実行で確かめていなければ（段 3 以下）未確認にする" "処置: 未確認"
+L raise --id R1-cq-1 --evidence 2
+assert_rc "確信の段階は下げられない" 1
+L raise --id R1-cq-1 --evidence 4
+assert_contains "実行で確かめたら（段 4）直すになる" "処置: 直す"
+L add --id R1-cq-2 --role code-quality --trigger "空の入力" --frequency 条件付き --impact 支障 --target src/a.ts --evidence 2
+assert_contains "コードの担当でも「直す」以外は段 2 のまま載せる" "処置: 起票"
+L derive --role test --frequency 常時 --impact 支障 --target src/a.ts --evidence 3
+assert_contains "derive も同じ規則で未確認を出す（Phase 2.5 のレビュー）" "処置: 未確認"
+L derive --role requirements --frequency 常時 --impact 支障 --target docs/a/REQUIREMENTS.md --evidence 2
+assert_contains "Spec の担当は段 2 でも直すになる" "処置: 直す"
 L add --id R1-cross-1 --role cross --trigger "空の入力" --frequency 条件付き --impact 軽微 --target src/a.ts --evidence 2
 assert_rc "横断の担当は段 2 でも載せられる" 0
 assert_contains "処置を表示する" "処置: 見送り可"
@@ -105,8 +115,6 @@ L raise --id R1-cross-1 --impact 致命
 assert_contains "4 項目を上げると処置を導き直す" "処置: 直す"
 L defer --id R1-cross-1 --reason "後で"
 assert_rc "処置が直すの指摘は見送れない" 1
-L unproven --id R1-cross-2 --role cross --reason x
-assert_rc "unproven は実行で証明する担当にだけ使う" 1
 
 echo "[ゲート: 条件 1 レビューされている]"
 G="$TMP_ROOT/g1"; new_repo "$G"; D="$G"
@@ -163,7 +171,7 @@ assert_rc "直すを修正し、起票を issue にすれば合格" 0
 echo "[ゲート: 条件 3 指摘が記録から漏れていない]"
 G="$TMP_ROOT/g3"; new_repo "$G"; D="$G"
 L round start
-L unproven --id R1-cp-1 --role code-performance --reason "再現の手順で失敗しなかった"
+L add --id R1-cp-1 --role code-performance --trigger t --frequency 常時 --impact 致命 --target src/a.ts --evidence 3
 for r in $(lines_of launch); do
     case "$r" in
         code-performance) L report --role "$r" --ids "R1-cp-1" ;;
@@ -177,14 +185,14 @@ L gate
 assert_rc "報告の ID が台帳に無ければ不合格" 1
 assert_contains "載っていない ID を知らせる" "R1-cq-9 が台帳にありません"
 assert_contains "報告の無い担当を知らせる" "起動した security の報告が記録されていません"
-printf '%s' "$OUT" | grep -q "R1-cp-1" && ng "実行で確かめられなかった指摘は記録済みとして扱う" || ok "実行で確かめられなかった指摘は記録済みとして扱う"
+printf '%s' "$OUT" | grep -q "R1-cp-1" && ng "未確認の指摘は終わりの条件に数えない" || ok "未確認の指摘は終わりの条件に数えない"
 printf 'no ids\n' > "$TMP_ROOT/bad.md"; L report --role security --file "$TMP_ROOT/bad.md"
 assert_rc "報告の末尾に ID の一覧が無ければ記録しない" 1
 
 echo "[集計]"
 L summary --json
-printf '%s' "$OUT" | jq -e '.rounds == 1 and .independent == false and .unproven["code-performance"] == 1' >/dev/null \
-    && ok "テレメトリ用の集計にラウンド・独立性・実行で確かめられなかった件数が入る" || ng "テレメトリ用の集計"
+printf '%s' "$OUT" | jq -e '.rounds == 1 and .independent == false and .unconfirmed["code-performance"] == 1 and .findings.unconfirmed == 1' >/dev/null \
+    && ok "テレメトリ用の集計にラウンド・独立性・未確認の件数が入る" || ng "テレメトリ用の集計"
 
 echo "[フック]"
 pr() { hook_input Bash "$(jq -cn --arg c "$1" '{command:$c}')" "" "$D"; }

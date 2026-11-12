@@ -89,7 +89,7 @@ run post --exempt user_waived
 assert_rc "免除の申告で投稿できる" 0
 assert_contains "棚卸しの記録が無ければ警告する" "フィードバックの棚卸しの記録がありません"
 OUT=$(posted)
-[ "$(printf '%s' "$OUT" | jq -c .review)" = '{"rounds":0,"exempt":"user_waived","findings":null,"independent":null,"unproven":null}' ] && ok "免除の区分を持つ" || ng "免除の区分"
+[ "$(printf '%s' "$OUT" | jq -c .review)" = '{"rounds":0,"exempt":"user_waived","findings":null,"independent":null,"unconfirmed":null}' ] && ok "免除の区分を持つ" || ng "免除の区分"
 [ "$(printf '%s' "$OUT" | jq -c .feedback)" = 'null' ] && ok "棚卸しをしていなければ feedback は null" || ng "feedback は null"
 [ "$(printf '%s' "$OUT" | jq -c .duration_min.steps)" = 'null' ] && ok "工程の記録が無ければ steps は null（0 にしない）" || ng "steps は null"
 [ "$(printf '%s' "$OUT" | jq -r .duration_min.lead_time)" = 'null' ] && ok "起点が無ければ所要は null" || ng "所要は null"
@@ -137,14 +137,14 @@ pr_fixture
 LEDGER_SH="$REPO_ROOT/packages/core/skills/reviewing-changes/scripts/review-ledger.sh"
 ( cd "$REPO_DIR" && bash "$LEDGER_SH" round start --independent yes >/dev/null 2>&1 \
     && bash "$LEDGER_SH" add --id R1-cross-1 --role cross --trigger t --frequency 常時 --impact 支障 --target README.md --evidence 2 >/dev/null \
-    && bash "$LEDGER_SH" unproven --id R1-security-1 --role security --reason x >/dev/null \
+    && bash "$LEDGER_SH" add --id R1-security-1 --role security --trigger t --impact 致命 --target README.md --evidence 2 >/dev/null \
     && bash "$LEDGER_SH" round end >/dev/null 2>&1 )
 run post
 assert_rc "台帳があればレビューの記録として投稿できる" 0
 OUT=$(posted)
 [ "$(printf '%s' "$OUT" | jq -c '.review | {rounds, independent}')" = '{"rounds":1,"independent":true}' ] && ok "台帳のラウンド数と独立性を持つ" || ng "台帳のラウンド数と独立性"
 [ "$(printf '%s' "$OUT" | jq -r '.review.findings.fix')" = 1 ] && ok "指摘の処置の内訳を持つ" || ng "処置の内訳"
-[ "$(printf '%s' "$OUT" | jq -c '.review.unproven')" = '{"security":1}' ] && ok "実行で確かめられなかった指摘の担当ごとの件数を持つ" || ng "unproven"
+[ "$(printf '%s' "$OUT" | jq -c '.review.unconfirmed')" = '{"security":1}' ] && ok "未確認の指摘の担当ごとの件数を持つ" || ng "unproven"
 
 echo "== post: push していない"
 new_case unpushed

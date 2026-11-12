@@ -13,14 +13,12 @@
 #   add --id <ID> --role <担当> --trigger <発生条件> --frequency 常時|条件付き|稀 --impact 致命|支障|軽微
 #       --target <影響先> --evidence 1-5
 #                              指摘を台帳に載せ、導いた処置を表示する。セキュリティの担当は --frequency を書かない
-#   unproven --id <ID> --role <担当> --reason <理由>
-#                              実行で確かめられなかった指摘を記録する（台帳の指摘には数えない）
-#   raise --id <ID> [--frequency <値>] [--impact <値>]
-#                              4 項目を上げる（下げることはできない）
+#   raise --id <ID> [--frequency <値>] [--impact <値>] [--evidence <1-5>]
+#                              4 項目と確信の段階を上げる（下げることはできない）
 #   fixed --id <ID> --commit <SHA> | filed --id <ID> --issue <番号> | defer --id <ID> --reason <理由>
 #                              指摘の状態を記録する。defer は処置が「見送り可」の指摘にだけ使える
-#   derive --role <担当> [--frequency <値>] --impact <値> --target <影響先>
-#                              処置の導出だけを行う（記録しない）
+#   derive --role <担当> [--frequency <値>] --impact <値> --target <影響先> [--evidence <1-5>]
+#                              処置の導出だけを行う（記録しない）。Phase 1a / 1b / 2.5 のレビューで使う
 #   gate                       PR 作成の前の 3 条件を確かめる（満たさなければ exit 1）
 #   summary [--json]           台帳の集計を表示する（--json は工程テレメトリ用）
 #   table                      処置の表と起こりやすさの表を表示する
@@ -29,7 +27,8 @@
 #
 # 担当（起動の単位）: cross（横断）/ consistency（突合）/ requirements / tech-specs / test /
 #   code-quality（規約と品質）/ code-performance（性能とエラー処理）/ security（セキュリティ）
-#   実行で証明できた指摘だけを台帳に載せる担当: test / code-quality / code-performance / security
+#   実行で確かめる担当: test / code-quality / code-performance / security。処置が「直す」になる指摘は、
+#   確信の段階 4 以上（実行して確かめた）でなければ処置を「未確認」にする。未確認は終わりの条件に数えない
 #
 # 置き場: 作業ツリーの外（git の共通ディレクトリ配下の stdd-review/<ブランチの / を __ にしたもの>.tsv）。
 #   コミットにも差分にも入らない。1 行 1 記録のタブ区切りで、追記だけを行う（同じ ID の後の行が勝つ）。
@@ -224,15 +223,22 @@ rank_freq()   { case "$1" in 稀) echo 1 ;; 条件付き) echo 2 ;; 常時) echo
 rank_impact() { case "$1" in 軽微) echo 1 ;; 支障) echo 2 ;; 致命) echo 3 ;; *) echo 0 ;; esac; }
 
 # 出力: 種別<TAB>範囲<TAB>起こりやすさ<TAB>処置
+# $5 = 確信の段階（空なら確かめない）
 derive() {
-    local role="$1" freq="$2" impact="$3" target="$4" kind scope lk act
+    local role="$1" freq="$2" impact="$3" target="$4" ev="${5:-}" kind scope lk act
     kind=$(kind_of_diff); scope=$(scope_of "$target")
     if [ "$role" = security ]; then
         lk="-"; act=$(security_action "$impact")
     else
         lk=$(likelihood "$freq" "$scope"); act=$(action "$kind" "$lk" "$impact")
     fi
+    # 実行で確かめる担当の「直す」は、確信の段階 4 以上を求める
+    if [ "$act" = 直す ] && is_proof "$role" && [ -n "$ev" ] && [ "$ev" -lt 4 ]; then act=未確認; fi
     printf '%s\t%s\t%s\t%s\n' "$kind" "$scope" "$lk" "$act"
+}
+action_note() { # $1 = 処置
+    [ "$1" = 未確認 ] && printf '（「直す」に当たるが、実行で確かめていない。確かめたら raise --evidence 4）'
+    return 0
 }
 
 # 指摘の最新の行（ID ごとに後の行が勝つ）: 出力 = finding の行
@@ -362,19 +368,16 @@ cmd_add() {
         valid_freq "$OPT_frequency" || die "--frequency は 常時 / 条件付き / 稀 のどれかです"
     fi
     case "$OPT_evidence" in [1-5]) ;; *) die "--evidence は確信の段階（1〜5。assessing-change-impact §1）です" ;; esac
-    if is_proof "$OPT_role" && [ "$OPT_evidence" -lt 4 ]; then
-        die "担当 $OPT_role の指摘は、実行で失敗を確かめたもの（確信の段階 4 以上）だけを台帳に載せます。確かめられなければ unproven で記録してください"
-    fi
     [ -z "$(finding_field "$OPT_id" 2)" ] || die "ID $OPT_id は台帳にあります（4 項目を上げるなら raise）"
     local n d
     n=$(current_round); [ "$n" -gt 0 ] || die "始めたラウンドがありません（round start）"
-    d=$(derive "$OPT_role" "$OPT_frequency" "$OPT_impact" "$OPT_target")
+    d=$(derive "$OPT_role" "$OPT_frequency" "$OPT_impact" "$OPT_target" "$OPT_evidence")
     IFS="$TAB" read -r kind scope lk act <<EOF
 $d
 EOF
     record finding "$OPT_id" "$n" "$OPT_role" "$OPT_frequency" "$OPT_impact" "$kind" "$scope" "$lk" "$act" \
         "$OPT_evidence" "$(clean "$OPT_trigger")" "$(clean "$OPT_target")"
-    echo "$OPT_id: 種別 $kind / 範囲 $scope / 起こりやすさ $lk / 影響 $OPT_impact → 処置: $act"
+    echo "$OPT_id: 種別 $kind / 範囲 $scope / 起こりやすさ $lk / 影響 $OPT_impact → 処置: $act$(action_note "$act")"
 }
 
 cmd_raise() {
@@ -396,23 +399,18 @@ EOF
         [ "$(rank_impact "$OPT_impact")" -ge "$(rank_impact "$impact")" ] || die "4 項目は下げられません（影響 $impact → $OPT_impact）"
         impact="$OPT_impact"
     fi
+    if [ -n "$OPT_evidence" ]; then
+        case "$OPT_evidence" in [1-5]) ;; *) die "--evidence は確信の段階（1〜5）です" ;; esac
+        [ "$OPT_evidence" -ge "$evidence" ] || die "確信の段階は下げられません（$evidence → $OPT_evidence）"
+        evidence="$OPT_evidence"
+    fi
     local d kind scope lk act
-    d=$(derive "$role" "$freq" "$impact" "$target")
+    d=$(derive "$role" "$freq" "$impact" "$target" "$evidence")
     IFS="$TAB" read -r kind scope lk act <<EOF
 $d
 EOF
     record finding "$OPT_id" "$n" "$role" "$freq" "$impact" "$kind" "$scope" "$lk" "$act" "$evidence" "$trigger" "$target"
-    echo "$OPT_id: 種別 $kind / 範囲 $scope / 起こりやすさ $lk / 影響 $impact → 処置: $act"
-}
-
-cmd_unproven() {
-    parse_opts "$@"
-    [ -n "$OPT_id" ] || die "--id を渡してください"
-    is_proof "$OPT_role" || die "unproven は実行で証明する担当（$PROOF_ROLES）にだけ使います"
-    [ -n "$OPT_reason" ] || die "--reason（確かめられなかった理由）を渡してください"
-    local n; n=$(current_round); [ "$n" -gt 0 ] || die "始めたラウンドがありません（round start）"
-    record unproven "$OPT_id" "$n" "$OPT_role" "$(clean "$OPT_reason")"
-    echo "$OPT_id: 実行で確かめられなかった指摘として記録しました（台帳の指摘には数えません）"
+    echo "$OPT_id: 種別 $kind / 範囲 $scope / 起こりやすさ $lk / 影響 $impact → 処置: $act$(action_note "$act")"
 }
 
 cmd_state() {
@@ -457,11 +455,12 @@ cmd_derive() {
     is_role "$OPT_role" || die "--role は $ROLES のどれかです"
     valid_impact "$OPT_impact" || die "--impact は 致命 / 支障 / 軽微 のどれかです"
     [ "$OPT_role" = security ] || valid_freq "$OPT_frequency" || die "--frequency は 常時 / 条件付き / 稀 のどれかです"
-    local d; d=$(derive "$OPT_role" "${OPT_frequency:--}" "$OPT_impact" "$OPT_target")
+    case "$OPT_evidence" in ''|[1-5]) ;; *) die "--evidence は確信の段階（1〜5）です" ;; esac
+    local d; d=$(derive "$OPT_role" "${OPT_frequency:--}" "$OPT_impact" "$OPT_target" "$OPT_evidence")
     IFS="$TAB" read -r kind scope lk act <<EOF
 $d
 EOF
-    echo "種別 $kind / 範囲 $scope / 起こりやすさ $lk / 処置: $act"
+    echo "種別 $kind / 範囲 $scope / 起こりやすさ $lk / 処置: $act$(action_note "$act")"
 }
 
 # ---------------------------------------------------------------------------
@@ -512,7 +511,7 @@ EOF
 
     # 条件 3: 指摘が記録から漏れていない
     local known r role ids i
-    known=$( { latest_findings | cut -f2; lines unproven | cut -f2; } | sort -u)
+    known=$(latest_findings | cut -f2 | sort -u)
     while IFS="$TAB" read -r _ r role _; do
         [ -n "$r" ] || continue
         [ -n "$(lines report | awk -F'\t' -v r="$r" -v role="$role" '$2 == r && $3 == role')" ] \
@@ -524,7 +523,7 @@ EOF
         [ -n "$r" ] || continue
         for i in $(printf '%s' "$ids" | tr ',' ' '); do
             printf '%s\n' "$known" | grep -qxF -- "$i" \
-                || add_problem "条件 3: ラウンド $r の $role の報告にある $i が台帳にありません（add か unproven で記録する）"
+                || add_problem "条件 3: ラウンド $r の $role の報告にある $i が台帳にありません（add で記録する）"
         done
     done <<EOF
 $(lines report)
@@ -553,21 +552,20 @@ cmd_summary() {
                 split(line, f, "\t")
                 if (f[1] == "state") st[f[2]] = f[3]
                 if (f[1] == "round") { rounds++; ind[f[4]]++ }
-                if (f[1] == "unproven") { up[f[4]]++; ups++ }
             }
         }
-        { act[$10]++; total++; s = ($2 in st) ? st[$2] : "未対応"; stc[s]++ }
+        { act[$10]++; total++; s = ($2 in st) ? st[$2] : "未対応"; stc[s]++; if ($10 == "未確認") { up[$4]++; ups++ } }
         END {
             indep = (rounds == 0) ? "null" : (ind["yes"] == rounds ? "true" : (ind["no"] == rounds ? "false" : "\"mixed\""))
             if (json == "yes") {
                 u = ""; for (k in up) u = u (u == "" ? "" : ",") "\"" k "\":" up[k]
-                printf "{\"rounds\":%d,\"independent\":%s,\"findings\":{\"total\":%d,\"fix\":%d,\"file\":%d,\"may_defer\":%d},\"states\":{\"fixed\":%d,\"filed\":%d,\"deferred\":%d,\"open\":%d},\"unproven\":{%s}}\n", \
-                    rounds, indep, total, act["直す"], act["起票"], act["見送り可"], stc["修正済み"], stc["起票済み"], stc["見送り"], stc["未対応"], u
+                printf "{\"rounds\":%d,\"independent\":%s,\"findings\":{\"total\":%d,\"fix\":%d,\"file\":%d,\"may_defer\":%d,\"unconfirmed\":%d},\"states\":{\"fixed\":%d,\"filed\":%d,\"deferred\":%d,\"open\":%d},\"unconfirmed\":{%s}}\n", \
+                    rounds, indep, total, act["直す"], act["起票"], act["見送り可"], act["未確認"], stc["修正済み"], stc["起票済み"], stc["見送り"], stc["未対応"], u
             } else {
                 printf "ラウンド: %d（独立性: %s）\n", rounds, indep
-                printf "指摘: %d 件（直す %d / 起票 %d / 見送り可 %d）\n", total, act["直す"], act["起票"], act["見送り可"]
+                printf "指摘: %d 件（直す %d / 起票 %d / 見送り可 %d / 未確認 %d）\n", total, act["直す"], act["起票"], act["見送り可"], act["未確認"]
                 printf "状態: 修正済み %d / 起票済み %d / 見送り %d / 未対応 %d\n", stc["修正済み"], stc["起票済み"], stc["見送り"], stc["未対応"]
-                printf "実行で確かめられず台帳に載せなかった指摘: %d 件", ups
+                printf "未確認（実行で確かめていない「直す」の指摘。終わりの条件に数えない）: %d 件", ups
                 if (ups > 0) { printf "（"; sep = ""; for (k in up) { printf "%s%s %d", sep, k, up[k]; sep = " / " } printf "）" }
                 printf "\n"
             }
@@ -593,7 +591,6 @@ case "$CMD" in
     report) cmd_report ${ARGS[@]+"${ARGS[@]}"} ;;
     add) cmd_add ${ARGS[@]+"${ARGS[@]}"} ;;
     raise) cmd_raise ${ARGS[@]+"${ARGS[@]}"} ;;
-    unproven) cmd_unproven ${ARGS[@]+"${ARGS[@]}"} ;;
     fixed|filed|defer) cmd_state "$CMD" ${ARGS[@]+"${ARGS[@]}"} ;;
     derive) cmd_derive ${ARGS[@]+"${ARGS[@]}"} ;;
     gate) cmd_gate ;;

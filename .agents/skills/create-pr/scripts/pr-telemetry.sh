@@ -204,17 +204,17 @@ EOF
     local exempt_json="null"
     [ -n "$exempt" ] && exempt_json=$(json_str "$exempt")
 
-    # 台帳が無ければ findings / independent / unproven は null（0 とは区別する）
-    local findings="null" independent="null" unproven="null"
+    # 台帳が無ければ findings / independent / unconfirmed は null（0 とは区別する）
+    local findings="null" independent="null" unconfirmed="null"
     if [ "$ledger" != "null" ]; then
         findings=$(printf '%s' "$ledger" | sed -n 's/.*"findings":\({[^}]*}\).*/\1/p')
         independent=$(printf '%s' "$ledger" | sed -n 's/.*"independent":\([^,]*\),.*/\1/p')
-        unproven=$(printf '%s' "$ledger" | sed -n 's/.*"unproven":\({[^}]*}\).*/\1/p')
+        unconfirmed=$(printf '%s' "$ledger" | sed -n 's/.*"unconfirmed":\({[^}]*}\).*/\1/p')
     fi
 
-    printf '{"schema":"%s","pr":%s,"head_sha":"%s","base":%s,"size":{"files":%s,"additions":%s,"deletions":%s,"commits":%s},"duration_min":{"lead_time":%s,"steps":%s},"review":{"rounds":%s,"exempt":%s,"findings":%s,"independent":%s,"unproven":%s},"feedback":%s}\n' \
+    printf '{"schema":"%s","pr":%s,"head_sha":"%s","base":%s,"size":{"files":%s,"additions":%s,"deletions":%s,"commits":%s},"duration_min":{"lead_time":%s,"steps":%s},"review":{"rounds":%s,"exempt":%s,"findings":%s,"independent":%s,"unconfirmed":%s},"feedback":%s}\n' \
         "$SCHEMA" "$pr" "$head" "$(json_str "$base")" "$files" "$add" "$del" "$commits" "$lead" "$steps" "$rounds" "$exempt_json" \
-        "${findings:-null}" "${independent:-null}" "${unproven:-null}" "$fb"
+        "${findings:-null}" "${independent:-null}" "${unconfirmed:-null}" "$fb"
 }
 
 comment_body() {
