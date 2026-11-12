@@ -226,4 +226,12 @@ FOUND=$(grep -rnE "$C1|$C2" \
 OUT="$FOUND"; RC=0
 [ -z "$FOUND" ] && ok "処置の表と起こりやすさの表を文書に転記していない（正本は review-ledger.sh）" || ng "表の転記"
 
+
+echo "[重大度と reviewer の総合判定を使わない]"
+FOUND=$(grep -rnE '重要度:|Hard Threshold|NEEDS CHANGES|CRITICAL ISSUES|\[(Critical|High|Medium|Low|HIGH|MEDIUM|LOW)[]/]|(Critical|High|Medium|HIGH|MEDIUM) severity|総合(判定|評価): ' \
+    "$REPO_ROOT/packages/core/agents" "$REPO_ROOT/packages/core/skills/auto-implement" "$REPO_ROOT/packages/core/skills/reviewing-changes" \
+    --include='*.md')
+OUT="$FOUND"; RC=0
+[ -z "$FOUND" ] && ok "agent・auto-implement・reviewing-changes に重大度と総合判定の書式が無い" || ng "重大度の書式が残っている"
+
 finish

@@ -141,7 +141,7 @@ subagent を起動する側（メインのエージェント）が、作業す�
 | 実装の前に Spec とテストを更新する | フック `spec-first-check.sh`。ID による影響範囲の確認は `trace-audit.sh` | 変更が仕様の振る舞いを変えるかどうかは判断を伴う |
 | 要件・設計・テスト・実装に ID を通す | 検査スクリプト `trace-audit.sh`（pre-push・CI） | — |
 | reviewer はレビューされる作業ツリーを書き換えない | フック `agent-scope-guard.sh` と、統合のときの `git status --porcelain`・HEAD の突合 | 分離されたシェルからの絶対パスでの書き込みはフックでは防げず、突合で検出する。agent の名前で始まらない名前を付けて起動した subagent は判定できない（§3.1） |
-| reviewer の High 以上の指摘には再現を付ける | 統合のときにメインのセッションが再現を実行し直す（`auto-implement` の phases.md） | 再現として十分かは判断を伴う |
+| reviewer の「直す」に当たりうるテストとコードの指摘には再現を付ける | 統合のときにメインのセッションが再現を実行し直す（`auto-implement` の phases.md） | 再現として十分かは判断を伴う |
 | 配る agent に書き込みの道具を持たせない | テスト `test/agent-roles.test.mjs`（[`skill-and-agent.md`](skill-and-agent.md)） | — |
 | subagent は指定された作業ツリーで作業する | フック `worktree-lock-guard.sh` と宣言のスクリプト | 宣言するかどうかは起動する側の手順（`auto-implement` Step 4）に任せる |
 | Red / Green の確認ではテストの対象を絞る | フック `test-scope-guard.sh` | どのテストが対象かの選び方は技術スタックに依存する |

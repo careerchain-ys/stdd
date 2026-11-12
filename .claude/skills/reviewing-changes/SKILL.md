@@ -66,21 +66,21 @@ bash <skill-dir>/scripts/review-ledger.sh report --role <担当> --file <報告�
 
 指摘ごとに、**現物で裏を取ってから**台帳に載せる（`ファイル:行` が実在し、書かれた状態になっているか）。
 
-- **テストとコードの担当（`test` / `code-*` / `security`）**: 実行で失敗を確かめられた指摘だけを載せる。
-  reviewer はシェルを読み取りにしか使えないので、報告に書かれた再現の手順は、メインのセッションが、
-  レビューした時点のコミットから作った使い捨ての作業ツリーで実行する（`git worktree add --detach <一時ディレクトリ> <コミット>`。
-  終わったら `git worktree remove` で消す）。意図した出力と違う結果が出たら `--evidence 4` で載せ、
-  出なければ `unproven` で理由を残す（台帳の指摘には数えない）。
-- **それ以外の担当**: 確かめた段階を `--evidence`（`assessing-change-impact` §1 の確信の段階）に書いて載せる。
+- 確かめた段階を `--evidence`（`assessing-change-impact` §1 の確信の段階）に書いて載せる。
+- **テストとコードの担当（`test` / `code-*` / `security`）の「直す」**: 確信の段階 4 以上（実行して確かめた）が要る。
+  reviewer が自分の作業ツリーで実行した再現の手順を、メインのセッションがもう一度実行し、意図した出力と違う結果が出たら
+  `--evidence 4` で載せる。作業ツリーを分けられなかった reviewer（Codex など）の手順は、メインのセッションが、レビューした
+  コミットから作った使い捨ての作業ツリーで実行する（`git worktree add --detach <一時ディレクトリ> <コミット>`。終わったら
+  `git worktree remove`）。確かめられなければ段階をそのまま書いて載せる。処置は「未確認」になり、終わりの条件に数えない。
 
 ```bash
 bash <skill-dir>/scripts/review-ledger.sh add --id <ID> --role <担当> --trigger "<発生条件>" \
   --frequency <常時|条件付き|稀> --impact <致命|支障|軽微> --target "<影響先>" --evidence <1-5>
-bash <skill-dir>/scripts/review-ledger.sh unproven --id <ID> --role <担当> --reason "<確かめられなかった理由>"
 ```
 
 - 処置（直す・起票・見送り可）は `add` が表示する。reviewer は評価だけを書き、処置は決めない。
-- 4 項目は、裏を取った結果に応じて `raise` で上げてよい。**下げることはできない**（スクリプトが拒否する）。
+- 4 項目と確信の段階は、裏を取った結果に応じて `raise` で上げてよい（未確認の指摘を後で確かめたら `raise --evidence 4`）。
+  **下げることはできない**（スクリプトが拒否する）。
 - 複数の担当が同じ箇所を指摘したときも、それぞれの ID で載せる（修正のコミットは同じでよい）。
 
 ## 5. ラウンドを終えて直す
@@ -121,4 +121,4 @@ bash <skill-dir>/scripts/review-ledger.sh summary   # PR の備考に貼る
 
 - reviewer に処置や重大度（Critical / Major / Minor）を書かせない。
 - 処置の表を文書や依頼文に書き写さない（正本は `review-ledger.sh`。`review-ledger.sh table` で表示できる）。
-- 実行で確かめられなかったテスト・コードの指摘を、台帳の指摘として扱わない。
+- 未確認の指摘を「直す」として数えない。直すと決めたら、先に実行で確かめる。

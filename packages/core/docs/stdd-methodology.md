@@ -244,7 +244,7 @@ flowchart TD
 ### 5.2.2 PR 前レビュー
 
 レビューは PR を作る前に回す。差分から担当を決めて並列に起動し、指摘ごとに発生条件・頻度・影響・影響先を書かせ、
-処置（直す・起票・見送り可）はスクリプトが表から決める。テストとコードの指摘は、実行で失敗を確かめたものだけを残す。
+処置（直す・起票・見送り可）はスクリプトが表から決め、処置が「直す」の指摘が 0 件になったら進む。重大度は使わない。テストとコードの「直す」の指摘は、実行で確かめたもの（確信の段階 4 以上）だけを数える。
 止める場所は PR を作る直前の 1 か所で、確かめる条件は 3 つ（レビューされている・直すべき指摘が残っていない・
 指摘が記録から漏れていない）に絞る。テストと機械検査は CI に任せる（`reviewing-changes`）。詳細は
 [`review-process.md`](review-process.md) を参照。
@@ -416,7 +416,7 @@ reviewer と qa-engineer は `opus` にする。agent ごとのモデルは `.st
 作業は、既定ではメインのセッションが skill を使って行う。要件・技術設計・PLAN・テスト・実装を書く作業は、ユーザーとの
 やりとりと前の成果物に依存して順に進むので、subagent に分けない。subagent にするのは、書いた経緯を見ていない目での
 レビュー・長い出力の隔離・独立した作業の並行・道具の制限の 4 つの場面に限る。STDD が配る agent は reviewer 4 つと
-`qa-engineer` で、どれもレビューされる作業ツリーを書き換えない。`test-reviewer`・`code-reviewer` は自分の作業ツリーで再現を実行し、High 以上の指摘に再現のコマンドと出力を付ける。レビューは観点ごと・文書ごとに既定で並列に起動し、agent teams が使えるなら
+`qa-engineer` で、どれもレビューされる作業ツリーを書き換えない。`test-reviewer`・`code-reviewer` は自分の作業ツリーで再現を実行し、処置が「直す」に当たりうる指摘に再現のコマンドと出力を付ける。レビューは観点ごと・文書ごとに既定で並列に起動し、agent teams が使えるなら
 既定でそれを使う。ファイルが重ならない機能の開発のような、レビュー以外の並行は条件を満たすときに行う。詳細は [`skill-and-agent.md`](skill-and-agent.md) を参照。
 
 ---
@@ -430,7 +430,7 @@ reviewer と qa-engineer は `opus` にする。agent ごとのモデルは `.st
 - `discipline-automation.md` — 規律の自動化（規律を足すときの方針・フックの一覧と限界）
 - `parallel-work.md` — 並行作業の規律（1 セッション 1 作業ツリー・重なりの検出・共有作業ツリーで使わないコマンド）
 - `model-selection.md` — subagent と skill のモデルの使い分け（作業の性質ごとのモデル・agent ごとの既定・設定での上書き）
-- `review-process.md` — PR 前レビュー（担当の起動・指摘の 4 項目と処置・実行で証明できた指摘・台帳とラウンド・PR 作成前のゲート）
+- `review-process.md` — PR 前レビュー（担当の起動・指摘の 4 項目と処置・「直す」の指摘の実行での確認・台帳とラウンド・PR 作成前のゲート）
 - `skill-and-agent.md` — skill と agent の使い分け（subagent にする場面・並行にする条件・STDD の構成・agent を足すときの基準）
 - `spec-lineup.md` — 設計書のラインナップと章立て（single / layered の構成・文書の分担・行の ID・レスポンスコード体系・章名と列名）
 - `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
