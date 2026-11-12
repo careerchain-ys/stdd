@@ -119,6 +119,7 @@ subagent を起動する側（メインのエージェント）が、作業す�
 | skill・agent・rule の定義は文字数の上限と総量の基準値を超えない | `npm run check:harness-size`（`docs/config-driven-authoring.md` §7） | 基準値を上げるかどうかは判断を伴うので、理由を PR の本文に書く |
 | 着手前に、ほかの作業ツリーや作成中の PR との重なりを確かめる | `work-overlap.sh`（[`parallel-work.md`](parallel-work.md)） | 着手の時点を機械で知る手段が無いので、フックにせず手順で呼ぶ |
 | 開発の課題を PR の前に棚卸しする | skill の手順（[`feedback-loop.md`](feedback-loop.md) §7） | 何を起票するかは判断を伴う |
+| agent のモデルは別名で書き、判断が中心の agent は既定で下げない | `build-adapters.mjs` の検査（別名以外で失敗）、導入時の設定の検査（`stdd init`）、`test/model-selection.test.mjs`（[`model-selection.md`](model-selection.md)） | どの作業を軽いモデルに任せるかは判断を伴う |
 | 緊急モードはユーザーが明示したときだけ入る | フック `work-mode-prompt.sh` と宣言のスクリプト（[`work-modes-and-limits.md`](work-modes-and-limits.md)） | — |
 
 ## 5. 規律を足すときの手順
