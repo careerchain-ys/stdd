@@ -2,27 +2,36 @@
 
 各フェーズの詳細な手順。SKILL.mdから参照される。
 
-## Reviewer エージェント運用の前提（必読）
+## reviewer の使い方
 
-`requirements-reviewer` / `tech-specs-reviewer` / `test-reviewer` / `code-reviewer` は **独立した Evaluator** として懐疑的にチューニングされている。Team Lead は以下を順守すること:
+`requirements-reviewer` / `tech-specs-reviewer` / `test-reviewer` / `code-reviewer` と `qa-engineer` は subagent として起動する。
+書いた本人（メインのセッション）とは別の文脈で、成果物だけを見て判定させるためである。
 
-- **Reviewer の判定は原則そのまま受け入れる**: NEEDS CHANGES / ⚠️ 要修正 / ❌ Blocked を「厳しすぎる」と判断して無視しない。各 Reviewer は Hard Threshold を1項目でも下回ったら必ず NEEDS CHANGES 以下を出すよう設計されている。
-- **差し戻し時は Reviewer 出力をそのまま渡す**: Reviewer 出力末尾の「Generator への差し戻し指示」セクションを、対象 Generator（requirements-writer / tech-specs-writer / implementer）にそのまま引き渡す。Team Lead が要約・再解釈しない。
-- **再レビューは差分のみではなく全体を見させる**: 修正後の Spec/テスト/コード全体を Reviewer に渡し、修正により別の Hard Threshold を割っていないか確認させる。
-- **3回ループ超過時**: 後述の各 Phase のループ上限（最大3回）を超えた場合、現状をコミット・push して draft PR を作成する。PR description には **どの Reviewer がどの Hard Threshold で停止させたか** を明記する。
+| reviewer | 起動する条件 |
+| --- | --- |
+| `requirements-reviewer` | REQUIREMENTS.md（feature / common）を作成・変更したとき |
+| `tech-specs-reviewer` | TECH_DESIGN.md・TEST_PLAN.md・common の技術文書を作成・変更したとき |
+| `test-reviewer` | テストを追加・変更し、実装に入る前（`quick` を除く） |
+| `qa-engineer` | 実装・テストを変更したとき |
+| `code-reviewer` | 実装のコードを変更したとき（文書だけの変更では起動しない） |
+
+- **依頼の内容**: 対象のファイル、基準にする Spec のパス、作業ツリーを渡す。書いたときの判断の理由は渡さない。
+- **判定は原則そのまま受け入れる**: 「厳しすぎる」として NEEDS CHANGES / ⚠️ 要修正 / ❌ Blocked を退けない。退けるときは理由を完了報告に書く。
+- **直すのはメインのセッション**: reviewer の出力の末尾の「修正の依頼」に沿って直し、直した後の全体を同じ reviewer にもう一度見せる（差分だけでなく、別の基準を割っていないかを確かめさせる）。
+- **3 回で止める**: 各 Phase の差し戻しは最大 3 回。超えたら現状をコミット・push して draft PR を作り、どの reviewer がどの基準で止めたかを PR description に書く。
 
 ## 人間レビューゲート（必読）
 
-Spec 工程はエージェント同士のレビューだけで自動承認せず、**節目で必ずユーザー（人間）の確認を仰ぐ**。`requirements-reviewer` / `tech-specs-reviewer` が ✅ 承認を出しても、それは**人間レビューに進める状態になった**という意味であり、フロー全体の承認ではない。
+Spec 工程は reviewer のレビューだけで自動承認せず、**節目で必ずユーザー（人間）の確認を仰ぐ**。`requirements-reviewer` / `tech-specs-reviewer` が ✅ 承認を出しても、それは**人間レビューに進める状態になった**という意味であり、フロー全体の承認ではない。
 
 - **ゲート①（要件）**: Phase 1a で `requirements-reviewer` が ✅ 承認したら、REQUIREMENTS.md の要点をユーザーに提示し、**承認を求めて停止**する。ユーザーが承認するまで Phase 1b に進まない。
 - **ゲート②（技術設計）**: Phase 1b で `tech-specs-reviewer` が ✅ 承認したら、TECH_DESIGN.md / TEST_PLAN.md の要点をユーザーに提示し、**承認を求めて停止**する。ユーザーが承認するまで Phase 1.5 に進まない。
-- ユーザーから修正指示が出た場合は、対象 Generator（requirements-writer / tech-specs-writer）に修正を依頼し、エージェントレビュー → 人間ゲートを再度通す。
+- ユーザーから修正指示が出た場合は、メインのセッションが直し、reviewer のレビュー → 人間ゲートを再度通す。
 - ユーザーの指示で人間ゲートをスキップする運用（完全自動）も可能だが、**既定は停止して確認**とする。
 
 ## 工程の記録（工程テレメトリ）
 
-PR 作成後に投稿する工程テレメトリ（`create-pr` §5）の所要時間とレビュー回数は、Team Lead が各 Phase の
+PR 作成後に投稿する工程テレメトリ（`create-pr` §5）の所要時間とレビュー回数は、メインのセッションが各 Phase の
 開始と終了で付ける記録から集計する。`.stdd.config.yml` の `telemetry.enabled` が `false` なら省く。
 
 ```bash
@@ -47,7 +56,7 @@ bash <create-pr>/scripts/pr-telemetry.sh mark <step> end     # Phase を出る�
 
 要件（What & Why）を確定させるフェーズ。技術設計（Phase 1b）には進まず、まず REQUIREMENTS.md を完成・承認させる。
 
-**Requirements Writerに依頼**して、入力（タスク記述。GitHub issue の場合はその情報、それ以外は Step 1 のヒアリングで確定したタスク記述）をもとに REQUIREMENTS.md を作成する。
+`documenting-requirements` skill に従い、入力（タスク記述。GitHub issue の場合はその情報、それ以外は Step 1 のヒアリングで確定したタスク記述）をもとに REQUIREMENTS.md を作成する。
 
 1. `docs/` 配下に該当機能のディレクトリを作成（存在しない場合）
 2. `REQUIREMENTS.md` を作成:
@@ -61,7 +70,7 @@ bash <create-pr>/scripts/pr-telemetry.sh mark <step> end     # Phase を出る�
 
 作成した REQUIREMENTS.md をコミット。
 
-**Requirements Reviewerに依頼**して、作成された REQUIREMENTS.md をレビューする。
+`requirements-reviewer` を起動して、作成した REQUIREMENTS.md をレビューさせる。
 
 チェック項目:
 
@@ -70,15 +79,15 @@ bash <create-pr>/scripts/pr-telemetry.sh mark <step> end     # Phase を出る�
 - SSOT 準拠（履歴・経緯・issue 言及がないか）
 - 既存・common 階層との整合性
 
-### 判定と差し戻しループ（エージェント）
+### 判定と差し戻しループ（reviewer）
 
 Requirements Reviewer の **Hard Threshold（SSOT 違反 0件）** を1件でも下回った場合は必ず ⚠️ 要修正 となる。
 
-- **⚠️ 要修正**: Reviewer 出力末尾の「Generator への差し戻し指示」をそのまま requirements-writer に渡して修正させ、再度 Requirements Reviewer に依頼する。**最大3回**ループ。
+- **⚠️ 要修正**: 出力末尾の「修正の依頼」に沿ってメインのセッションが直し、再度 `requirements-reviewer` に見せる。**最大3回**ループ。
 - **✅ 承認**: **人間レビューゲート①**へ進む。
 - **3回ループ後も未解消**: 現状をコミットし、未解消の指摘を保持したまま人間レビューゲート①へ進み、ユーザー判断を仰ぐ。
 
-HIGH/MEDIUM の指摘がある場合は Hard Threshold とは別に判断する。Team Lead は HIGH が複数残っていれば実質的に差し戻す方向で扱う。
+HIGH/MEDIUM の指摘がある場合は Hard Threshold とは別に判断する。HIGH が複数残っていれば実質的に差し戻す方向で扱う。
 
 ### 🧑 人間レビューゲート①（要件）
 
@@ -87,14 +96,14 @@ Requirements Reviewer が ✅ 承認したら（または 3回ループ上限に
 - REQUIREMENTS.md の要点（ユースケース一覧・Priority・主要な受入基準・スコープ外・未解消の指摘があればそれ）を簡潔に提示する
 - 「この要件で技術設計に進んでよいか」をユーザーに確認する
 - **ユーザーが承認するまで Phase 1b に進まない**
-- 修正指示が出たら requirements-writer に修正を依頼し、Requirements Reviewer の再レビュー → 本ゲートを再度通す
+- 修正指示が出たらメインのセッションが直し、`requirements-reviewer` の再レビュー → 本ゲートを再度通す
 - ユーザーが明示的に「人間ゲートをスキップして自動で進めてよい」と指示した場合のみ、停止せず Phase 1b に進む
 
 ## Phase 1b: 技術設計作成（`full`, `spec-only`のみ）
 
 **人間レビューゲート①で承認された REQUIREMENTS.md を前提**に、技術設計を作成するフェーズ。
 
-**Tech Specs Writerに依頼**して、TECH_DESIGN.md と TEST_PLAN.md を作成する。
+`documenting-tech-specs` skill に従い、TECH_DESIGN.md と TEST_PLAN.md を作成する。
 
 1. `TECH_DESIGN.md` を作成:
    - 技術設計方針（概要＋対応ユースケース表 / 主要な設計判断 / ロジック設計 / エラーハンドリング戦略）
@@ -104,7 +113,7 @@ Requirements Reviewer が ✅ 承認したら（または 3回ループ上限に
 
 作成した技術設計をコミット。
 
-**Tech Specs Reviewerに依頼**して、作成された技術設計をレビューする。
+`tech-specs-reviewer` を起動して、作成した技術設計をレビューさせる。
 
 チェック項目:
 
@@ -113,11 +122,11 @@ Requirements Reviewer が ✅ 承認したら（または 3回ループ上限に
 - テスト戦略の十分性（テストレベル分類・総数/内訳・P0 E2E 方針）
 - SSOT 準拠（履歴・「統合/集約」フレーミングがないか）
 
-### 判定と差し戻しループ（エージェント）
+### 判定と差し戻しループ（reviewer）
 
 Tech Specs Reviewer の **Hard Threshold（SSOT 違反 0件 / ユースケースマッピング漏れ 0件 / P0 E2E 方針明記）** を1件でも下回った場合は必ず ⚠️ 要修正 となる。
 
-- **⚠️ 要修正**: Reviewer 出力末尾の「Generator への差し戻し指示」をそのまま tech-specs-writer に渡して修正させ、再度 Tech Specs Reviewer に依頼する。**最大3回**ループ。
+- **⚠️ 要修正**: 出力末尾の「修正の依頼」に沿ってメインのセッションが直し、再度 `tech-specs-reviewer` に見せる。**最大3回**ループ。
 - **✅ 承認**: **人間レビューゲート②**へ進む。
 - **3回ループ後も未解消**: 現状をコミットし、未解消の指摘を保持したまま人間レビューゲート②へ進み、ユーザー判断を仰ぐ。
 
@@ -128,15 +137,15 @@ Tech Specs Reviewer が ✅ 承認したら（または 3回ループ上限に�
 - 技術設計の要点（主要な設計判断・ロジック設計の概略・テスト総数と内訳・P0 E2E 方針・未解消の指摘があればそれ）を簡潔に提示する
 - 「この技術設計で PLAN 作成・実装に進んでよいか」をユーザーに確認する
 - **ユーザーが承認するまで Phase 1.5 に進まない**
-- 修正指示が出たら tech-specs-writer に修正を依頼し、Tech Specs Reviewer の再レビュー → 本ゲートを再度通す
+- 修正指示が出たらメインのセッションが直し、`tech-specs-reviewer` の再レビュー → 本ゲートを再度通す
 - ユーザーが明示的に「人間ゲートをスキップして自動で進めてよい」と指示した場合のみ、停止せず Phase 1.5 に進む
 
 ## Phase 1.5: PLANドキュメント作成（`full`, `impl-only`）
 
-**Plan Writerに依頼**して、Specドキュメントに基づきPLANドキュメントを作成する。
+`documenting-plans` skill に従い、Specドキュメントに基づきPLANドキュメントを作成する。
 `.stdd.config.yml` に `docs.layout.plan` が無いプロジェクトは PLAN を作らない体系なので、本 Phase を SKIP して Phase 2 に進む。
 
-1. REQUIREMENTS.mdのユースケース（振る舞い＋受入基準）とPriorityを確認
+1. REQUIREMENTS.mdのユースケース（振る舞い＋受入基準）とPriorityを確認し、スコープを決める（`full`: P0 と P1、P2 は任意 / `impl-only`: TEST_PLAN.md の全範囲）
 2. TEST_PLAN.mdのテスト戦略に基づきタスクを分解
 3. テスト→実装の順序でタスクリストを作成
 4. ファイル構成（新規/既存修正/既存維持）を明記
@@ -146,32 +155,11 @@ Tech Specs Reviewer が ✅ 承認したら（または 3回ループ上限に�
 
 ## Phase 2: 実装（`full`, `impl-only`, `quick`）
 
-**Implementerに依頼**して、PLANドキュメント（存在する場合）に従いSTDDフローで実装する。
+[implementation.md](implementation.md) の手順で、PLANドキュメント（存在する場合）に従いメインのセッションが実装する。
 
-1. **テスト作成**（`quick`モードではスキップ可）:
-   - PLANドキュメントのタスクリストに従いテストを作成（Unit → Integration → E2E）
-   - テストが失敗すること（Red状態）を確認（作成したテストだけを実行する。全件は Phase 3）
-   - テストをコミット
-
-   **`quick`モード以外では、テストをコミットした時点で一旦Phase 2の作業を中断し、Phase 2.5（テストレビュー）に進む**。Phase 2.5で承認されてから次の「実装」ステップに戻る。
-
-2. **実装**:
-   - PLANドキュメントのタスクリストに従い実装
-   - テストがパスすること（Green状態）を確認（対象のテストだけを実行する。全件は Phase 3）
-   - 実装をコミット
-
-3. **型チェック**: `.stdd.config.yml` の `commands.typecheck` を実行する。
-
-   ```bash
-   # 例（実際の値は .stdd.config.yml に従う）
-   <commands.typecheck>
-   ```
-
-4. **ビルドエラー解決**（型チェック/ビルドでエラーが発生した場合）:
-   **Build Error Resolverに依頼**して、ビルド・型エラーを段階的に修正する。
-   - エラーを1つずつ修正し、修正ごとに型チェックを再実行
-   - 修正が新たなエラーを生まないことを確認
-   - 最大3回の修正ループ後もエラーが残る場合はImplementerに差し戻し
+1. **テスト作成（Red）**（`quick`モードではスキップ可）: テストを書き、書いたテストだけを実行して失敗を確かめ、コミットする。
+   **`quick`モード以外では、ここで Phase 2.5（テストレビュー）に進み**、承認されてから実装に戻る。
+2. **実装（Green）**: 対象のテストを通す実装をし、`commands.typecheck` を通してコミットする。ビルド・型のエラーもここで直す。
 
 ## Phase 2.5: テストレビュー（`full`, `impl-only`のみ）
 
@@ -184,7 +172,7 @@ Tech Specs Reviewer が ✅ 承認したら（または 3回ループ上限に�
 
 ### 実行手順
 
-**Test Reviewerに依頼**して、作成されたテストをレビューする。
+`test-reviewer` を起動して、作成したテストをレビューさせる。
 
 レビュー観点:
 
@@ -198,14 +186,14 @@ Tech Specs Reviewer が ✅ 承認したら（または 3回ループ上限に�
 Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テスト 0件 / TEST_PLAN.md整合 / P0 E2E完全カバー / 受入基準テスト網羅）を1項目でも下回った場合は必ず NEEDS CHANGES 以下となる。
 
 - **PASS**: Phase 2のステップ2（実装）に戻って作業を継続。
-- **NEEDS CHANGES**: Test Reviewer 出力末尾の「Generator への差し戻し指示」をそのまま implementer に渡してテストを修正させる → テストを再コミット → Test Reviewer に再レビュー依頼。**最大3回**ループ。
-- **CRITICAL ISSUES**: Spec の受入基準がまったく検証されていない等の重大な問題。implementer に差し戻し、場合によっては Phase 1b の tech-specs-writer（テスト戦略 TEST_PLAN.md の見直し）や Phase 1a の requirements-writer（受入基準の見直し）にも依頼する。
+- **NEEDS CHANGES**: 出力末尾の「修正の依頼」に沿ってメインのセッションがテストを直す → 再コミット → `test-reviewer` に再レビューさせる。**最大3回**ループ。
+- **CRITICAL ISSUES**: Spec の受入基準がまったく検証されていない等の重大な問題。テストを直し、必要なら TEST_PLAN.md（Phase 1b）や受入基準（Phase 1a）に戻って見直す。
 
 3回の修正ループ後も問題が解消されない場合は、現状のテストをコミットして Phase 2 のステップ2に進み、未解消の Hard Threshold 違反項目を PR description に明記する。
 
 ## Phase 3: QA（`full`, `impl-only`のみ）
 
-**QA Engineerに依頼**して、品質を確認する。
+`qa-engineer` を起動して、品質を確認させる。全件のテストや監査の長い出力は qa-engineer の中で読み、結果の要約だけを受け取る。
 
 1. **ユニットテスト実行**: `.stdd.config.yml` の `apps[]` を読み、各アプリについて `apps[].path` ディレクトリで `commands.test` を実行する（apps[] の数だけ繰り返す）。
 
@@ -228,13 +216,28 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
 
 問題がある場合:
 
-- **ビルド・型エラー**: Build Error Resolverに修正を依頼
-- **テスト失敗・ロジックの問題**: Implementerに修正を依頼
+- ビルド・型のエラー、テストの失敗、ロジックの問題は、メインのセッションが直す
 - 修正→QAを最大3回繰り返す
 
 ## Phase 4: コードレビュー（`full`, `impl-only`のみ）
 
-**Code Reviewerに依頼**して、コード品質をレビューする。
+`code-reviewer` を起動して、コード品質をレビューさせる。Phase 3 と互いに独立しているので、並行に起動してよい。
+
+### 観点を分けた並行レビュー
+
+1 体の reviewer は、一度に 1 種類の問題に注意が偏りやすい。認証・認可・外部からの入力・データアクセスに触れる変更や、
+複数の層にまたがる変更では、`code-reviewer` を観点ごとに分けて並行に起動する。小さな変更は 1 体で全観点を見る。
+
+| 観点 | 見る範囲 |
+| --- | --- |
+| セキュリティ | OWASP Top 10、認証・認可、入力の検証、秘密情報の扱い |
+| 性能とエラー処理 | 不要な繰り返しやデータの取得、エラーハンドリング |
+| 規約と品質 | `AGENTS.md` / `CLAUDE.md` の規約、責務の分け方、フォーム・レスポンシブ（UI の変更時） |
+
+- 依頼文で観点を 1 つだけ渡し、ほかの観点は見ないよう伝える。観点が重ならないようにするためである。
+- 結果はメインのセッションが統合する。判定は観点ごとの判定のうち最も悪いものとし、同じ箇所への指摘はまとめる。
+- 差し戻しの後は、NEEDS CHANGES 以下だった観点をもう一度起動する。
+- 指摘を互いに確かめ合わせたいときは、ユーザーが選べば agent teams で同じ分け方をしてもよい（`skill-and-agent.md` §2）。
 
 チェック項目:
 
@@ -249,47 +252,14 @@ Test Reviewer の **Hard Threshold**（HIGH 0件 / MEDIUM ≤2件 / 形骸的テ
 Code Reviewer の **Hard Threshold**（Critical 0件 / High 0件 / Medium ≤2件 / OWASP Critical/High 0件 / `AGENTS.md / CLAUDE.md` 絶対ルール違反 0件（存在する場合のみ評価） / `.claude/docs/coding-conventions.md` 全項目準拠（存在する場合のみ評価））を1項目でも下回った場合は必ず NEEDS CHANGES 以下となる。
 
 - **✅ PASS**: 次の Phase に進む。
-- **⚠️ NEEDS CHANGES**: Code Reviewer 出力末尾の「Generator への差し戻し指示」をそのまま implementer に渡して修正させ、再度 Code Reviewer に依頼。**最大3回**ループ。
-- **❌ Blocked**: セキュリティ脆弱性が実証可能 or アーキテクチャ崩壊レベル。即座に implementer に最優先で修正を依頼。3回ループで解消しなければ draft PR を作成し、PR description で **Blocked 理由** を明示する。
+- **⚠️ NEEDS CHANGES**: 出力末尾の「修正の依頼」に沿ってメインのセッションが直し、再度 `code-reviewer` に見せる。**最大3回**ループ。
+- **❌ Blocked**: セキュリティ脆弱性が実証可能 or アーキテクチャ崩壊レベル。最優先で直す。3回ループで解消しなければ draft PR を作成し、PR description で **Blocked 理由** を明示する。
 
 3回の修正ループ後も問題が解消されない場合は、現状をコミットして次の Phase に進むが、未解消の Hard Threshold 違反項目を PR description に明記する。
-
-## Phase 4.3: ペネトレーションテスト（`full`, `impl-only`のみ）
-
-**このPhaseはPhase 4（コードレビュー）の後に実行する。**
-
-### スキップ条件
-
-変更ファイルがすべて以下に該当する場合はスキップしてPhase 4.5に進む:
-
-- `.md` / `.txt` 等のドキュメントファイルのみ
-- `.claude/` 配下の設定・エージェント定義のみ
-- CSS/Tailwindクラスのスタイル変更のみ（Server Actions/APIルート/マイグレーションに影響なし）
-
-### 実行手順
-
-**Penetration Testerに依頼**して、攻撃者視点で変更箇所の脆弱性を検証する。
-
-1. **偵察**: 変更されたファイルから攻撃対象領域をマッピング
-2. **攻撃シナリオ設計**: 認証バイパス、認可エスカレーション、RLSバイパス、インジェクション、IDOR、ビジネスロジック悪用の観点で攻撃シナリオを設計
-3. **エクスプロイト実行**: 稼働中のローカル環境に対して実際に攻撃ペイロードを送信
-4. **結果報告**: 実証された脆弱性（PoC付き）と潜在的リスクを報告
-
-### 判定基準
-
-- **SECURE**: 次のPhaseに進む
-- **AT RISK**: Medium以上の潜在リスクをImplementerに修正依頼し、修正→再テストを最大3回繰り返す
-- **COMPROMISED**: 脆弱性が実証された。Implementerに即座に修正を依頼し、修正→再テストを最大3回繰り返す
-
-### Phase 4.5との関係
-
-Phase 4.3の判定がSECUREまたはAT RISK（修正済み）の場合のみPhase 4.5を実行する。COMPROMISEDが3回の修正ループ後も解消されない場合はPhase 4.5をスキップし、draft PRを作成する。
 
 ## Phase 4.5: Figmaデザイン更新（`full`, `impl-only`のみ）
 
 UI変更を伴う実装の場合、対象のSpecドキュメント（REQUIREMENTS.md）に「Figmaデザイン」セクションが存在するかを確認し、存在する場合はFigmaファイルを更新する。
-
-**このPhaseはPhase 4.3（ペネトレーションテスト）完了後に実行する。**
 
 ### 実行条件の判定
 
@@ -320,7 +290,7 @@ UI変更を伴う実装の場合、対象のSpecドキュメント（REQUIREMENT
 （ユーザーからの訂正、繰り返した手戻り、その場しのぎの判断、検査で拾えたはずの欠陥）を起票する。
 `.stdd.config.yml` の `feedback.enabled` が `false` なら省く。緊急モードのブランチでも省く（`choosing-work-mode` §3）。
 
-- 各エージェントの完了報告に書かれた「気づき」もここで拾う。エージェントには起票させない。
+- 各 reviewer の完了報告に書かれた「気づき」もここで拾う。subagent には起票させない。
 - 起票は 1 PR あたりの上限（既定 5 件）まで。上限で起票しなかった件数も `triage --skipped` で記録する（0 件でも実行する）。
 - 対象機能の Spec の誤りや実装のバグは起票せず、この PR の中で直す。
 - 起票の失敗（`gh` が使えない等）は PR 作成をブロックしない。完了報告の備考に理由を書く。

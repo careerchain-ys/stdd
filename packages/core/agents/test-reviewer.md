@@ -168,11 +168,10 @@ expect(result.error.issues[0].message).toBe('必須項目です')
 
 ### 総合判定: PASS / FAIL
 
-### Generator への差し戻し指示（判定が PASS 未満の場合のみ）
+### 修正の依頼（判定が PASS 未満の場合のみ）
 
-判定が NEEDS CHANGES または CRITICAL ISSUES の場合、以下を末尾に必ず明記する。Team Lead はこの内容をそのまま implementer に渡す。
+判定が NEEDS CHANGES または CRITICAL ISSUES の場合、以下を末尾に必ず明記する。呼び出し元はこの内容に沿って修正する。
 
-- **修正対象 Generator**: implementer
 - **修正必須項目**: 上記「改善が必要な点」のうち、Hard Threshold を割っている項目すべて（HIGH 全件 + 形骸的テスト全件 + MEDIUM 超過分 + Spec準拠不一致の解消 + P0 E2Eカバレッジ不足の埋め合わせ）
 - **修正不要な指摘**: LOW / 任意改善として明示的に区別する
 - **再レビュー時の確認ポイント**: 修正反映を確認すべきテストファイル・行・期待されるアサーション形状
@@ -180,7 +179,7 @@ expect(result.error.issues[0].message).toBe('必須項目です')
 
 ## 判定基準（Hard Threshold）
 
-以下の **すべて** を満たす場合のみ PASS。1つでも下回れば NEEDS CHANGES 以下とし、implementer に差し戻すこと。「全体的には書けているが」で甘くしない。
+以下の **すべて** を満たす場合のみ PASS。1つでも下回れば NEEDS CHANGES 以下としとすること。「全体的には書けているが」で甘くしない。
 
 | 項目                                                     | PASS の Threshold |
 | -------------------------------------------------------- | ----------------- |

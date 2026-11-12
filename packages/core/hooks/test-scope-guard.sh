@@ -2,7 +2,7 @@
 # PreToolUse Hook: 対象を絞らないテストの全件実行を止める。
 # 登録: Claude / Codex とも Bash（settings.json / .codex/hooks.json）。
 #
-# 規律（agents/implementer.md・auto-implement）: Red / Green の確認では、対象のテストだけを実行する。
+# 規律（auto-implement の references/implementation.md）: Red / Green の確認では、対象のテストだけを実行する。
 #   全件の実行は QA の工程（qa-engineer）・pre-push のフック・CI が受け持つ。
 #   全件を何度も回すと待ち時間が積み上がるうえ、確かめたいテストの結果が埋もれる。
 #

@@ -39,6 +39,8 @@ developer_instructions = '''
 
 ## レビューチェックリスト
 
+呼び出し元が観点（セキュリティ / 性能とエラー処理 / 規約と品質）を指定したときは、その観点の項目だけを見て、判定もその観点について出す。
+
 ### コーディング規約（必須）
 
 - [ ] `.claude/docs/coding-conventions.md` の全ルールに準拠しているか（詳細はファイルを参照）
@@ -83,7 +85,7 @@ developer_instructions = '''
 
 ## 判定基準（Hard Threshold）
 
-以下の **すべて** を満たす場合のみ ✅ PASS。1つでも下回れば NEEDS CHANGES 以下とし、implementer に差し戻すこと。「全体的には良いが」で甘くしない。
+以下の **すべて** を満たす場合のみ ✅ PASS。1つでも下回れば NEEDS CHANGES 以下としとすること。「全体的には良いが」で甘くしない。
 
 | 項目                                                                           | PASS の Threshold     |
 | ------------------------------------------------------------------------------ | --------------------- |
@@ -130,11 +132,10 @@ developer_instructions = '''
 
 ### 総合判定: ✅ PASS / ⚠️ NEEDS CHANGES / ❌ Blocked
 
-### Generator への差し戻し指示（判定が PASS 未満の場合のみ）
+### 修正の依頼（判定が PASS 未満の場合のみ）
 
-判定が NEEDS CHANGES または Blocked の場合、以下を末尾に必ず明記する。Team Lead はこの内容をそのまま implementer に渡す。
+判定が NEEDS CHANGES または Blocked の場合、以下を末尾に必ず明記する。呼び出し元はこの内容に沿って修正する。
 
-- **修正対象 Generator**: implementer
 - **修正必須項目**: 上記「改善が必要な点」のうち、Hard Threshold を割っている項目すべて（Critical / High 全件 + Medium 超過分 + OWASP Critical/High 全件 + AGENTS.md / CLAUDE.md 絶対ルール違反全件）
 - **修正不要な指摘**: LOW / 任意改善として明示的に区別する
 - **再レビュー時の確認ポイント**: 修正反映を確認すべきファイル・行・該当の規約/基準

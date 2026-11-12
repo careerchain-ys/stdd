@@ -195,7 +195,7 @@
           "type": "string",
           "enum": ["off", "warn", "block"],
           "default": "warn",
-          "description": "Behavior of the agent-scope PreToolUse hook (.claude/hooks/agent-scope-guard.sh). Applies only to subagent calls of the spec writers (requirements-writer / tech-specs-writer / plan-writer) and reviewers (requirements-reviewer / tech-specs-reviewer / test-reviewer / code-reviewer). Writers may edit only inside the directories that docs.layout points to; reviewers may not write files; both may run only one read-only shell command per call. 'off': disabled. 'warn' (default): report the violation in context without stopping. 'block': deny the operation."
+          "description": "Behavior of the agent-scope PreToolUse hook (.claude/hooks/agent-scope-guard.sh). Applies only to subagent calls of the reviewers (requirements-reviewer / tech-specs-reviewer / test-reviewer / code-reviewer). Reviewers may not write files and may run only one read-only shell command per call. 'off': disabled. 'warn' (default): report the violation in context without stopping. 'block': deny the operation."
         },
         "enforce_worktree_lock": {
           "type": "string",

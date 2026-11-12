@@ -335,6 +335,7 @@ STDD は「テスト・実装の改修も必ず Spec 起点で行う」ことを
 - 開発プロセス自体の課題を作業のたびに集め、定期的に効果を測って改善する（→ 8）
 - 局面に応じて適用の強さを選ぶ。速さが必要なときはユーザーが明示して緊急モードを使い、あとで通常の工程で見直す（→ 9）
 - 規律を足すときは、それを確かめる自動化（フック・検査スクリプト・skill の手順）を一緒に用意する（→ 10）
+- 書く作業はメインのセッションが skill を使って行い、subagent はレビュー・長い出力の隔離・並行作業・道具の制限に限って使う（→ 11）
 - 並行して作業するときは、1 つのセッションにつき 1 つの作業ツリーを使い、着手前にほかの作業ツリーや作成中の PR との重なりを確かめる。共有している作業ツリーでは、変更を退避・破棄するコマンド（`git stash` など）を使わない（→ [`parallel-work.md`](parallel-work.md)）
 
 ---
@@ -355,7 +356,7 @@ Spec・テスト・実装の一貫性を保つ仕組みも、使ううちに足�
 
 STDD は既定で品質を優先しており、そのぶん開発の速度は落ちる。障害対応のように速さを優先すべき場面のために、
 **緊急モード**を用意する。緊急モードはユーザーが着手時に明示したときだけ入り（AI が自分の判断で切り替えることはしない）、
-専門エージェントによる分業・レビューの回数・品質ゲートの合格を必須にしない。Spec → テスト → 実装の順序は守り、
+reviewer によるレビュー・品質ゲートの合格を必須にしない。Spec → テスト → 実装の順序は守り、
 PR 本文に緊急モードで作ったことを明記する（`choosing-work-mode`）。
 
 あわせて、要件が頻繁に変わる段階やゼロから作る段階のように、STDD をそのまま当てると負担が大きい局面と、その判断の目安を
@@ -369,12 +370,22 @@ PR 本文に緊急モードで作ったことを明記する（`choosing-work-mo
 手段を同時に検討する。手段はフック・検査スクリプト・skill の確認手順・文章のみ、の順に検討し、文章だけにとどめる
 規律には理由を残す。操作を止める検査は数を絞り、既定は警告にして、誤検知が無いことを確かめてから止める設定に上げる。
 
-あわせて、subagent の編集範囲の制限・作業ツリーの突合・全件テストの抑止のフックを用意する。詳細は
+あわせて、reviewer の書き込みの制限・作業ツリーの突合・全件テストの抑止のフックを用意する。詳細は
 [`discipline-automation.md`](discipline-automation.md) を参照。
 
 ---
 
-## 11. 関連ドキュメント
+## 11. skill と agent の使い分け
+
+作業は、既定ではメインのセッションが skill を使って行う。要件・技術設計・PLAN・テスト・実装を書く作業は、ユーザーとの
+やりとりと前の成果物に依存して順に進むので、subagent に分けない。subagent にするのは、書いた経緯を見ていない目での
+レビュー・長い出力の隔離・独立した作業の並行・道具の制限の 4 つの場面に限る。STDD が配る agent は reviewer 4 つと
+`qa-engineer` で、どれもファイルを書かない。互いに依存しない作業（複数の観点のレビュー、ファイルが重ならない機能）は、
+条件を満たせば並行に進める。詳細は [`skill-and-agent.md`](skill-and-agent.md) を参照。
+
+---
+
+## 12. 関連ドキュメント
 
 - `guide-for-existing-project.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
 - `guide-for-new-project.md` — 新規プロジェクトの STDD 立ち上げ手順（最初から順行）
@@ -382,6 +393,7 @@ PR 本文に緊急モードで作ったことを明記する（`choosing-work-mo
 - `work-modes-and-limits.md` — 作業モードと適用限界（緊急モード・STDD が向かない局面と判断の目安）
 - `discipline-automation.md` — 規律の自動化（規律を足すときの方針・フックの一覧と限界）
 - `parallel-work.md` — 並行作業の規律（1 セッション 1 作業ツリー・重なりの検出・共有作業ツリーで使わないコマンド）
+- `skill-and-agent.md` — skill と agent の使い分け（subagent にする場面・並行にする条件・STDD の構成・agent を足すときの基準）
 - `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
 - `.claude/skills/documenting-tech-specs/templates/` — 技術 spec テンプレ（feature: `tech-design.md` / `test-plan.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
 - `.claude/skills/documenting-plans/templates/plan.md` — 実装計画テンプレ

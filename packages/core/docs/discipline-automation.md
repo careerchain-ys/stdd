@@ -65,7 +65,7 @@ STDD の規律の多くは、規約・skill・agent の定義に文章として�
 | フック | 確かめる規律 | 設定（既定） | 対象 |
 | --- | --- | --- | --- |
 | `spec-first-check.sh` | 実装の前に Spec とテストを更新する | `workflow.enforce_spec_first`（`warn`） | 実装ファイルの編集 |
-| `agent-scope-guard.sh` | 設計書を書く agent は担当する文書だけを編集し、レビュー担当はファイルを書かない。シェルは読み取りにだけ使う | `workflow.enforce_agent_scope`（`warn`） | writer・reviewer の subagent の編集とシェル |
+| `agent-scope-guard.sh` | reviewer はファイルを書かない。シェルは読み取りにだけ使う | `workflow.enforce_agent_scope`（`warn`） | reviewer の subagent の編集とシェル |
 | `worktree-lock-guard.sh` | subagent は指定された作業ツリーの中で作業する | `workflow.enforce_worktree_lock`（`warn`） | 作業ツリーを宣言したセッションの subagent の編集とシェル |
 | `test-scope-guard.sh` | Red / Green の確認ではテストの対象を絞る。全件は QA の工程・pre-push・CI が受け持つ | `workflow.enforce_test_scope`（`warn`） | 対象を絞らない `commands.test` の実行 |
 | `pre-push-check.sh` | push の前にテスト・ビルド・トレーサビリティ監査を通す | `traceability.enforce` ほか | `git push` |
@@ -74,18 +74,18 @@ STDD の規律の多くは、規約・skill・agent の定義に文章として�
 各フックの判定の詳細と限界は、スクリプトの冒頭のコメントが正本である。登録は Claude が `.claude/settings.json`、
 Codex が `.codex/hooks.json`（`scripts/build-adapters.mjs` が生成）で、`pre-push-check.sh` は Claude だけに登録する。
 
-### 3.1 編集範囲の制限（`agent-scope-guard.sh`）
+### 3.1 reviewer の書き込みの制限（`agent-scope-guard.sh`）
 
-対象は `requirements-writer` / `tech-specs-writer` / `plan-writer` と、`requirements-reviewer` / `tech-specs-reviewer` /
-`test-reviewer` / `code-reviewer` の subagent だけで、メインのエージェントと実装・QA の agent は対象にしない。
+対象は `requirements-reviewer` / `tech-specs-reviewer` / `test-reviewer` / `code-reviewer` の subagent だけで、
+メインのエージェントと QA の agent は対象にしない。設計書と実装はメインのセッションが skill を使って書くので
+（[`skill-and-agent.md`](skill-and-agent.md)）、書く側の範囲は、このフックでは確かめない。
 
-- writer が編集できるのは、`docs.layout` の各テンプレートが指すディレクトリの内側だけ（`{{...}}` は任意の文字列として扱う）。
-- reviewer はファイルを書けない。
+- reviewer はファイルを書けない。agent の `tools` で編集の道具を外していても、シェル経由の書き込みは防げないためである。
 - シェルは、読み取りの許可一覧に完全に一致する 1 コマンドだけを許す。連結・パイプ・リダイレクト・置換を含むものは違反とする。
   先頭のコマンド名だけで許可すると、連結や書き込み用のオプションで規律を抜けられるためである。
 
 名前を付けて起動した subagent では、入力の `agent_type` に付けた名前が入ることがあり、その場合は対象にならない。
-writer と reviewer は名前を付けずに起動する。
+reviewer は名前を付けずに起動する。
 
 ### 3.2 作業場所の突合（`worktree-lock-guard.sh`）
 
@@ -112,7 +112,8 @@ subagent を起動する側（メインのエージェント）が、作業す�
 | --- | --- | --- |
 | 実装の前に Spec とテストを更新する | フック `spec-first-check.sh`。ID による影響範囲の確認は `trace-audit.sh` | 変更が仕様の振る舞いを変えるかどうかは判断を伴う |
 | 要件・設計・テスト・実装に ID を通す | 検査スクリプト `trace-audit.sh`（pre-push・CI） | — |
-| writer は担当の文書だけを編集し、reviewer は書かない | フック `agent-scope-guard.sh` | 名前を付けて起動した subagent は判定できない（§3.1） |
+| reviewer はファイルを書かない | フック `agent-scope-guard.sh` | 名前を付けて起動した subagent は判定できない（§3.1） |
+| 配る agent に書き込みの道具を持たせない | テスト `test/agent-roles.test.mjs`（[`skill-and-agent.md`](skill-and-agent.md)） | — |
 | subagent は指定された作業ツリーで作業する | フック `worktree-lock-guard.sh` と宣言のスクリプト | 宣言するかどうかは起動する側の手順（`auto-implement` Step 4）に任せる |
 | Red / Green の確認ではテストの対象を絞る | フック `test-scope-guard.sh` | どのテストが対象かの選び方は技術スタックに依存する |
 | skill・agent の正本と生成物は一致している | `npm run check:adapters` | — |

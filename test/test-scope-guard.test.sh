@@ -21,7 +21,7 @@ for c in "npm test" "npm  test" "cd app && npm test" "npm test -- --watch=false"
          "STDD_FULL_TEST_REASON=\"\" npm test" $'echo a\nnpm test'; do
     run_hook $H "$(bash_in "$c" "" "$B")" "$B"; expect_deny "全件: $c"
 done
-run_hook $H "$(bash_in "npm test" implementer "$B")" "$B"; expect_deny "implementer の全件も見る"
+run_hook $H "$(bash_in "npm test" general-purpose "$B")" "$B"; expect_deny "subagent の全件も見る"
 expect_out_contains "メッセージに絞り方が入る" "npm test <テストファイル>"
 expect_out_contains "メッセージに例外の前置が入る" "STDD_FULL_TEST_REASON="
 
