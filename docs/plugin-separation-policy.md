@@ -91,7 +91,7 @@ git worktree + devcontainer を用いたマルチ環境並列開発向けのプ�
 9. `starting-new-with-stdd`
 10. `tailoring-spec-format`
 11. `create-pr`
-12. `review-pr-with-agents`
+12. `reviewing-changes` — PR 前レビュー（担当の起動・指摘の台帳・PR 作成前のゲート。git と `gh` だけを使う）
 13. `kaizen`
 14. `software-architecture`
 15. `recording-dev-feedback` — 開発フィードバックの起票（GitHub issue と `gh` を前提にするが、技術スタックには依存しない。`feedback.enabled` で無効化できる）

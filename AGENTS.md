@@ -55,6 +55,7 @@ stdd 本体はランタイムコードを含まないため、伝統的なビル
 | 禁止語監査                    | リポジトリの公開状態に応じて、旧名称・固有名詞が残っていないかを `grep -rI` で確認                                          |
 | トレーサビリティ監査スクリプトの検証 | `bash test/trace-audit.test.sh`（`packages/core/hooks/trace-audit.sh` の順方向 gap 検知・逆方向影響範囲の振る舞いテスト）        |
 | フィードバックの仕組みのスクリプトの検証 | `bash test/dev-feedback.test.sh` / `bash test/pr-telemetry.test.sh` / `bash test/collect.test.sh`（偽の `gh` と `jq` で、起票・再発・見送り・テレメトリの投稿と集計の振る舞いを確かめる） |
+| PR 前レビューの台帳とゲートの検証 | `bash test/review-gate.test.sh`（担当の決定・処置の導出・ゲートの 3 条件と、`gh pr create` の直前のフック） |
 | 並行作業の重なりの検出の検証 | `bash test/work-overlap.test.sh`（ほかの作業ツリー・作成中の PR との重なりの検出を確かめる） |
 | 緊急モードのスクリプトとフックの検証 | `bash test/work-mode.test.sh`（申し出の記録・宣言・解除と、pre-push の緩和を確かめる） |
 | 規律のフックの検証 | `bash test/agent-scope-guard.test.sh` / `bash test/worktree-lock.test.sh` / `bash test/test-scope-guard.test.sh`（reviewer の書き込みの制限・作業ツリーの突合・全件テストの抑止を確かめる） |
@@ -133,6 +134,7 @@ stdd 本体（ドキュメント・テンプレート）は監査スクリプト
 | フィードバックの収集と改善のループ | `packages/core/docs/feedback-loop.md` |
 | 作業モードと適用限界 | `packages/core/docs/work-modes-and-limits.md` |
 | 規律の自動化 | `packages/core/docs/discipline-automation.md` |
+| PR 前レビュー | `packages/core/docs/review-process.md` |
 | 並行作業の規律 | `packages/core/docs/parallel-work.md` |
 | skill と agent の使い分け | `packages/core/docs/skill-and-agent.md` |
 | 設計書のラインナップと章立て | `packages/core/docs/spec-lineup.md` |
