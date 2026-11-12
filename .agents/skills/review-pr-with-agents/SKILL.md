@@ -95,7 +95,8 @@ Critical / Major / Minor で分類し、ファイル:行で指摘。テスト結
 ### 4.2 code-reviewer へのプロンプト雛形
 
 ```
-PR #<番号> (ブランチ `<headRef>`, worktree `<WORKTREE_PATH>`) のコードレビューを実施してください。
+PR #<番号> (ブランチ `<headRef>`, worktree `<WORKTREE_PATH>`, コミット `<headRefOid>`) のコードレビューを実施してください。
+最初に自分の作業ツリーで `git checkout --detach <headRefOid>` に切り替えてください。`<WORKTREE_PATH>` は書き換えないでください。
 
 ## PR概要
 <タイトル>
@@ -119,6 +120,7 @@ Critical / Major / Minor で分類し、ファイル:行で指摘。マージ可
 
 ### 4.3 並列起動時の工夫
 
+- `code-reviewer` は作業ツリーを分けて起動する（`isolation: "worktree"`）。起動の前後の確かめ方と、High 以上の指摘の再現のし直しは `auto-implement` の phases.md「作業ツリーを分ける」に従う
 - 両エージェントは独立作業のため、どちらかを `run_in_background: true` にして、もう一方が完了してから結果を束ねてもよい
 - ただし**片方ずつ起動するのは禁止**（並列化のメリットが消える）。1回のメッセージで2つの Agent tool use を含めること
 

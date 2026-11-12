@@ -13,7 +13,7 @@ STDD 方法論（[`stdd-methodology.md`](stdd-methodology.md)）の一章。作�
 | 書いた経緯を見ていない目で確かめる | レビュー | reviewer の agent |
 | 長い出力をメインの会話の外で読む | 全件のテスト、監査、ログ、広い検索 | `qa-engineer`、検索・要約の subagent |
 | 互いに独立した作業を並行に進める | QA とコードレビュー | 同時に起動する |
-| 使える道具を制限する | ファイルを書かせない | reviewer の `tools` とフック |
+| 使える道具を制限する | レビューされる作業ツリーを書き換えさせない | reviewer の `tools`・別の作業ツリー・フック |
 
 それ以外の作業、特に次のものは subagent にしない。
 
@@ -46,7 +46,7 @@ subagent はそれぞれ自分の文脈を使い、セッションの使用量�
   使えなければ subagent を同時に起動する。実際にどちらで動いたかは完了報告と PR の備考に書く。
 - **レビュー以外では、agent teams はユーザーが選んだときに使う。** 実験的な機能で既定では無効であり、メンバーの数だけ使用量が増える。
   結果を返すだけでよい作業は subagent で足りる。
-- **チームのメンバーにも reviewer の定義を使う。** メンバーは agent の定義の `tools` に制限されるので、ファイルを書かない。
+- **チームのメンバーにも reviewer の定義を使う。** メンバーは agent の定義の `tools` に制限されるので、書き込みの道具を持たない。作業ツリーを分けずに動くメンバーは、フックがシェルを読み取りのみに制限する。
   名前は agent の名前で始める（フック `agent-scope-guard.sh` が名前の先頭で見分ける）。
 - **レビューは観点を分ける。** 1 体の reviewer は一度に 1 種類の問題に注意が偏りやすい。並行にするときは観点を 1 つずつ渡し、
   重ならないようにする（`auto-implement` の phases.md「観点を分けた並列レビュー」）。
@@ -63,14 +63,17 @@ subagent はそれぞれ自分の文脈を使い、セッションの使用量�
 | --- | --- | --- |
 | 要件・技術設計・PLAN を書く | skill（`documenting-requirements` / `documenting-tech-specs` / `documenting-plans`） | ユーザーとのやりとりに依存し、順番に進む |
 | テストと実装を書く | skill（`auto-implement` の `references/implementation.md`） | 同じファイルの編集が続き、Spec とテストに依存する |
-| Spec・テスト・コードのレビュー | agent（`requirements-reviewer` / `tech-specs-reviewer` / `test-reviewer` / `code-reviewer`） | 書いた経緯を見ていない目で確かめる。ファイルは書かない |
+| Spec・テスト・コードのレビュー | agent（`requirements-reviewer` / `tech-specs-reviewer` / `test-reviewer` / `code-reviewer`） | 書いた経緯を見ていない目で確かめる。レビューされる作業ツリーは書き換えない |
 | QA | agent（`qa-engineer`） | 全件のテスト・監査・動作確認の長い出力を外で読み、要約だけを返す |
 | 工程の進行 | skill（`auto-implement`） | メインのセッションが skill を順に使って進める |
 
 - reviewer は、対象の変更があるときだけ起動する（条件は `auto-implement` の `references/phases.md`「reviewer の使い方」）。
 - reviewer には、対象のファイルと基準の Spec のパスを渡し、書いたときの判断の理由は渡さない。理由を渡すと、
   書いた側と同じ見方でしか確かめられなくなる。
-- 指摘を直すのはメインのセッションである。reviewer はファイルを書かず、指摘を結果として返す。
+- 指摘を直すのはメインのセッションである。reviewer はレビューされる作業ツリーを書き換えず、指摘を結果として返す。
+- `test-reviewer`・`code-reviewer` は、自分の作業ツリー（`isolation: worktree`）でテストや再現のスクリプトを実行し、
+  High 以上の指摘に再現のコマンドと出力を付ける。実行しない指摘は推測にとどまり、正しくても間違っていても同じように
+  説得力があるためである。`requirements-reviewer`・`tech-specs-reviewer` は文書のレビューなので実行しない。
 - 書く作業には agent teams を使わない。順番に進む作業や同じファイルの編集には単一のセッションのほうが向くためである。
   レビューは §2 のとおり、使えるなら既定で agent teams、使えなければ subagent（Codex は `multi_agent`）で並列に起動する。
 
@@ -80,6 +83,9 @@ subagent はそれぞれ自分の文脈を使い、セッションの使用量�
   `references/`）に書く。
 - **配る agent には書き込みの道具を持たせない。** 書く作業はメインのセッションが行うので、agent の `tools` に
   `Edit` / `Write` などは入れない（検査は §6）。
+- **シェル（`Bash`）は、実行して確かめる役割にだけ持たせる。** 今は `qa-engineer`（全件のテスト・監査）と
+  `test-reviewer`・`code-reviewer`（指摘の再現）である。reviewer に持たせるときは `isolation: worktree` を付け、
+  レビューされる作業ツリーの外で実行させる（検査は §6、フックは `discipline-automation.md` §3.1）。
 - **委譲を促す常設の指示を書かない。** skill・agent・規約に「〜は必ず subagent に任せる」と書くと、要らない場面でも
   委譲が増える。委譲する場面は、§1 の理由とともに、その工程の手順の中にだけ書く。
 - **絶対の言い方には範囲と理由を添える。** 「必ず」「禁止」とだけ書いた指示は、想定していない場面にも一律に効く。
@@ -92,6 +98,8 @@ subagent はそれぞれ自分の文脈を使い、セッションの使用量�
 
 - Codex 向けの生成物も同じ構成である。`.codex/agents/` には reviewer と `qa-engineer` だけを配り、書く作業は
   メインのセッションが skill で行う。
+- Codex の agent には作業ツリーを分ける設定が無いので（`isolation` は生成物に出さない）、reviewer は読み取りのみで動く
+  （`sandbox_mode = "read-only"` とフック）。再現を付けられない High 以上の指摘は「未確認」とし、メインのセッションが再現を試みる。
 - 既に導入しているプロジェクトでは、`stdd init` を再実行すると、配布から外れた agent の定義は、編集していなければ削除される。
   編集していた定義は残り、その旨が報告される。残った定義は `auto-implement` から呼ばれなくなる。
 
@@ -99,7 +107,8 @@ subagent はそれぞれ自分の文脈を使い、セッションの使用量�
 
 | 規律 | 確かめる手段 | 自動化しない部分と理由 |
 | --- | --- | --- |
-| reviewer はファイルを書かず、シェルは読み取りにだけ使う | フック `agent-scope-guard.sh`（`discipline-automation.md` §3.1） | agent の名前で始まらない名前を付けて起動した subagent は判定できない |
-| 配る agent に書き込みの道具を持たせない | テスト `node --test test/agent-roles.test.mjs` | — |
+| reviewer はレビューされる作業ツリーを書き換えない。作業ツリーが分かれていなければシェルは読み取りにだけ使う | フック `agent-scope-guard.sh`（`discipline-automation.md` §3.1）。統合のときの `git status --porcelain` と HEAD の突合（`auto-implement` の phases.md） | 分離されたシェルから絶対パスで書き換えることはフックでは防げず、統合のときの突合で検出する。agent の名前で始まらない名前を付けて起動した subagent は判定できない |
+| 配る agent に書き込みの道具を持たせない。シェルは `qa-engineer`・`test-reviewer`・`code-reviewer` だけが持ち、reviewer は `isolation: worktree` で動く | テスト `node --test test/agent-roles.test.mjs` | — |
+| High 以上の指摘には再現のコマンドと出力を付ける | 統合のときにメインのセッションが再現を実行し直し、再現しない指摘を捨てる | 指摘が再現として十分かは判断を伴う |
 | レビューは、使えるなら agent teams、使えなければ subagent で並列に起動する | 判定のスクリプト `review-runner.sh`（テスト `bash test/review-runner.test.sh`） | 実際にどちらで動いたかは非対話の実行などで判定と変わるので、起動した側が完了報告と PR に書く |
 | subagent にするのは §1 の場面に限り、並行にするのは §2 の条件に当たるときに限る | 文章のみ（この章と `auto-implement` の手順） | 委譲や並行が妥当かは作業の中身による判断で、機械では決められない |
