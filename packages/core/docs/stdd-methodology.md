@@ -380,7 +380,7 @@ PR 本文に緊急モードで作ったことを明記する（`choosing-work-mo
 
 要件・技術設計の作成、コードの編集、レビューのように判断が要る作業は性能の高いモデルで行い、広い範囲の検索やログの要約の
 ような機械的な作業は軽いモデルの subagent に任せる。STDD が配る agent は役割ごとに既定のモデルを決め、判断が中心の
-reviewer は `opus`、手順が決まっている qa-engineer は `sonnet` にする。agent ごとのモデルは `.stdd.config.yml` の `models` で上書きできる（Claude Code 向けのみ）。詳細は
+reviewer と qa-engineer は `opus` にする。agent ごとのモデルは `.stdd.config.yml` の `models` で上書きできる（Claude Code 向けのみ）。詳細は
 [`model-selection.md`](model-selection.md) を参照。
 
 ---

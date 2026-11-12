@@ -27,7 +27,7 @@ const EXPECTED_MODELS = {
   "tech-specs-reviewer": "opus",
   "test-reviewer": "opus",
   "code-reviewer": "opus",
-  "qa-engineer": "sonnet",
+  "qa-engineer": "opus",
 };
 
 test("配布する agent の既定のモデルが章 §2 の表どおり（Claude 向けの生成物も同じ）", async () => {
