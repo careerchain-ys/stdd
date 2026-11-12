@@ -42,6 +42,7 @@ bash <skill_dir>/scripts/collect.sh --since <開始日> --until <終了日> --li
 - 比較の窓は `--issues` と `--open` を外して回す（在庫と open の PR は実行時点の値で、過去の窓には意味がない）。
 - 登録簿には**同じ結果を再現できる引数**（`--since` と `--until` の両方）を残す。
 - PR ごとの値で集計し直したいときは `--raw` で TSV を出す。
+- 長い出力の要約は `models.mechanical` のモデルの subagent に任せてよい（数字はスクリプトから採る）。
 
 ## 2. 計器を疑う（数字を読む前に）
 

@@ -85,6 +85,16 @@ export interface InstallResult {
   docs: FileAction;
   /** 除外の記録。 */
   exclusions: ExclusionReport;
+  /** `.stdd.config.yml` の `models.agents` の反映結果（Claude のみ。設定が無ければ省略）。 */
+  models?: ModelOverrideReport;
+}
+
+/** agent のモデルの上書きの反映結果。 */
+export interface ModelOverrideReport {
+  /** 上書きを書いた agent（`<name>: <alias>`）。 */
+  applied: string[];
+  /** 配布物に無い agent の名前（設定の誤りの疑い）。 */
+  unknown: string[];
 }
 
 const CLAUDE_DIR = ".claude";
@@ -106,6 +116,8 @@ const CODEX_CONFIG_REL = path.join(".codex", "config.toml");
 const RULE_REL = path.join("rules", "stdd-spec-first.md");
 const AGENTS_MARK_BEGIN = "<!-- STDD:BEGIN spec-first -->";
 const AGENTS_MARK_END = "<!-- STDD:END spec-first -->";
+/** agent の model に書けるモデルの別名（packages/core/docs/model-selection.md）。モデルの ID は許さない。 */
+export const MODEL_ALIASES = ["inherit", "opus", "sonnet", "haiku", "fable"] as const;
 
 /** manifest.json に記録する 1 ファイル分のエントリ。 */
 interface ManifestEntry {
@@ -219,12 +231,15 @@ export async function install(opts: InstallOptions): Promise<InstallResult> {
     exclusions: { recorded: [], detected: [], file: toPosix(EXCLUSIONS_REL) },
   };
 
+  const modelOverrides = agents.includes("claude") ? await readModelOverrides(targetDir) : {};
+
   if (agents.includes("claude")) {
-    const merged = await mergeClaude(assetsRoot, targetDir, overwriteClaude, version, state);
+    const merged = await mergeClaude(assetsRoot, targetDir, overwriteClaude, version, state, modelOverrides);
     result.settings = await mergeSettingsFile(assetsRoot, targetDir, state, merged.manifest);
     await writeManifest(merged.manifestAbs, merged.manifest.files, version, merged.manifest.settingsHooks);
     result.claude = merged.summary;
     result.mcp = await installMcp(assetsRoot, targetDir);
+    if (Object.keys(modelOverrides).length > 0) result.models = merged.models;
   }
 
   if (agents.includes("codex")) {
@@ -459,17 +474,108 @@ async function mergeClaude(
   overwrite: boolean,
   version: string,
   state: ExclusionState,
-): Promise<TreeMergeResult> {
+  modelOverrides: Record<string, string> = {},
+): Promise<TreeMergeResult & { models: ModelOverrideReport }> {
   const src = path.join(assetsRoot, CLAUDE_DIR);
   const dst = path.join(targetDir, CLAUDE_DIR);
   const shipped = (await listFilesRel(src)).filter((rel) => rel !== SETTINGS_FILE);
-  const specs: FileSpec[] = shipped.map((rel) => ({
-    rel,
-    srcAbs: path.join(src, toNative(rel)),
-    dstAbs: path.join(dst, toNative(rel)),
-  }));
+  const models: ModelOverrideReport = { applied: [], unknown: [] };
+  const shippedAgents = new Set<string>();
+  const specs: FileSpec[] = shipped.map((rel) => {
+    const agent = /^agents\/([^/]+)\.md$/.exec(rel)?.[1];
+    if (agent) shippedAgents.add(agent);
+    const model = agent ? modelOverrides[agent] : undefined;
+    if (agent && model) models.applied.push(`${agent}: ${model}`);
+    return {
+      rel,
+      srcAbs: path.join(src, toNative(rel)),
+      dstAbs: path.join(dst, toNative(rel)),
+      // モデルの上書きは Claude の agent の定義だけに書く（Codex の生成物にはモデルを出さない）。
+      transform: model ? (content: Buffer) => Buffer.from(setAgentModel(content.toString("utf8"), model)) : undefined,
+    };
+  });
+  models.unknown = Object.keys(modelOverrides).filter((n) => !shippedAgents.has(n)).sort();
+  models.applied.sort();
   const manifestAbs = path.join(targetDir, CLAUDE_MANIFEST_REL);
-  return mergeManagedTree(specs, manifestAbs, (rel) => path.join(dst, toNative(rel)), dst, overwrite, claudeComponentOf, state);
+  const merged = await mergeManagedTree(
+    specs,
+    manifestAbs,
+    (rel) => path.join(dst, toNative(rel)),
+    dst,
+    overwrite,
+    claudeComponentOf,
+    state,
+  );
+  return { ...merged, models };
+}
+
+// ---- モデルの上書き（Claude のみ） -------------------------------------------
+
+/** 導入先の `.stdd.config.yml` から `models.agents` を読む。ファイルが無ければ空。 */
+async function readModelOverrides(targetDir: string): Promise<Record<string, string>> {
+  let text: string;
+  try {
+    text = await fs.readFile(path.join(targetDir, CONFIG_FILE), "utf8");
+  } catch (err) {
+    if (isErrnoCode(err, "ENOENT")) return {};
+    throw err;
+  }
+  return parseAgentModelOverrides(text);
+}
+
+/**
+ * `.stdd.config.yml` の本文から `models.agents` の対応（agent の名前 → モデルの別名）を取り出す。
+ * 依存を持たないため、この形（ブロック記法の 2 段の対応）だけを読む軽量の読み取りにとどめる。
+ * 値が別名でなければ InstallError（モデルの ID を書いた誤りを導入時に止める）。
+ */
+export function parseAgentModelOverrides(yaml: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  const lines = yaml.split(/\r?\n/);
+  const indentOf = (line: string) => line.length - line.trimStart().length;
+  const strip = (v: string) => v.replace(/\s+#.*$/, "").trim().replace(/^(["'])(.*)\1$/, "$2");
+  const isBlank = (line: string) => line.trim() === "" || line.trimStart().startsWith("#");
+
+  let i = lines.findIndex((l) => /^models:\s*(#.*)?$/.test(l));
+  if (i === -1) return out;
+  let agentsIndent = -1;
+  for (i += 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (isBlank(line)) continue;
+    const indent = indentOf(line);
+    if (indent === 0) break; // models の外に出た
+    if (agentsIndent === -1) {
+      if (/^\s*agents:\s*(#.*)?$/.test(line)) agentsIndent = indent;
+      continue;
+    }
+    if (indent <= agentsIndent) {
+      agentsIndent = -1;
+      if (/^\s*agents:\s*(#.*)?$/.test(line)) agentsIndent = indent;
+      continue;
+    }
+    const m = /^\s*([^:#\s][^:]*):\s*(.*)$/.exec(line);
+    if (!m) continue;
+    const name = strip(m[1]);
+    const value = strip(m[2]);
+    if (!EXCLUSION_NAME.test(name)) {
+      throw new InstallError(`${CONFIG_FILE} の models.agents の名前が不正です: ${name}`);
+    }
+    if (!(MODEL_ALIASES as readonly string[]).includes(value)) {
+      throw new InstallError(
+        `${CONFIG_FILE} の models.agents.${name} はモデルの別名（${MODEL_ALIASES.join(" / ")}）で書いてください: ${value}`,
+      );
+    }
+    out[name] = value;
+  }
+  return out;
+}
+
+/** agent の定義（frontmatter + 本文）の `model` の行を書き換える。行が無ければ frontmatter の末尾に足す。 */
+export function setAgentModel(md: string, model: string): string {
+  const m = /^---\r?\n([\s\S]*?)\r?\n---/.exec(md);
+  if (!m) return md;
+  const block = m[1];
+  const next = /^model:.*$/m.test(block) ? block.replace(/^model:.*$/m, `model: ${model}`) : `${block}\nmodel: ${model}`;
+  return md.slice(0, m.index) + m[0].replace(block, () => next) + md.slice(m.index + m[0].length);
 }
 
 /**

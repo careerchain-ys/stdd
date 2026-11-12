@@ -343,6 +343,7 @@ STDD は「テスト・実装の改修も必ず Spec 起点で行う」ことを
 - 局面に応じて適用の強さを選ぶ。速さが必要なときはユーザーが明示して緊急モードを使い、あとで通常の工程で見直す（→ 9）
 - 規律を足すときは、それを確かめる自動化（フック・検査スクリプト・skill の手順）を一緒に用意する（→ 10）
 - 並行して作業するときは、1 つのセッションにつき 1 つの作業ツリーを使い、着手前にほかの作業ツリーや作成中の PR との重なりを確かめる。共有している作業ツリーでは、変更を退避・破棄するコマンド（`git stash` など）を使わない（→ [`parallel-work.md`](parallel-work.md)）
+- 判断が要る作業は性能の高いモデルで行い、検索・要約などの機械的な作業は軽いモデルの subagent に任せる（→ 11）
 
 ---
 
@@ -382,7 +383,16 @@ PR 本文に緊急モードで作ったことを明記する（`choosing-work-mo
 
 ---
 
-## 11. 関連ドキュメント
+## 11. subagent と skill のモデルの使い分け
+
+要件・技術設計の作成、コードの編集、レビューのように判断が要る作業は性能の高いモデルで行い、広い範囲の検索やログの要約の
+ような機械的な作業は軽いモデルの subagent に任せる。STDD が配る agent は役割ごとに既定のモデルを決め、判断が中心の
+writer・reviewer・implementer は `opus`、手順が決まっている plan-writer・qa-engineer は `sonnet` にする。agent ごとのモデルは `.stdd.config.yml` の `models` で上書きできる（Claude Code 向けのみ）。詳細は
+[`model-selection.md`](model-selection.md) を参照。
+
+---
+
+## 12. 関連ドキュメント
 
 - `guide-for-existing-project.md` — 既存プロジェクトへの STDD 導入手順（遡行ブートストラップ → 順行運用）
 - `guide-for-new-project.md` — 新規プロジェクトの STDD 立ち上げ手順（最初から順行）
@@ -390,6 +400,7 @@ PR 本文に緊急モードで作ったことを明記する（`choosing-work-mo
 - `work-modes-and-limits.md` — 作業モードと適用限界（緊急モード・STDD が向かない局面と判断の目安）
 - `discipline-automation.md` — 規律の自動化（規律を足すときの方針・フックの一覧と限界）
 - `parallel-work.md` — 並行作業の規律（1 セッション 1 作業ツリー・重なりの検出・共有作業ツリーで使わないコマンド）
+- `model-selection.md` — subagent と skill のモデルの使い分け（作業の性質ごとのモデル・agent ごとの既定・設定での上書き）
 - `.claude/skills/documenting-requirements/templates/` — 要件テンプレ（feature: `requirements.md`、common: `requirements-common.md`）
 - `.claude/skills/documenting-tech-specs/templates/` — 技術 spec テンプレ（feature: `tech-design.md` / `test-plan.md`、common: `architecture-common.md` / `table-definition-common.md` / `api-spec-common.md` / `design-common.md`）
 - `.claude/skills/documenting-plans/templates/plan.md` — 実装計画テンプレ

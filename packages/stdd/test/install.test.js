@@ -7,7 +7,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
-import { install, mergeSettings } from "../dist/install.js";
+import { install, mergeSettings, parseAgentModelOverrides, setAgentModel } from "../dist/install.js";
 
 const MANIFEST_REL = path.join(".claude", ".stdd", "manifest.json");
 const CODEX_MANIFEST_REL = path.join(".stdd", "codex-manifest.json");
@@ -593,4 +593,95 @@ test("除外の指定の書式が誤っていればエラーにする", async ()
   const target = await makeTarget();
   await assert.rejects(install(baseOpts(target, assets, { exclude: ["kaizen"] })), /skill:<名前>/);
   await assert.rejects(install(baseOpts(target, assets, { exclude: ["plugin:x"] })), /skill:<名前>/);
+});
+
+// ---- agent のモデルの上書き（Claude のみ。packages/core/docs/model-selection.md） ----
+
+const AGENT_MD = "---\nname: implementer\ntools: Read, Edit\nmodel: inherit\n---\nbody\n";
+const CODEX_TOML = 'name = "implementer"\nsandbox_mode = "workspace-write"\n';
+
+async function makeModelAssets() {
+  const assets = await makeAssets();
+  await fs.writeFile(path.join(assets, ".claude", "agents", "implementer.md"), AGENT_MD);
+  return assets;
+}
+
+async function writeConfig(target, body) {
+  await fs.writeFile(path.join(target, ".stdd.config.yml"), `version: 1\n${body}plugins: []\n`);
+}
+
+test("設定が無ければ agent の定義は配布物のまま（既定の model: inherit）", async () => {
+  const assets = await makeModelAssets();
+  const target = await makeTarget();
+  const result = await install(baseOpts(target, assets, { agents: ["claude", "codex"] }));
+  assert.equal(await read(path.join(target, ".claude", "agents", "implementer.md")), AGENT_MD);
+  assert.equal(await read(path.join(target, ".codex", "agents", "implementer.toml")), CODEX_TOML);
+  assert.equal(result.models, undefined);
+});
+
+test("models.agents の上書きは Claude の agent の定義だけに効き、Codex の生成物は変わらない", async () => {
+  const assets = await makeModelAssets();
+  const target = await makeTarget();
+  await writeConfig(target, "models:\n  agents:\n    implementer: sonnet  # 試しに下げる\n    missing-agent: haiku\n  mechanical: haiku\n");
+
+  const result = await install(baseOpts(target, assets, { agents: ["claude", "codex"] }));
+
+  const md = await read(path.join(target, ".claude", "agents", "implementer.md"));
+  assert.equal(md, AGENT_MD.replace("model: inherit", "model: sonnet"));
+  assert.equal(await read(path.join(target, ".codex", "agents", "implementer.toml")), CODEX_TOML);
+  assert.deepEqual(result.models, { applied: ["implementer: sonnet"], unknown: ["missing-agent"] });
+
+  // 再導入は冪等。設定を外すと既定へ戻る（未編集のファイルなので更新される）
+  const again = await install(baseOpts(target, assets, { agents: ["claude", "codex"] }));
+  assert.deepEqual(again.claude.updated, []);
+  assert.deepEqual(again.claude.skippedModified, []);
+  await writeConfig(target, "");
+  const reset = await install(baseOpts(target, assets, { agents: ["claude", "codex"] }));
+  assert.deepEqual(reset.claude.updated, ["agents/implementer.md"]);
+  assert.equal(await read(path.join(target, ".claude", "agents", "implementer.md")), AGENT_MD);
+});
+
+test("利用者が編集した agent の定義には、モデルの上書きも書かない", async () => {
+  const assets = await makeModelAssets();
+  const target = await makeTarget();
+  await install(baseOpts(target, assets));
+  const edited = AGENT_MD.replace("body", "tailored body");
+  await fs.writeFile(path.join(target, ".claude", "agents", "implementer.md"), edited);
+  await writeConfig(target, "models:\n  agents:\n    implementer: opus\n");
+  const result = await install(baseOpts(target, assets));
+  assert.equal(await read(path.join(target, ".claude", "agents", "implementer.md")), edited);
+  assert.deepEqual(result.claude.skippedModified, ["agents/implementer.md"]);
+});
+
+test("models.agents にモデルの ID を書くと導入を止める", async () => {
+  const assets = await makeModelAssets();
+  const target = await makeTarget();
+  await writeConfig(target, "models:\n  agents:\n    implementer: claude-opus-x\n");
+  await assert.rejects(install(baseOpts(target, assets)), /モデルの別名/);
+});
+
+test("parseAgentModelOverrides: models.agents の対応だけを読む", () => {
+  const yaml = [
+    "agents: [claude]", // トップレベルの別のキーは読まない
+    "models:",
+    "  mechanical: haiku",
+    "  agents:",
+    "    # コメント",
+    '    code-reviewer: "opus"',
+    "    qa-engineer: sonnet # 理由",
+    "  other:",
+    "    implementer: haiku",
+    "plugins: []",
+  ].join("\n");
+  assert.deepEqual(parseAgentModelOverrides(yaml), { "code-reviewer": "opus", "qa-engineer": "sonnet" });
+  assert.deepEqual(parseAgentModelOverrides("version: 1\n"), {});
+  assert.deepEqual(parseAgentModelOverrides("# models:\n#   agents:\n#     qa-engineer: sonnet\n"), {});
+});
+
+test("setAgentModel: model の行を書き換え、無ければ frontmatter に足す", () => {
+  assert.equal(setAgentModel(AGENT_MD, "haiku"), AGENT_MD.replace("model: inherit", "model: haiku"));
+  assert.equal(
+    setAgentModel("---\nname: a\n---\nmodel: x\n", "opus"),
+    "---\nname: a\nmodel: opus\n---\nmodel: x\n",
+  );
 });

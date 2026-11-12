@@ -16,7 +16,7 @@ model: opus
 
 - `.stdd.config.yml`（`apps[]`・`commands.*`・`plugins`）
 - common 階層の `ARCHITECTURE.md`（システム構成・レイヤ規約・技術スタック詳細）
-- `AGENTS.md / CLAUDE.md` / `.claude/docs/coding-conventions.md`（プロジェクト固有規約）
+- `AGENTS.md / CLAUDE.md` / `.claude/docs/coding-conventions.md`（プロジェクト固有規約。存在する場合は作業開始前に**必ず Read** する。無ければスキップ）
 
 以下のチェックリストはスタック非依存の観点を基本とし、特定技術名は**例示**として扱う。
 スタック固有のレビュー基準（UI パターン・DB マイグレーション等）は、`.stdd.config.yml` の
@@ -68,14 +68,16 @@ model: opus
 - [ ] 320px〜1280px+で適切に表示されるか
 - [ ] タッチターゲットが十分なサイズか
 
-### セキュリティ（OWASP Top 10）
+### セキュリティ（OWASP Top 10・必須のスキャン）
 
-- [ ] SQLインジェクション: パラメータ化クエリの使用
-- [ ] XSS: ユーザー入力のサニタイズ、dangerouslySetInnerHTMLの不使用
+レビューの一環として必ず実施する。問題を検出したら**必ず Critical または High** として報告し、具体的な修正案を示す。
+
+- [ ] シークレット漏洩: ハードコードされた API キー・トークン・パスワードが無い。ログ・レスポンスに機密データを漏らさない
+- [ ] インジェクション: パラメータ化クエリを使う（SQL インジェクション）。ユーザー入力をサニタイズし、dangerouslySetInnerHTML を使わない（XSS）。コマンドインジェクションが無い
 - [ ] CSRF: 適切なトークン検証
-- [ ] 認証・認可: セッション管理、RBACの適切な実装
-- [ ] 機密データ: ログ・レスポンスへの漏洩防止
-- [ ] データアクセス制御ポリシーの適切な設定（例: Supabase/PostgreSQL の RLS、ORM のスコープ、アプリ層の認可）
+- [ ] 認証・認可: セッション管理・RBAC が適切。エンドポイント / ハンドラ（例: Server Actions・API ルート）で認証チェックや認可関数の適用が漏れていない
+- [ ] データアクセス制御: ポリシーが適切（例: Supabase/PostgreSQL の RLS、ORM のスコープ、アプリ層の認可）。マイグレーション / スキーマ変更があれば必ず確認する
+- [ ] 依存パッケージ: 新規に追加したパッケージに既知の脆弱性が無い
 
 ### エラーハンドリング
 
@@ -87,14 +89,14 @@ model: opus
 
 以下の **すべて** を満たす場合のみ ✅ PASS。1つでも下回れば NEEDS CHANGES 以下とし、implementer に差し戻すこと。「全体的には良いが」で甘くしない。
 
-| 項目                                                                           | PASS の Threshold     |
-| ------------------------------------------------------------------------------ | --------------------- |
-| Critical severity 問題                                                         | **0件**               |
-| High severity 問題                                                             | **0件**               |
-| Medium severity 問題                                                           | **2件以下**           |
-| OWASP Top 10 / セキュリティスキャン項目                                        | Critical/High **0件** |
-| AGENTS.md / CLAUDE.md 絶対ルール違反（snake_case禁止・`!`演算子禁止・`as`キャスト禁止 等） | **0件**               |
-| `.claude/docs/coding-conventions.md` 規約準拠                                  | 全項目準拠            |
+| 項目 | PASS の Threshold |
+| --- | --- |
+| Critical severity 問題 | **0件** |
+| High severity 問題 | **0件** |
+| Medium severity 問題 | **2件以下** |
+| OWASP Top 10 / セキュリティスキャン項目 | Critical/High **0件** |
+| AGENTS.md / CLAUDE.md 絶対ルール違反（snake_case禁止・`!`演算子禁止・`as`キャスト禁止 等） | **0件** |
+| `.claude/docs/coding-conventions.md` 規約準拠 | 全項目準拠 |
 
 **❌ Blocked** の条件: 以下のいずれかに該当する場合は Critical 件数に関わらず Blocked とする。
 
@@ -142,37 +144,16 @@ model: opus
 - **再レビュー時の確認ポイント**: 修正反映を確認すべきファイル・行・該当の規約/基準
 ```
 
-## セキュリティスキャンの実施
-
-レビューの一環として、下記のセキュリティチェックを必ず実施すること。
-
-### 必須セキュリティチェック項目
-
-1. **シークレット漏洩**: ハードコードされたAPIキー、トークン、パスワードがないか
-2. **インジェクション**: SQLインジェクション、XSS、コマンドインジェクションの脆弱性
-3. **認証・認可**: エンドポイント / ハンドラ（例: Server Actions・API ルート）での認証チェック漏れ、認可関数の適用漏れ
-4. **データアクセス制御**: マイグレーション / スキーマ変更がある場合、アクセス制御ポリシー（例: RLS）の適切性を確認
-5. **依存パッケージ**: 新規追加されたパッケージに既知の脆弱性がないか
-
-セキュリティ問題が検出された場合は、**必ずCriticalまたはHighとして報告**し、具体的な修正案を提示すること。
-
 ## 参照すべきスキル
 
 レビュー対象に応じて、以下のスキルのガイドラインを基準として参照すること:
 
-| スキル                | 参照パス                                             | 参照タイミング                                             |
-| --------------------- | ---------------------------------------------------- | ---------------------------------------------------------- |
-| software-architecture | `.claude/skills/software-architecture/`              | アーキテクチャ・責務分離・命名規則のレビュー時             |
-| implementing-ui       | `plugins/nextjs-supabase/skills/implementing-ui/`    | UIコンポーネントのレビュー時（パターン準拠、レスポンシブ） |
-| kaizen                | `.claude/skills/kaizen/`                             | 過剰設計・YAGNI違反の検出時                                |
-| migrating-supabase    | `plugins/nextjs-supabase/skills/migrating-supabase/` | マイグレーション・RLSポリシーのレビュー時                  |
-
-## 必須の事前読み込み
-
-作業開始前に、プロジェクトルートに以下のファイルが**存在する場合は必ず Read** すること（存在しない場合はスキップして次に進む）:
-
-1. `AGENTS.md / CLAUDE.md`（プロジェクト固有ルール）
-2. `.claude/docs/coding-conventions.md`（コーディング規約）
+| スキル | 参照パス | 参照タイミング |
+| --- | --- | --- |
+| software-architecture | `.claude/skills/software-architecture/` | アーキテクチャ・責務分離・命名規則のレビュー時 |
+| implementing-ui | `plugins/nextjs-supabase/skills/implementing-ui/` | UIコンポーネントのレビュー時（パターン準拠、レスポンシブ） |
+| kaizen | `.claude/skills/kaizen/` | 過剰設計・YAGNI違反の検出時 |
+| migrating-supabase | `plugins/nextjs-supabase/skills/migrating-supabase/` | マイグレーション・RLSポリシーのレビュー時 |
 
 ## 編集の範囲
 
