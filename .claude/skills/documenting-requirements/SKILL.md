@@ -24,9 +24,7 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
    docs/<app>/<path>/REQUIREMENTS.md
    ```
 
-   - **業務要件 → 機能要件 → 非機能要件** の3層で記述
-   - 機能要件は **コア**（2.1 ユースケース＋2.2 業務ルール）＋ **拡張**（2.3 指標定義・2.4 UI/UX・2.5 外部IF、該当機能のみ。無ければ章ごと省略）
-   - 各ユースケースに 見出し直下の トレーサビリティ ID（`**ID**: UC-<feature>-NN`）＋ 振る舞い（番号付き手順・主語明示）＋ 受入基準（EARS）を併記し、Priority を付与（ID は名前と分離し、リネームしても不変に保つ。見出しには ID を含めない）
+   - **業務要件 → 機能要件 → 非機能要件** の3層で記述（機能要件のコア・拡張の章立て、ユースケースの ID・振る舞い・受入基準・Priority の書き方は下記「基本原則」）
    - 指標を持つ機能は §2.3 指標定義表を埋める（算出ロジック・データソース・代理注記）
    - [テンプレート（feature）](templates/requirements.md) を参照
 
@@ -60,18 +58,12 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
 - feature の REQUIREMENTS は common 階層（サービス目的・アクター・横断業務ルール・非機能要件）を**前提とし、参照する**。common と矛盾しないこと。
 - 非機能要件・横断業務ルール・用語は common に集約し、feature は「common 準拠」で参照する。
 - common テンプレート: [`requirements-common.md`](templates/requirements-common.md)。既存実装からの common 要件作成は `reverse-engineering-common-spec` スキルを参照。
-- 技術設計の common 階層（ARCHITECTURE / TABLE_DEFINITION / API_SPEC / DESIGN）は [documenting-tech-specs Skill](../documenting-tech-specs/SKILL.md) が扱う。
 
 ## ドキュメント配置ルール
 
-| 実装ファイル                  | REQUIREMENTS 配置先 |
-| ----------------------------- | --- |
-| `<app>/app/<path>/page.tsx`   | `docs/<app>/<path>/REQUIREMENTS.md` |
-| `<app>/components/<name>.tsx` | `docs/<app>/components/<name>/REQUIREMENTS.md` |
-
 配置先は `.stdd.config.yml` の `docs.layout.requirements` テンプレートに、対象アプリの `app`（`apps[].id`）と `feature_path` を適用して決定する。
 
-**例**: 実装 `<app.path>/app/login/page.tsx` → `docs/<app.id>/login/REQUIREMENTS.md`
+**例**: 実装 `<app.path>/app/login/page.tsx` → `docs/<app.id>/login/REQUIREMENTS.md`、コンポーネント `<app.path>/components/<name>.tsx` → `docs/<app.id>/components/<name>/REQUIREMENTS.md`
 
 ## 絶対ルール: SSOT原則（最優先）
 
@@ -91,44 +83,7 @@ STDD（Spec and Test Driven Development）方法論に従って、REQUIREMENTS.m
 
 ### 違反例と修正例
 
-❌ **悪い例（履歴・経緯を記述）**:
-
-```markdown
-### メール送信実装
-
-**変更前**: 認証サービス（例: Supabase Auth / Auth0 / Cognito）経由でメール送信
-**変更後**: メール送信サービス（例: Resend / SendGrid / SES）経由でHTMLメール送信
-**変更理由**: テンプレートのカスタマイズ性のため
-```
-
-✅ **良い例（現在の仕様のみ）**:
-
-```markdown
-### メール送信実装
-
-リンク生成 API（例: `admin.generateLink()`）でリンクを生成し、メール送信サービス（例: Resend）経由でHTMLメールを送信する。
-HTMLテンプレートは `lib/email/templates/` で管理。
-```
-
-❌ **悪い例（issue・今回への言及）**:
-
-```markdown
-## 機能要件
-
-#### 新規ユーザー登録（issue #1234 で追加）
-
-今回のリリースで対応する新規登録フロー。
-```
-
-✅ **良い例**:
-
-```markdown
-## 機能要件
-
-#### 新規ユーザー登録
-
-**Priority**: P0
-```
+違反例と修正例（履歴の記述・issue への言及・テストケースの除去など）は [STDD違反例と対策「具体例」](guides/stdd-violations.md) を参照。
 
 ### Self-check（コミット前に必ず実行）
 
@@ -147,7 +102,7 @@ HTMLテンプレートは `lib/email/templates/` で管理。
 
 「ユースケース名」や「アーキテクチャ判断の理由」など現在仕様の説明として正当な「理由」は問題ない。禁止しているのは**変更そのものの理由**（なぜ仕様を変えたか）と、**過去構成からの再編を暗示するフレーミング**。
 
-> 詳細な違反例と修正例は [STDD違反例と対策](guides/stdd-violations.md) を参照。
+> 作成前に [STDD違反例と対策](guides/stdd-violations.md)（SSOT原則の詳細）を必ず読む。
 
 ---
 
@@ -179,24 +134,7 @@ Spec を書く過程で、確信が持てない／ユーザーに確定しても
 2. **章は省略しない**。テンプレートの構成を維持し、情報が無い箇所も仮説＋要確認マーカーで埋める。空欄・章削除による「見かけ上の完成」を作らない。
 3. **可視・一時的**。マーカーはレンダリングで見える一時注記。ユーザーが是非を確定したら、仮説を確定値に書き換えてマーカーを除去する。確定済み spec にマーカーを残さない（SSoT 原則）。
 
-### 例
-
-✅ 良い例（仮説とセット・章を保つ）:
-
-```markdown
-### 想定スケール
-
-初期は同時接続 100 程度を想定。
-**⚠️要確認**｜仮説: ローンチ後 3 ヶ月で MAU 1,000 規模／確認: 想定ユーザー数と成長見込み。
-```
-
-❌ 悪い例（仮説が無い・章を消す）:
-
-```markdown
-### 想定スケール
-
-**⚠️要確認**   ← 仮説が無い。何を確認したいかも不明
-```
+例（良い例・悪い例）は [STDD違反例と対策「要確認マーカーの例」](guides/stdd-violations.md) を参照。
 
 ---
 
@@ -209,7 +147,7 @@ Spec を書く過程で、確信が持てない／ユーザーに確定しても
 | 層 | 答える問い | 書くもの |
 | --- | --- | --- |
 | **業務要件** | なぜ作るか（Why） | ビジネス課題・目標・KPI・対象ユーザー・利用シーン |
-| **機能要件** | 何が見える/できるか（What） | **コア**: ユースケース（振る舞い〔手順〕＋受入基準〔EARS〕）・業務ルール ／ **拡張（該当機能のみ）**: 指標定義・UI/UX・外部IF |
+| **機能要件** | 何が見える/できるか（What） | **コア**: ユースケース（振る舞い〔手順〕＋受入基準〔EARS〕）・業務ルール ／ **拡張（該当機能のみ。無ければ章ごと省略）**: 指標定義・UI/UX・外部IF |
 | **非機能要件** | どれだけうまく（How well） | 性能・可用性・セキュリティ・アクセシビリティ（機能固有のみ。共通は common §6 を参照） |
 
 **記法**:
@@ -227,12 +165,6 @@ Spec を書く過程で、確信が持てない／ユーザーに確定しても
 
 **トレーサビリティ ID は見出しではなく見出し直下の `**ID**:` 行に置く**（例: `**ID**: UC-<feature>-01 ／ **Priority**: P0`）。見出しは説明テキストのみのまま、ID `UC-<feature>-NN` を名前と分離して安定させ、TECH_DESIGN / TEST_PLAN / テスト / 実装へ貫通させる（→ 方法論「トレーサビリティ」）。ID は連番の**見出し名**ではないため、上記「見出しに連番を付けない」と両立する。
 
-### common 階層の REQUIREMENTS
-
-- サービス全体の業務要件（目的・アクター・利用シーン）、横断業務ルール、非機能要件、用語定義のSSoT。
-- feature はここを参照し、固有要件のみを feature 側に書く。
-- テンプレート: [`requirements-common.md`](templates/requirements-common.md)
-
 ### Priority（優先度）ガイドライン
 
 | Priority | 定義                                                     | テスト戦略                 |
@@ -243,21 +175,7 @@ Spec を書く過程で、確信が持てない／ユーザーに確定しても
 
 ## 次のステップ
 
-REQUIREMENTS.md の作成・レビュー（人間レビュー含む）が完了したら:
-
-1. **技術設計** → [documenting-tech-specs Skill](../documenting-tech-specs/SKILL.md)（TECH_DESIGN.md + TEST_PLAN.md）
-2. **PLANドキュメント作成** → [documenting-plans Skill](../documenting-plans/SKILL.md)
-
-## 参照ファイル
-
-- **テンプレート**
-  - [REQUIREMENTS.md（feature）](templates/requirements.md)
-  - [REQUIREMENTS.md（common）](templates/requirements-common.md)
-- **ガイド**
-  - [STDD違反例と対策](guides/stdd-violations.md) ← 作成前に必読（SSOT原則の詳細）
-- **関連スキル**
-  - [generating-wireframes Skill](../generating-wireframes/SKILL.md) ← UI を持つ機能の WF 生成
-  - [documenting-tech-specs Skill](../documenting-tech-specs/SKILL.md) ← 技術設計（次のステップ）
+REQUIREMENTS.md の作成・レビュー（人間レビュー含む）が済んだら、技術設計（[documenting-tech-specs](../documenting-tech-specs/SKILL.md)）→ PLAN（[documenting-plans](../documenting-plans/SKILL.md)）へ進む。
 
 ## When NOT to Use This Skill
 
