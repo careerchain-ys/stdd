@@ -10,6 +10,7 @@
   "scripts": {
     "build:adapters": "node scripts/build-adapters.mjs",
     "check:adapters": "node scripts/build-adapters.mjs --check",
+    "check:harness-size": "node scripts/check-harness-size.mjs",
     "build": "npm run build:adapters && npm run build --workspaces --if-present"
   }
 }

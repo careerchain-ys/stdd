@@ -76,7 +76,7 @@ TEST_PLAN.mdのテスト戦略に従い、以下の順序でタスクを作成:
 
 ## 配置ルール
 
-配置先のパスは `.stdd.config.yml` の `docs.layout.*` のパステンプレートに、対象アプリの `app.id`（`apps[].id`）と `feature_path` を適用して決定する。中立例:
+配置先のパスは `.stdd.config.yml` の `docs.layout.plan` のパステンプレートに、対象アプリの `app.id`（`apps[].id`）と `feature_path` を適用して決定する。`docs.layout.plan` が無いプロジェクトは PLAN を作らない体系なので、作成せずにその旨を返す。中立例:
 
 ```
 docs/<app.id>/<feature_path>/plans/[yyyy-mm-dd].md

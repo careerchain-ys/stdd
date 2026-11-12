@@ -28,7 +28,9 @@ npx @careerchain/stdd init [options]
 | --- | --- |
 | `--agent <claude\|codex\|both>` | 導入するエージェントビュー（既定: both） |
 | `--name <name>` | `.stdd.config.yml` の `project.name`（既定: ディレクトリ名） |
-| `--force` | tailoring 済み（編集された）STDD ファイルも最新へ上書きする |
+| `--force` | tailoring 済み（編集された）STDD ファイルも最新へ上書きする（除外の記録は上書きしない） |
+| `--exclude <kind>:<name>` | skill / agent / フックを導入しない。除外の記録に足し、再実行でも復活させない（`kind` は `skill` / `agent` / `hook`。複数回指定できる） |
+| `--include <kind>:<name>` | 除外の記録から外し、導入し直す |
 | `--yes`, `-y` | 対話プロンプトをスキップし既定値で進める |
 | `--help`, `-h` | ヘルプを表示 |
 | `--version`, `-v` | バージョンを表示 |
@@ -60,6 +62,33 @@ Codex ビュー（`--agent codex|both`）:
 
 - **`.stdd.config.yml`**: 無ければ生成、既存は保持。
 - **`docs/`**: 無ければ作成。
+
+### 削除した配布物を復活させない（除外の記録）
+
+不要な skill / agent を削除したり、フックの登録を外したりしたあとで `stdd init` を再実行しても、
+それらは復活しません。導入しないものを `.stdd/exclusions.json` に記録し、両ビューに適用します。
+
+```json
+{
+  "skills": ["kaizen"],
+  "agents": [],
+  "hooks": ["pre-push-check"]
+}
+```
+
+- **自動で記録する**: manifest に記録のある skill / agent のファイルがすべて消えていたら、利用者が削除したものとみなして記録します。
+  `.claude/settings.json` から STDD のフックの登録を外した場合も同じです（前回登録したフックの名前を manifest の `settingsHooks` に残しています）。
+  ビューごと消した場合（記録したものが 1 つも残っていない場合）は導入し直しとみなし、記録しません。
+  skill の一部のファイルだけが消えている場合は削除とはみなさず、作り直します。
+- **明示して記録する**: `stdd init --exclude skill:kaizen` のように指定します。初回の導入から使えます。
+  記録した skill / agent の未編集のファイルは削除し、編集済みのファイルは残して報告します。
+- **フックの除外**は登録だけを外します（Claude の `.claude/settings.json`、Codex の `.codex/hooks.json`）。
+  スクリプトの実体は、ほかの手順から呼ばれることがあるので残します。
+- **戻す**ときは `stdd init --include skill:kaizen` を実行します。記録ファイルを直接編集してもかまいません。
+- 記録ファイルはリポジトリにコミットしてください。チームの全員が同じ構成で再導入できます。
+
+フックの登録は名前（`hooks/<name>.sh`）の単位で合わせます。利用者が書き換えた登録（`timeout` の変更など）は残し、
+STDD の登録を重ねて足しません。配布から外れたフックの登録は外します。
 
 ### STDD 由来の明示
 

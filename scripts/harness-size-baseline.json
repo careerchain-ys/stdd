@@ -1,0 +1,26 @@
+{
+  "_note": "skill / agent / rule の文字数の台帳。規約は docs/config-driven-authoring.md §7。減ったら --update-baseline、増やすと決めたら --accept-growth（理由を PR に書く）",
+  "limits": {
+    "skill": 8000,
+    "skill-metadata": 500,
+    "agent": 6000,
+    "agent-description": 200,
+    "rule": 3000
+  },
+  "over_limit": {
+    "skill:documenting-requirements": 10000,
+    "skill:documenting-tech-specs": 9000,
+    "skill:reverse-engineering-feature-spec": 13000,
+    "skill-metadata:starting-new-with-stdd": 550,
+    "agent:code-reviewer": 6500,
+    "agent:test-reviewer": 8000
+  },
+  "totals": {
+    "skill": 108621,
+    "skill-metadata": 6317,
+    "agent": 45098,
+    "agent-description": 947,
+    "rule": 1905,
+    "all": 233297
+  }
+}

@@ -32,9 +32,13 @@ STDD（Spec and Test Driven Development）方法論において、セッショ�
 
 ## ドキュメント配置ルール
 
+配置先は `.stdd.config.yml` の `docs.layout.plan` のパステンプレートで決める。中立例:
+
 ```
 docs/<app>/<feature-path>/plans/[yyyy-mm-dd].md
 ```
+
+`docs.layout.plan` は任意項目。設定が無いプロジェクトは PLAN を作らない体系なので、PLAN を作成しない。
 
 **例**:
 

@@ -134,6 +134,7 @@ Tech Specs Reviewer が ✅ 承認したら（または 3回ループ上限に�
 ## Phase 1.5: PLANドキュメント作成（`full`, `impl-only`）
 
 **Plan Writerに依頼**して、Specドキュメントに基づきPLANドキュメントを作成する。
+`.stdd.config.yml` に `docs.layout.plan` が無いプロジェクトは PLAN を作らない体系なので、本 Phase を SKIP して Phase 2 に進む。
 
 1. REQUIREMENTS.mdのユースケース（振る舞い＋受入基準）とPriorityを確認
 2. TEST_PLAN.mdのテスト戦略に基づきタスクを分解
@@ -141,7 +142,7 @@ Tech Specs Reviewer が ✅ 承認したら（または 3回ループ上限に�
 4. ファイル構成（新規/既存修正/既存維持）を明記
 5. PLANドキュメントをコミット
 
-配置先: `docs/<app>/<feature-path>/plans/[yyyy-mm-dd].md`
+配置先: `docs.layout.plan` のパステンプレート（中立例: `docs/<app>/<feature-path>/plans/[yyyy-mm-dd].md`）
 
 ## Phase 2: 実装（`full`, `impl-only`, `quick`）
 
